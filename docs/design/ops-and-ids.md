@@ -323,6 +323,17 @@ Queries so far: `Store::children`, `Store::search` (FTS5 syntax) and
   - `Native` adds `id` to every node except text runs (`TEXT_RUN_TYPES`:
     `text`, `emphasis`, `strong`, `inlineCode`, …), and `relation` to typed
     links.
+- **Saving an edited tree** (`update_document`) is the reverse diff, used
+  by the editor:
+  - Nodes match by `id`, and text runs by type and order.
+  - The longest run of children already in order stays put; the rest move.
+  - Changed fields become `set_attrs`, `edit_text` and `set_relation`.
+  - Missing nodes are deleted.
+  - An ID that can't be reused (the node was deleted, or its type changed)
+    gets a new ID, reported in `renamed`.
+
+  A seeded random-edit test checks that every save materializes back to
+  the edited tree. See `desktop-shell.md`.
 - **Ops keep documents valid MyST.** `insert_node` and `set_attrs` refuse
   content that does not parse as its MyST type, for example a `heading`
   whose `depth` is a string, with `INVALID_OP`. Inserting under a MyST

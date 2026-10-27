@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lv-notes</title>
+  </head>
+  <body>
+    <section id="welcome" class="welcome" data-tauri-drag-region hidden>
+      <div class="welcome-card">
+        <h1>lv-notes</h1>
+        <p>Notes, drafts and the links between them, in one project file.</p>
+        <div class="welcome-actions">
+          <button id="new-project" class="primary">New project…</button>
+          <button id="open-project">Open project…</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="workspace" class="workspace" hidden>
+      <aside class="sidebar">
+        <div class="sidebar-top" data-tauri-drag-region></div>
+        <div class="project">
+          <button id="switch-project" class="project-name" title="Open another project"><span id="project-name"></span></button>
+        </div>
+        <div class="section-head">
+          <span>Notes</span>
+          <button id="new-document" class="icon" title="New note (⌘N)">+</button>
+        </div>
+        <ul id="documents" class="documents"></ul>
+      </aside>
+
+      <main class="main">
+        <header class="main-top" data-tauri-drag-region>
+          <div id="toolbar" class="toolbar">
+            <select id="block-type" title="Block type">
+              <option value="p">Paragraph</option>
+              <option value="h1">Heading 1</option>
+              <option value="h2">Heading 2</option>
+              <option value="h3">Heading 3</option>
+              <option value="code">Code</option>
+            </select>
+            <span class="sep"></span>
+            <button data-command="strong" title="Bold (⌘B)"><b>B</b></button>
+            <button data-command="emphasis" title="Italic (⌘I)"><i>I</i></button>
+            <button data-command="inlineCode" title="Code (⌘E)"><code>&lt;/&gt;</code></button>
+            <span class="sep"></span>
+            <button data-command="quote" title="Quote">❝</button>
+            <button data-command="bullets" title="Bulleted list">•</button>
+            <button data-command="numbers" title="Numbered list">1.</button>
+          </div>
+          <span id="status" class="status"></span>
+        </header>
+
+        <div id="no-document" class="no-document">
+          <p>No note open.</p>
+          <button id="new-document-empty">New note</button>
+        </div>
+
+        <div id="editor-pane" class="editor-pane" hidden>
+          <article class="page">
+            <input id="title" class="title" placeholder="Untitled" spellcheck="true" />
+            <div id="editor"></div>
+          </article>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

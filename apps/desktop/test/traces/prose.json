@@ -1,0 +1,2482 @@
+[
+ {
+  "edit": "load",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "text",
+         "value": "Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "type at the start of a paragraph",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "text",
+         "value": "Indeed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "type in a heading",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "text",
+         "value": "Indeed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "bold a word",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "Ind"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "split a paragraph",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7418-a64a-1b4d70e81cbf",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "join it back",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7418-a64a-1b4d70e81cbf",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+       "children": [
+        {
+         "type": "text",
+         "value": "Annotate"
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "paragraph to heading",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b89-7572-b9cd-61eef895d9c8",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+       "children": [
+        {
+         "type": "text",
+         "value": "Annotate"
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "wrap in a list",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b89-7572-b9cd-61eef895d9c8",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "id": "node_01a17ea3-5b89-7573-a59e-b1ee275db70d",
+       "children": [
+        {
+         "type": "listItem",
+         "id": "node_01a17ea3-5b89-7574-9296-b35bda65a90b",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "new paragraph at the end",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b89-7572-b9cd-61eef895d9c8",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "id": "node_01a17ea3-5b89-7573-a59e-b1ee275db70d",
+       "children": [
+        {
+         "type": "listItem",
+         "id": "node_01a17ea3-5b89-7574-9296-b35bda65a90b",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b89-7575-b9a4-2599ee1339d7",
+     "children": [
+      {
+       "type": "text",
+       "value": "The end."
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "move the last block first",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b89-7575-b9a4-2599ee1339d7",
+     "children": [
+      {
+       "type": "text",
+       "value": "The end."
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b89-7572-b9cd-61eef895d9c8",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "id": "node_01a17ea3-5b89-7573-a59e-b1ee275db70d",
+       "children": [
+        {
+         "type": "listItem",
+         "id": "node_01a17ea3-5b89-7574-9296-b35bda65a90b",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "delete across blocks",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "children": [
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b89-7575-b9a4-2599ee1339d7",
+     "children": [
+      {
+       "type": "text",
+       "value": ", Close reading is "
+      },
+      {
+       "type": "emphasis",
+       "children": [
+        {
+         "type": "text",
+         "value": "not"
+        }
+       ]
+      },
+      {
+       "type": "text",
+       "value": " the same as "
+      },
+      {
+       "type": "strong",
+       "children": [
+        {
+         "type": "text",
+         "value": "slow"
+        }
+       ]
+      },
+      {
+       "type": "text",
+       "value": " reading; see "
+      },
+      {
+       "type": "link",
+       "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+       "url": "https://example.org/essay",
+       "title": "An essay",
+       "children": [
+        {
+         "type": "text",
+         "value": "this essay"
+        }
+       ]
+      },
+      {
+       "type": "text",
+       "value": " and "
+      },
+      {
+       "type": "inlineCode",
+       "value": "grep -c"
+      },
+      {
+       "type": "text",
+       "value": "."
+      },
+      {
+       "type": "break"
+      },
+      {
+       "type": "delete",
+       "children": [
+        {
+         "type": "text",
+         "value": "struck"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "children": [
+      {
+       "type": "list",
+       "id": "node_01a17ea3-5b89-7573-a59e-b1ee275db70d",
+       "children": [
+        {
+         "type": "listItem",
+         "id": "node_01a17ea3-5b89-7574-9296-b35bda65a90b",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ }
+]

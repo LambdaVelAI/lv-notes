@@ -1,0 +1,453 @@
+[
+ {
+  "edit": "load",
+  "myst": {
+   "type": "root",
+   "frontmatter": {
+    "title": "Edge cases",
+    "authors": [
+     {
+      "name": "A. Scholar"
+     }
+    ]
+   },
+   "id": "node_01a17ea3-5b8b-7648-8ca4-32c9739c170c",
+   "children": [
+    {
+     "type": "block",
+     "key": "k8Xq2",
+     "id": "node_01a17ea3-5b8b-7649-a016-68bff2cd2699",
+     "children": [
+      {
+       "type": "heading",
+       "enumerated": false,
+       "data": {
+        "custom": [
+         1,
+         2.5,
+         true,
+         null
+        ]
+       },
+       "id": "node_01a17ea3-5b8b-764a-9f12-5fc107ef8dd9",
+       "depth": 2,
+       "children": [
+        {
+         "type": "text",
+         "value": "Unmodelled fields"
+        }
+       ]
+      },
+      {
+       "type": "proof",
+       "kind": "theorem",
+       "enumerated": true,
+       "children": [
+        {
+         "type": "admonitionTitle",
+         "children": [
+          {
+           "type": "text",
+           "value": "Fermat"
+          }
+         ],
+         "id": "node_01a17ea3-5b8b-764c-8b3d-273585622c2d"
+        },
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "No three positive integers..."
+          }
+         ],
+         "id": "node_01a17ea3-5b8b-764d-b777-1278f24605f5"
+        }
+       ],
+       "id": "node_01a17ea3-5b8b-764b-861e-5cc038738e90"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8b-764e-9178-54d904b2ce25",
+       "children": [
+        {
+         "type": "abbreviation",
+         "title": "HyperText Markup Language",
+         "children": [
+          {
+           "type": "text",
+           "value": "HTML"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8b-764f-8780-6e18e8696ea0",
+       "children": []
+      },
+      {
+       "type": "list",
+       "ordered": false,
+       "children": [],
+       "id": "node_01a17ea3-5b8b-7650-b337-d1088cb9a9e2"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "type in a heading",
+  "myst": {
+   "type": "root",
+   "frontmatter": {
+    "title": "Edge cases",
+    "authors": [
+     {
+      "name": "A. Scholar"
+     }
+    ]
+   },
+   "id": "node_01a17ea3-5b8b-7648-8ca4-32c9739c170c",
+   "children": [
+    {
+     "type": "block",
+     "key": "k8Xq2",
+     "id": "node_01a17ea3-5b8b-7649-a016-68bff2cd2699",
+     "children": [
+      {
+       "type": "heading",
+       "enumerated": false,
+       "data": {
+        "custom": [
+         1,
+         2.5,
+         true,
+         null
+        ]
+       },
+       "id": "node_01a17ea3-5b8b-764a-9f12-5fc107ef8dd9",
+       "depth": 2,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ Unmodelled fields"
+        }
+       ]
+      },
+      {
+       "type": "proof",
+       "kind": "theorem",
+       "enumerated": true,
+       "children": [
+        {
+         "type": "admonitionTitle",
+         "children": [
+          {
+           "type": "text",
+           "value": "Fermat"
+          }
+         ],
+         "id": "node_01a17ea3-5b8b-764c-8b3d-273585622c2d"
+        },
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "No three positive integers..."
+          }
+         ],
+         "id": "node_01a17ea3-5b8b-764d-b777-1278f24605f5"
+        }
+       ],
+       "id": "node_01a17ea3-5b8b-764b-861e-5cc038738e90"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8b-764e-9178-54d904b2ce25",
+       "children": [
+        {
+         "type": "abbreviation",
+         "title": "HyperText Markup Language",
+         "children": [
+          {
+           "type": "text",
+           "value": "HTML"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8b-764f-8780-6e18e8696ea0",
+       "children": []
+      },
+      {
+       "type": "list",
+       "ordered": false,
+       "children": [],
+       "id": "node_01a17ea3-5b8b-7650-b337-d1088cb9a9e2"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "new paragraph at the end",
+  "myst": {
+   "type": "root",
+   "frontmatter": {
+    "title": "Edge cases",
+    "authors": [
+     {
+      "name": "A. Scholar"
+     }
+    ]
+   },
+   "id": "node_01a17ea3-5b8b-7648-8ca4-32c9739c170c",
+   "children": [
+    {
+     "type": "block",
+     "key": "k8Xq2",
+     "id": "node_01a17ea3-5b8b-7649-a016-68bff2cd2699",
+     "children": [
+      {
+       "type": "heading",
+       "enumerated": false,
+       "data": {
+        "custom": [
+         1,
+         2.5,
+         true,
+         null
+        ]
+       },
+       "id": "node_01a17ea3-5b8b-764a-9f12-5fc107ef8dd9",
+       "depth": 2,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ Unmodelled fields"
+        }
+       ]
+      },
+      {
+       "type": "proof",
+       "kind": "theorem",
+       "enumerated": true,
+       "children": [
+        {
+         "type": "admonitionTitle",
+         "children": [
+          {
+           "type": "text",
+           "value": "Fermat"
+          }
+         ],
+         "id": "node_01a17ea3-5b8b-764c-8b3d-273585622c2d"
+        },
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "No three positive integers..."
+          }
+         ],
+         "id": "node_01a17ea3-5b8b-764d-b777-1278f24605f5"
+        }
+       ],
+       "id": "node_01a17ea3-5b8b-764b-861e-5cc038738e90"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8b-764e-9178-54d904b2ce25",
+       "children": [
+        {
+         "type": "abbreviation",
+         "title": "HyperText Markup Language",
+         "children": [
+          {
+           "type": "text",
+           "value": "HTML"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8b-764f-8780-6e18e8696ea0",
+       "children": []
+      },
+      {
+       "type": "list",
+       "ordered": false,
+       "children": [],
+       "id": "node_01a17ea3-5b8b-7650-b337-d1088cb9a9e2"
+      }
+     ]
+    },
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b8b-7651-a3e6-339a5db11157",
+     "children": [
+      {
+       "type": "text",
+       "value": "The end."
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "move the last block first",
+  "myst": {
+   "type": "root",
+   "frontmatter": {
+    "title": "Edge cases",
+    "authors": [
+     {
+      "name": "A. Scholar"
+     }
+    ]
+   },
+   "id": "node_01a17ea3-5b8b-7648-8ca4-32c9739c170c",
+   "children": [
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b8b-7651-a3e6-339a5db11157",
+     "children": [
+      {
+       "type": "text",
+       "value": "The end."
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "key": "k8Xq2",
+     "id": "node_01a17ea3-5b8b-7649-a016-68bff2cd2699",
+     "children": [
+      {
+       "type": "heading",
+       "enumerated": false,
+       "data": {
+        "custom": [
+         1,
+         2.5,
+         true,
+         null
+        ]
+       },
+       "id": "node_01a17ea3-5b8b-764a-9f12-5fc107ef8dd9",
+       "depth": 2,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ Unmodelled fields"
+        }
+       ]
+      },
+      {
+       "type": "proof",
+       "kind": "theorem",
+       "enumerated": true,
+       "children": [
+        {
+         "type": "admonitionTitle",
+         "children": [
+          {
+           "type": "text",
+           "value": "Fermat"
+          }
+         ],
+         "id": "node_01a17ea3-5b8b-764c-8b3d-273585622c2d"
+        },
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "No three positive integers..."
+          }
+         ],
+         "id": "node_01a17ea3-5b8b-764d-b777-1278f24605f5"
+        }
+       ],
+       "id": "node_01a17ea3-5b8b-764b-861e-5cc038738e90"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8b-764e-9178-54d904b2ce25",
+       "children": [
+        {
+         "type": "abbreviation",
+         "title": "HyperText Markup Language",
+         "children": [
+          {
+           "type": "text",
+           "value": "HTML"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8b-764f-8780-6e18e8696ea0",
+       "children": []
+      },
+      {
+       "type": "list",
+       "ordered": false,
+       "children": [],
+       "id": "node_01a17ea3-5b8b-7650-b337-d1088cb9a9e2"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "delete across blocks",
+  "myst": {
+   "type": "root",
+   "frontmatter": {
+    "title": "Edge cases",
+    "authors": [
+     {
+      "name": "A. Scholar"
+     }
+    ]
+   },
+   "id": "node_01a17ea3-5b8b-7648-8ca4-32c9739c170c",
+   "children": [
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b8b-7651-a3e6-339a5db11157",
+     "children": []
+    },
+    {
+     "type": "block",
+     "key": "k8Xq2",
+     "id": "node_01a17ea3-5b8b-7649-a016-68bff2cd2699",
+     "children": [
+      {
+       "type": "list",
+       "ordered": false,
+       "children": [],
+       "id": "node_01a17ea3-5b8b-7650-b337-d1088cb9a9e2"
+      }
+     ]
+    }
+   ]
+  }
+ }
+]

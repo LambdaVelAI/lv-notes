@@ -1,0 +1,1922 @@
+[
+ {
+  "edit": "load",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b8a-7046-88a1-ecf3fa966e3e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b8a-7047-b050-8ddfd215f27b",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8a-7048-968c-4259ae1e03dc",
+       "children": [
+        {
+         "type": "text",
+         "value": "As "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "narrative",
+         "children": [
+          {
+           "type": "cite",
+           "kind": "narrative",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "children": [
+            {
+             "type": "text",
+             "value": "Knuth (1984)"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-704a-9f7d-f5d300561ced"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7049-a963-d3a203ba53a0"
+        },
+        {
+         "type": "text",
+         "value": " argued, programs are literature "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "parenthetical",
+         "children": [
+          {
+           "type": "cite",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "prefix": "see",
+           "suffix": "p. 97",
+           "id": "node_01a17ea3-5b8a-704c-9aae-73144ca7e157"
+          },
+          {
+           "type": "cite",
+           "label": "ramsey1994",
+           "identifier": "ramsey1994",
+           "id": "node_01a17ea3-5b8a-704d-aefb-63e0aaca0fc6"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704b-937a-7f3bbcc27806"
+        },
+        {
+         "type": "text",
+         "value": ". See "
+        },
+        {
+         "type": "crossReference",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "children": [
+          {
+           "type": "text",
+           "value": "Figure 1"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704e-ac65-be483f84ce4d"
+        },
+        {
+         "type": "text",
+         "value": " and the footnote"
+        },
+        {
+         "type": "footnoteReference",
+         "identifier": "fn1",
+         "label": "fn1",
+         "id": "node_01a17ea3-5b8a-704f-a240-ff0c9d92c6e0"
+        },
+        {
+         "type": "text",
+         "value": "."
+        }
+       ]
+      },
+      {
+       "type": "table",
+       "align": [
+        "left",
+        null,
+        "right"
+       ],
+       "children": [
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "left",
+           "children": [
+            {
+             "type": "text",
+             "value": "Relation"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7052-ae93-8095b7f71b91"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "children": [
+            {
+             "type": "text",
+             "value": "Meaning"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7053-a592-06938ebd01ae"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "Count"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7054-8e13-575246a7d796"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7051-98c5-bef86fd58708"
+        },
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "align": "left",
+           "children": [
+            {
+             "type": "inlineCode",
+             "value": "supports"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7056-9f40-1b7022bdd994"
+          },
+          {
+           "type": "tableCell",
+           "children": [
+            {
+             "type": "text",
+             "value": "evidence for"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7057-9278-a597f22db2a7"
+          },
+          {
+           "type": "tableCell",
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "12"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7058-9690-fbdb4052b93b"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7055-9482-dac2d2601d3f"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7050-b93b-b19c6d89189f"
+      },
+      {
+       "type": "footnoteDefinition",
+       "identifier": "fn1",
+       "label": "fn1",
+       "children": [
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "A footnote with "
+          },
+          {
+           "type": "underline",
+           "children": [
+            {
+             "type": "text",
+             "value": "emphasis"
+            }
+           ]
+          },
+          {
+           "type": "superscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-705a-ba04-4eb500ce12b1"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7059-a6b8-607b79060b43"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "type at the start of a paragraph",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b8a-7046-88a1-ecf3fa966e3e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b8a-7047-b050-8ddfd215f27b",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8a-7048-968c-4259ae1e03dc",
+       "children": [
+        {
+         "type": "text",
+         "value": "Indeed, As "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "narrative",
+         "children": [
+          {
+           "type": "cite",
+           "kind": "narrative",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "children": [
+            {
+             "type": "text",
+             "value": "Knuth (1984)"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-704a-9f7d-f5d300561ced"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7049-a963-d3a203ba53a0"
+        },
+        {
+         "type": "text",
+         "value": " argued, programs are literature "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "parenthetical",
+         "children": [
+          {
+           "type": "cite",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "prefix": "see",
+           "suffix": "p. 97",
+           "id": "node_01a17ea3-5b8a-704c-9aae-73144ca7e157"
+          },
+          {
+           "type": "cite",
+           "label": "ramsey1994",
+           "identifier": "ramsey1994",
+           "id": "node_01a17ea3-5b8a-704d-aefb-63e0aaca0fc6"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704b-937a-7f3bbcc27806"
+        },
+        {
+         "type": "text",
+         "value": ". See "
+        },
+        {
+         "type": "crossReference",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "children": [
+          {
+           "type": "text",
+           "value": "Figure 1"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704e-ac65-be483f84ce4d"
+        },
+        {
+         "type": "text",
+         "value": " and the footnote"
+        },
+        {
+         "type": "footnoteReference",
+         "identifier": "fn1",
+         "label": "fn1",
+         "id": "node_01a17ea3-5b8a-704f-a240-ff0c9d92c6e0"
+        },
+        {
+         "type": "text",
+         "value": "."
+        }
+       ]
+      },
+      {
+       "type": "table",
+       "align": [
+        "left",
+        null,
+        "right"
+       ],
+       "children": [
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "left",
+           "children": [
+            {
+             "type": "text",
+             "value": "Relation"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7052-ae93-8095b7f71b91"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "children": [
+            {
+             "type": "text",
+             "value": "Meaning"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7053-a592-06938ebd01ae"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "Count"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7054-8e13-575246a7d796"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7051-98c5-bef86fd58708"
+        },
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "align": "left",
+           "children": [
+            {
+             "type": "inlineCode",
+             "value": "supports"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7056-9f40-1b7022bdd994"
+          },
+          {
+           "type": "tableCell",
+           "children": [
+            {
+             "type": "text",
+             "value": "evidence for"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7057-9278-a597f22db2a7"
+          },
+          {
+           "type": "tableCell",
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "12"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7058-9690-fbdb4052b93b"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7055-9482-dac2d2601d3f"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7050-b93b-b19c6d89189f"
+      },
+      {
+       "type": "footnoteDefinition",
+       "identifier": "fn1",
+       "label": "fn1",
+       "children": [
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "A footnote with "
+          },
+          {
+           "type": "underline",
+           "children": [
+            {
+             "type": "text",
+             "value": "emphasis"
+            }
+           ]
+          },
+          {
+           "type": "superscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-705a-ba04-4eb500ce12b1"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7059-a6b8-607b79060b43"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "bold a word",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b8a-7046-88a1-ecf3fa966e3e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b8a-7047-b050-8ddfd215f27b",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8a-7048-968c-4259ae1e03dc",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "Ind"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, As "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "narrative",
+         "children": [
+          {
+           "type": "cite",
+           "kind": "narrative",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "children": [
+            {
+             "type": "text",
+             "value": "Knuth (1984)"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-704a-9f7d-f5d300561ced"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7049-a963-d3a203ba53a0"
+        },
+        {
+         "type": "text",
+         "value": " argued, programs are literature "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "parenthetical",
+         "children": [
+          {
+           "type": "cite",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "prefix": "see",
+           "suffix": "p. 97",
+           "id": "node_01a17ea3-5b8a-704c-9aae-73144ca7e157"
+          },
+          {
+           "type": "cite",
+           "label": "ramsey1994",
+           "identifier": "ramsey1994",
+           "id": "node_01a17ea3-5b8a-704d-aefb-63e0aaca0fc6"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704b-937a-7f3bbcc27806"
+        },
+        {
+         "type": "text",
+         "value": ". See "
+        },
+        {
+         "type": "crossReference",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "children": [
+          {
+           "type": "text",
+           "value": "Figure 1"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704e-ac65-be483f84ce4d"
+        },
+        {
+         "type": "text",
+         "value": " and the footnote"
+        },
+        {
+         "type": "footnoteReference",
+         "identifier": "fn1",
+         "label": "fn1",
+         "id": "node_01a17ea3-5b8a-704f-a240-ff0c9d92c6e0"
+        },
+        {
+         "type": "text",
+         "value": "."
+        }
+       ]
+      },
+      {
+       "type": "table",
+       "align": [
+        "left",
+        null,
+        "right"
+       ],
+       "children": [
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "left",
+           "children": [
+            {
+             "type": "text",
+             "value": "Relation"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7052-ae93-8095b7f71b91"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "children": [
+            {
+             "type": "text",
+             "value": "Meaning"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7053-a592-06938ebd01ae"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "Count"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7054-8e13-575246a7d796"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7051-98c5-bef86fd58708"
+        },
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "align": "left",
+           "children": [
+            {
+             "type": "inlineCode",
+             "value": "supports"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7056-9f40-1b7022bdd994"
+          },
+          {
+           "type": "tableCell",
+           "children": [
+            {
+             "type": "text",
+             "value": "evidence for"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7057-9278-a597f22db2a7"
+          },
+          {
+           "type": "tableCell",
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "12"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7058-9690-fbdb4052b93b"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7055-9482-dac2d2601d3f"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7050-b93b-b19c6d89189f"
+      },
+      {
+       "type": "footnoteDefinition",
+       "identifier": "fn1",
+       "label": "fn1",
+       "children": [
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "A footnote with "
+          },
+          {
+           "type": "underline",
+           "children": [
+            {
+             "type": "text",
+             "value": "emphasis"
+            }
+           ]
+          },
+          {
+           "type": "superscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-705a-ba04-4eb500ce12b1"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7059-a6b8-607b79060b43"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "split a paragraph",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b8a-7046-88a1-ecf3fa966e3e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b8a-7047-b050-8ddfd215f27b",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8a-7048-968c-4259ae1e03dc",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8a-705b-824d-f88f6edc4fbd",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, As "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "narrative",
+         "children": [
+          {
+           "type": "cite",
+           "kind": "narrative",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "children": [
+            {
+             "type": "text",
+             "value": "Knuth (1984)"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-704a-9f7d-f5d300561ced"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7049-a963-d3a203ba53a0"
+        },
+        {
+         "type": "text",
+         "value": " argued, programs are literature "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "parenthetical",
+         "children": [
+          {
+           "type": "cite",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "prefix": "see",
+           "suffix": "p. 97",
+           "id": "node_01a17ea3-5b8a-704c-9aae-73144ca7e157"
+          },
+          {
+           "type": "cite",
+           "label": "ramsey1994",
+           "identifier": "ramsey1994",
+           "id": "node_01a17ea3-5b8a-704d-aefb-63e0aaca0fc6"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704b-937a-7f3bbcc27806"
+        },
+        {
+         "type": "text",
+         "value": ". See "
+        },
+        {
+         "type": "crossReference",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "children": [
+          {
+           "type": "text",
+           "value": "Figure 1"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704e-ac65-be483f84ce4d"
+        },
+        {
+         "type": "text",
+         "value": " and the footnote"
+        },
+        {
+         "type": "footnoteReference",
+         "identifier": "fn1",
+         "label": "fn1",
+         "id": "node_01a17ea3-5b8a-704f-a240-ff0c9d92c6e0"
+        },
+        {
+         "type": "text",
+         "value": "."
+        }
+       ]
+      },
+      {
+       "type": "table",
+       "align": [
+        "left",
+        null,
+        "right"
+       ],
+       "children": [
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "left",
+           "children": [
+            {
+             "type": "text",
+             "value": "Relation"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7052-ae93-8095b7f71b91"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "children": [
+            {
+             "type": "text",
+             "value": "Meaning"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7053-a592-06938ebd01ae"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "Count"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7054-8e13-575246a7d796"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7051-98c5-bef86fd58708"
+        },
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "align": "left",
+           "children": [
+            {
+             "type": "inlineCode",
+             "value": "supports"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7056-9f40-1b7022bdd994"
+          },
+          {
+           "type": "tableCell",
+           "children": [
+            {
+             "type": "text",
+             "value": "evidence for"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7057-9278-a597f22db2a7"
+          },
+          {
+           "type": "tableCell",
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "12"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7058-9690-fbdb4052b93b"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7055-9482-dac2d2601d3f"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7050-b93b-b19c6d89189f"
+      },
+      {
+       "type": "footnoteDefinition",
+       "identifier": "fn1",
+       "label": "fn1",
+       "children": [
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "A footnote with "
+          },
+          {
+           "type": "underline",
+           "children": [
+            {
+             "type": "text",
+             "value": "emphasis"
+            }
+           ]
+          },
+          {
+           "type": "superscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-705a-ba04-4eb500ce12b1"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7059-a6b8-607b79060b43"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "paragraph to heading",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b8a-7046-88a1-ecf3fa966e3e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b8a-7047-b050-8ddfd215f27b",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8a-7048-968c-4259ae1e03dc",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b8a-705c-a544-1de27533b92e",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, As "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "narrative",
+         "children": [
+          {
+           "type": "cite",
+           "kind": "narrative",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "children": [
+            {
+             "type": "text",
+             "value": "Knuth (1984)"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-704a-9f7d-f5d300561ced"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7049-a963-d3a203ba53a0"
+        },
+        {
+         "type": "text",
+         "value": " argued, programs are literature "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "parenthetical",
+         "children": [
+          {
+           "type": "cite",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "prefix": "see",
+           "suffix": "p. 97",
+           "id": "node_01a17ea3-5b8a-704c-9aae-73144ca7e157"
+          },
+          {
+           "type": "cite",
+           "label": "ramsey1994",
+           "identifier": "ramsey1994",
+           "id": "node_01a17ea3-5b8a-704d-aefb-63e0aaca0fc6"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704b-937a-7f3bbcc27806"
+        },
+        {
+         "type": "text",
+         "value": ". See "
+        },
+        {
+         "type": "crossReference",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "children": [
+          {
+           "type": "text",
+           "value": "Figure 1"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704e-ac65-be483f84ce4d"
+        },
+        {
+         "type": "text",
+         "value": " and the footnote"
+        },
+        {
+         "type": "footnoteReference",
+         "identifier": "fn1",
+         "label": "fn1",
+         "id": "node_01a17ea3-5b8a-704f-a240-ff0c9d92c6e0"
+        },
+        {
+         "type": "text",
+         "value": "."
+        }
+       ]
+      },
+      {
+       "type": "table",
+       "align": [
+        "left",
+        null,
+        "right"
+       ],
+       "children": [
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "left",
+           "children": [
+            {
+             "type": "text",
+             "value": "Relation"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7052-ae93-8095b7f71b91"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "children": [
+            {
+             "type": "text",
+             "value": "Meaning"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7053-a592-06938ebd01ae"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "Count"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7054-8e13-575246a7d796"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7051-98c5-bef86fd58708"
+        },
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "align": "left",
+           "children": [
+            {
+             "type": "inlineCode",
+             "value": "supports"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7056-9f40-1b7022bdd994"
+          },
+          {
+           "type": "tableCell",
+           "children": [
+            {
+             "type": "text",
+             "value": "evidence for"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7057-9278-a597f22db2a7"
+          },
+          {
+           "type": "tableCell",
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "12"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7058-9690-fbdb4052b93b"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7055-9482-dac2d2601d3f"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7050-b93b-b19c6d89189f"
+      },
+      {
+       "type": "footnoteDefinition",
+       "identifier": "fn1",
+       "label": "fn1",
+       "children": [
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "A footnote with "
+          },
+          {
+           "type": "underline",
+           "children": [
+            {
+             "type": "text",
+             "value": "emphasis"
+            }
+           ]
+          },
+          {
+           "type": "superscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-705a-ba04-4eb500ce12b1"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7059-a6b8-607b79060b43"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "new paragraph at the end",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b8a-7046-88a1-ecf3fa966e3e",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b8a-7047-b050-8ddfd215f27b",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8a-7048-968c-4259ae1e03dc",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b8a-705c-a544-1de27533b92e",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, As "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "narrative",
+         "children": [
+          {
+           "type": "cite",
+           "kind": "narrative",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "children": [
+            {
+             "type": "text",
+             "value": "Knuth (1984)"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-704a-9f7d-f5d300561ced"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7049-a963-d3a203ba53a0"
+        },
+        {
+         "type": "text",
+         "value": " argued, programs are literature "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "parenthetical",
+         "children": [
+          {
+           "type": "cite",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "prefix": "see",
+           "suffix": "p. 97",
+           "id": "node_01a17ea3-5b8a-704c-9aae-73144ca7e157"
+          },
+          {
+           "type": "cite",
+           "label": "ramsey1994",
+           "identifier": "ramsey1994",
+           "id": "node_01a17ea3-5b8a-704d-aefb-63e0aaca0fc6"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704b-937a-7f3bbcc27806"
+        },
+        {
+         "type": "text",
+         "value": ". See "
+        },
+        {
+         "type": "crossReference",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "children": [
+          {
+           "type": "text",
+           "value": "Figure 1"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704e-ac65-be483f84ce4d"
+        },
+        {
+         "type": "text",
+         "value": " and the footnote"
+        },
+        {
+         "type": "footnoteReference",
+         "identifier": "fn1",
+         "label": "fn1",
+         "id": "node_01a17ea3-5b8a-704f-a240-ff0c9d92c6e0"
+        },
+        {
+         "type": "text",
+         "value": "."
+        }
+       ]
+      },
+      {
+       "type": "table",
+       "align": [
+        "left",
+        null,
+        "right"
+       ],
+       "children": [
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "left",
+           "children": [
+            {
+             "type": "text",
+             "value": "Relation"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7052-ae93-8095b7f71b91"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "children": [
+            {
+             "type": "text",
+             "value": "Meaning"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7053-a592-06938ebd01ae"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "Count"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7054-8e13-575246a7d796"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7051-98c5-bef86fd58708"
+        },
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "align": "left",
+           "children": [
+            {
+             "type": "inlineCode",
+             "value": "supports"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7056-9f40-1b7022bdd994"
+          },
+          {
+           "type": "tableCell",
+           "children": [
+            {
+             "type": "text",
+             "value": "evidence for"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7057-9278-a597f22db2a7"
+          },
+          {
+           "type": "tableCell",
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "12"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7058-9690-fbdb4052b93b"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7055-9482-dac2d2601d3f"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7050-b93b-b19c6d89189f"
+      },
+      {
+       "type": "footnoteDefinition",
+       "identifier": "fn1",
+       "label": "fn1",
+       "children": [
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "A footnote with "
+          },
+          {
+           "type": "underline",
+           "children": [
+            {
+             "type": "text",
+             "value": "emphasis"
+            }
+           ]
+          },
+          {
+           "type": "superscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-705a-ba04-4eb500ce12b1"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7059-a6b8-607b79060b43"
+      }
+     ]
+    },
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b8a-705d-9c66-9201456a4104",
+     "children": [
+      {
+       "type": "text",
+       "value": "The end."
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "move the last block first",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b8a-7046-88a1-ecf3fa966e3e",
+   "children": [
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b8a-705d-9c66-9201456a4104",
+     "children": [
+      {
+       "type": "text",
+       "value": "The end."
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b8a-7047-b050-8ddfd215f27b",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b8a-7048-968c-4259ae1e03dc",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b8a-705c-a544-1de27533b92e",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, As "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "narrative",
+         "children": [
+          {
+           "type": "cite",
+           "kind": "narrative",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "children": [
+            {
+             "type": "text",
+             "value": "Knuth (1984)"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-704a-9f7d-f5d300561ced"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7049-a963-d3a203ba53a0"
+        },
+        {
+         "type": "text",
+         "value": " argued, programs are literature "
+        },
+        {
+         "type": "citeGroup",
+         "kind": "parenthetical",
+         "children": [
+          {
+           "type": "cite",
+           "label": "knuth1984",
+           "identifier": "knuth1984",
+           "prefix": "see",
+           "suffix": "p. 97",
+           "id": "node_01a17ea3-5b8a-704c-9aae-73144ca7e157"
+          },
+          {
+           "type": "cite",
+           "label": "ramsey1994",
+           "identifier": "ramsey1994",
+           "id": "node_01a17ea3-5b8a-704d-aefb-63e0aaca0fc6"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704b-937a-7f3bbcc27806"
+        },
+        {
+         "type": "text",
+         "value": ". See "
+        },
+        {
+         "type": "crossReference",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "children": [
+          {
+           "type": "text",
+           "value": "Figure 1"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-704e-ac65-be483f84ce4d"
+        },
+        {
+         "type": "text",
+         "value": " and the footnote"
+        },
+        {
+         "type": "footnoteReference",
+         "identifier": "fn1",
+         "label": "fn1",
+         "id": "node_01a17ea3-5b8a-704f-a240-ff0c9d92c6e0"
+        },
+        {
+         "type": "text",
+         "value": "."
+        }
+       ]
+      },
+      {
+       "type": "table",
+       "align": [
+        "left",
+        null,
+        "right"
+       ],
+       "children": [
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "left",
+           "children": [
+            {
+             "type": "text",
+             "value": "Relation"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7052-ae93-8095b7f71b91"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "children": [
+            {
+             "type": "text",
+             "value": "Meaning"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7053-a592-06938ebd01ae"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "Count"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7054-8e13-575246a7d796"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7051-98c5-bef86fd58708"
+        },
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "align": "left",
+           "children": [
+            {
+             "type": "inlineCode",
+             "value": "supports"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7056-9f40-1b7022bdd994"
+          },
+          {
+           "type": "tableCell",
+           "children": [
+            {
+             "type": "text",
+             "value": "evidence for"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7057-9278-a597f22db2a7"
+          },
+          {
+           "type": "tableCell",
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "12"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7058-9690-fbdb4052b93b"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7055-9482-dac2d2601d3f"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7050-b93b-b19c6d89189f"
+      },
+      {
+       "type": "footnoteDefinition",
+       "identifier": "fn1",
+       "label": "fn1",
+       "children": [
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "A footnote with "
+          },
+          {
+           "type": "underline",
+           "children": [
+            {
+             "type": "text",
+             "value": "emphasis"
+            }
+           ]
+          },
+          {
+           "type": "superscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-705a-ba04-4eb500ce12b1"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7059-a6b8-607b79060b43"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "delete across blocks",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b8a-7046-88a1-ecf3fa966e3e",
+   "children": [
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b8a-705d-9c66-9201456a4104",
+     "children": [
+      {
+       "type": "text",
+       "value": "ms are literature "
+      },
+      {
+       "type": "citeGroup",
+       "kind": "parenthetical",
+       "children": [
+        {
+         "type": "cite",
+         "label": "knuth1984",
+         "identifier": "knuth1984",
+         "prefix": "see",
+         "suffix": "p. 97",
+         "id": "node_01a17ea3-5b8a-704c-9aae-73144ca7e157"
+        },
+        {
+         "type": "cite",
+         "label": "ramsey1994",
+         "identifier": "ramsey1994",
+         "id": "node_01a17ea3-5b8a-704d-aefb-63e0aaca0fc6"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-704b-937a-7f3bbcc27806"
+      },
+      {
+       "type": "text",
+       "value": ". See "
+      },
+      {
+       "type": "crossReference",
+       "kind": "figure",
+       "identifier": "fig-graph",
+       "label": "fig-graph",
+       "children": [
+        {
+         "type": "text",
+         "value": "Figure 1"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-704e-ac65-be483f84ce4d"
+      },
+      {
+       "type": "text",
+       "value": " and the footnote"
+      },
+      {
+       "type": "footnoteReference",
+       "identifier": "fn1",
+       "label": "fn1",
+       "id": "node_01a17ea3-5b8a-704f-a240-ff0c9d92c6e0"
+      },
+      {
+       "type": "text",
+       "value": "."
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b8a-7047-b050-8ddfd215f27b",
+     "children": [
+      {
+       "type": "table",
+       "align": [
+        "left",
+        null,
+        "right"
+       ],
+       "children": [
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "left",
+           "children": [
+            {
+             "type": "text",
+             "value": "Relation"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7052-ae93-8095b7f71b91"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "children": [
+            {
+             "type": "text",
+             "value": "Meaning"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7053-a592-06938ebd01ae"
+          },
+          {
+           "type": "tableCell",
+           "header": true,
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "Count"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7054-8e13-575246a7d796"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7051-98c5-bef86fd58708"
+        },
+        {
+         "type": "tableRow",
+         "children": [
+          {
+           "type": "tableCell",
+           "align": "left",
+           "children": [
+            {
+             "type": "inlineCode",
+             "value": "supports"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7056-9f40-1b7022bdd994"
+          },
+          {
+           "type": "tableCell",
+           "children": [
+            {
+             "type": "text",
+             "value": "evidence for"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7057-9278-a597f22db2a7"
+          },
+          {
+           "type": "tableCell",
+           "align": "right",
+           "children": [
+            {
+             "type": "text",
+             "value": "12"
+            }
+           ],
+           "id": "node_01a17ea3-5b8a-7058-9690-fbdb4052b93b"
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-7055-9482-dac2d2601d3f"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7050-b93b-b19c6d89189f"
+      },
+      {
+       "type": "footnoteDefinition",
+       "identifier": "fn1",
+       "label": "fn1",
+       "children": [
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "A footnote with "
+          },
+          {
+           "type": "underline",
+           "children": [
+            {
+             "type": "text",
+             "value": "emphasis"
+            }
+           ]
+          },
+          {
+           "type": "superscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b8a-705a-ba04-4eb500ce12b1"
+        }
+       ],
+       "id": "node_01a17ea3-5b8a-7059-a6b8-607b79060b43"
+      }
+     ]
+    }
+   ]
+  }
+ }
+]

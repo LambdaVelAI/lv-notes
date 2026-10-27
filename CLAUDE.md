@@ -37,6 +37,17 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
   server the app exposes) use the same ops with a delegated grant. No back
   doors.
 
+## Layout and commands
+
+- `crates/lv-core`: the core. `cargo test -p lv-core`.
+- `apps/desktop`: the desktop app.
+  - Web UI in `src/`, Tauri crate `lv-desktop` in `src-tauri/`.
+  - Setup: `npm install` and `npm run build` (the Rust crate embeds `dist/`).
+  - Run: `npm run tauri dev`.
+  - Browser preview with an in-memory backend: `npm run dev`.
+  - Tests: `npm test`, and `cargo test -p lv-desktop`.
+- Design notes: `docs/design/` (`ops-and-ids.md`, `desktop-shell.md`).
+
 ## Invariants (do not compromise; retrofitting means migrating the op log)
 
 1. Every op carries a principal: a person, or an agent acting for a person,

@@ -186,6 +186,24 @@ impl Store {
         .transpose()
     }
 
+    pub fn has_person(&self, id: PersonId) -> Result<bool> {
+        let n: i64 = self.conn.query_row("SELECT count(*) FROM person WHERE id = ?1", [id], |r| r.get(0))?;
+        Ok(n > 0)
+    }
+
+    /// Unrevoked grants held by `holder`, oldest first.
+    pub fn grants_held_by(&self, holder: Principal) -> Result<Vec<Grant>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id FROM grants
+             WHERE person_id = ?1 AND agent_id IS ?2 AND revoked_at IS NULL
+             ORDER BY created_at, id",
+        )?;
+        let ids = stmt
+            .query_map(params![holder.person(), holder.agent()], |r| r.get::<_, GrantId>(0))?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        ids.into_iter().filter_map(|id| self.grant(id).transpose()).collect()
+    }
+
     /// Turns auto-accept on or off for a grant. Takes effect on the next
     /// submitted op. Returns false if there is no such grant.
     pub fn set_auto_accept(&self, id: GrantId, on: bool) -> Result<bool> {

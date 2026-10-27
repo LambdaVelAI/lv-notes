@@ -1,8 +1,8 @@
 //! MyST AST -> ops -> project state -> MyST AST must give back the document.
 
-use lv_core::convert::{Flavor, ImportError, import_document, import_nodes, materialize};
+use lv_core::convert::{Flavor, ImportError, Update, import_document, import_nodes, materialize, update_document};
 use lv_core::ids::{DocumentId, NodeId, OpId, PersonId, ProjectId};
-use lv_core::myst::{Node, TEXT_RUN_TYPES};
+use lv_core::myst::{ChildrenPolicy, Node, TEXT_RUN_TYPES, children_policy};
 use lv_core::op::{DocKind, NodeContent, Op, OpBody, Parent, Relation, TextEdit, Timestamp};
 use lv_core::principal::{Grant, GrantScope, Principal};
 use lv_core::refusal::RefusalCode;
@@ -69,6 +69,57 @@ impl World {
     fn export(&self, doc: DocumentId, flavor: Flavor) -> Value {
         serde_json::to_value(materialize(self.seq.state(), doc, flavor).unwrap()).unwrap()
     }
+
+    /// Saves `edited` over `doc` and checks the document now exports as it.
+    fn save(&mut self, doc: DocumentId, edited: &Value) -> Update {
+        let update = update_document(self.seq.state(), doc, &parse(edited.clone())).unwrap();
+        if !update.ops.is_empty() {
+            self.submit(update.ops.clone()).unwrap_or_else(|code| panic!("{code:?} for {:#?}", update.ops));
+        }
+        let mut expected = edited.clone();
+        rename(&mut expected, &update.renamed);
+        drop_optional_empty_children(&mut expected);
+        assert_eq!(self.export(doc, Flavor::Native), expected, "save did not give the edited tree");
+        update
+    }
+}
+
+fn rename(value: &mut Value, renamed: &[(NodeId, NodeId)]) {
+    let Value::Object(map) = value else { return };
+    if let Some(Value::String(id)) = map.get_mut("id")
+        && let Some((_, new)) = renamed.iter().find(|(old, _)| old.to_string() == *id)
+    {
+        *id = new.to_string();
+    }
+    if let Some(Value::Array(children)) = map.get_mut("children") {
+        children.iter_mut().for_each(|c| rename(c, renamed));
+    }
+}
+
+/// State does not record an empty `children` on types where it is optional
+/// (a known gap), so an emptied directive exports without it.
+fn drop_optional_empty_children(value: &mut Value) {
+    let Value::Object(map) = value else { return };
+    let optional = map.get("type").and_then(Value::as_str).is_some_and(|t| children_policy(t) != ChildrenPolicy::Always);
+    if optional && map.get("children").is_some_and(|c| c.as_array().is_some_and(Vec::is_empty)) {
+        map.remove("children");
+    }
+    if let Some(Value::Array(children)) = map.get_mut("children") {
+        children.iter_mut().for_each(drop_optional_empty_children);
+    }
+}
+
+fn kinds(update: &Update) -> Vec<&'static str> {
+    update.ops.iter().map(OpBody::kind).collect()
+}
+
+/// The child at `path` (indices into `children`) of `root`.
+fn at<'a>(root: &'a mut Value, path: &[usize]) -> &'a mut Value {
+    path.iter().fold(root, |v, &i| &mut v["children"][i])
+}
+
+fn children(value: &mut Value) -> &mut Vec<Value> {
+    value["children"].as_array_mut().unwrap()
 }
 
 /// Every object in `value` that has a `type`, depth first.
@@ -308,4 +359,235 @@ fn materializes_the_same_after_reloading_the_file() {
     let reloaded = Sequencer::load(&mut store).unwrap();
     assert_eq!(materialize(reloaded.state(), doc, Flavor::Native).unwrap(), before);
     assert_eq!(serde_json::to_value(materialize(reloaded.state(), doc, Flavor::Plain).unwrap()).unwrap(), fixture("directives"));
+}
+
+// ---- Saving edited documents ----------------------------------------------
+
+/// A project with the `prose` fixture imported, and its native export.
+fn edited_prose() -> (World, DocumentId, Value) {
+    let mut w = World::new();
+    let doc = w.import(&parse(fixture("prose")));
+    let native = w.export(doc, Flavor::Native);
+    (w, doc, native)
+}
+
+#[test]
+fn saving_an_unchanged_document_is_no_ops() {
+    let (mut w, doc, native) = edited_prose();
+    assert_eq!(w.save(doc, &native), Update::default());
+}
+
+#[test]
+fn typing_is_one_text_edit() {
+    let (mut w, doc, mut native) = edited_prose();
+    // root > block > heading > text
+    at(&mut native, &[0, 0, 0])["value"] = json!("On reading slowly, again");
+    assert_eq!(kinds(&w.save(doc, &native)), ["edit_text"]);
+}
+
+#[test]
+fn reorder_insert_delete_and_attrs() {
+    let (mut w, doc, mut native) = edited_prose();
+    let block = at(&mut native, &[0]);
+    let blocks = children(block);
+    blocks.swap(0, 1);
+    blocks.remove(2);
+    let new = NodeId::new();
+    blocks.insert(1, json!({ "type": "paragraph", "id": new, "children": [{ "type": "text", "value": "New" }] }));
+    let heading = blocks.iter_mut().find(|b| b["type"] == "heading").unwrap();
+    heading["depth"] = json!(3);
+    heading.as_object_mut().unwrap().remove("position");
+
+    let update = w.save(doc, &native);
+    let mut kinds = kinds(&update);
+    kinds.sort();
+    assert_eq!(kinds, ["delete_node", "insert_node", "insert_node", "move_node", "set_attrs"]);
+}
+
+#[test]
+fn wrapping_and_unwrapping_swap_ancestors() {
+    let (mut w, doc, mut native) = edited_prose();
+    let quote = NodeId::new();
+    let blocks = children(at(&mut native, &[0]));
+    let first = blocks.remove(0);
+    blocks.insert(0, json!({ "type": "blockquote", "id": quote, "children": [first] }));
+    w.save(doc, &native);
+
+    // Now the heading takes the quote's place and holds it.
+    let blocks = children(at(&mut native, &[0]));
+    let mut quote = blocks.remove(0);
+    let mut heading = children(&mut quote).remove(0);
+    children(&mut heading).push(quote);
+    blocks.insert(0, heading);
+    assert!(kinds(&w.save(doc, &native)).iter().all(|k| *k == "move_node"));
+}
+
+#[test]
+fn changing_a_type_or_reusing_a_deleted_id_renames() {
+    let (mut w, doc, mut native) = edited_prose();
+    let blocks = children(at(&mut native, &[0]));
+    let paragraph = blocks.iter_mut().find(|b| b["type"] == "paragraph").unwrap();
+    let old: NodeId = paragraph["id"].as_str().unwrap().parse().unwrap();
+    paragraph["type"] = json!("heading");
+    paragraph["depth"] = json!(2);
+    let update = w.save(doc, &native);
+    assert_eq!(update.renamed.len(), 1);
+    assert_eq!(update.renamed[0].0, old);
+    assert!(w.seq.state().node(old).unwrap().deleted);
+
+    // Undo in the editor brings the old ID back: it is deleted, so renamed again.
+    let mut restored = native.clone();
+    rename(&mut restored, &[(old, old)]);
+    let paragraph = children(at(&mut restored, &[0])).iter_mut().find(|b| b["id"] == json!(old.to_string()));
+    let paragraph = paragraph.unwrap();
+    paragraph["type"] = json!("paragraph");
+    paragraph.as_object_mut().unwrap().remove("depth");
+    let update = w.save(doc, &restored);
+    assert_eq!(update.renamed.iter().map(|r| r.0).collect::<Vec<_>>(), [old]);
+}
+
+#[test]
+fn nodes_move_between_documents() {
+    let (mut w, from, mut native) = edited_prose();
+    let to = w.import(&parse(json!({ "type": "root", "children": [] })));
+    let mut target = w.export(to, Flavor::Native);
+    let moved = children(at(&mut native, &[0])).remove(1);
+    let moved_id: NodeId = moved["id"].as_str().unwrap().parse().unwrap();
+    children(&mut target).push(moved);
+
+    assert_eq!(kinds(&w.save(to, &target)), ["move_node"]);
+    assert_eq!(w.seq.state().node(moved_id).unwrap().document, to);
+    assert_eq!(w.save(from, &native), Update::default(), "already gone from the source");
+}
+
+#[test]
+fn inline_edits_reuse_text_runs() {
+    let (mut w, doc, mut native) = edited_prose();
+    let heading = at(&mut native, &[0, 0]);
+    *children(heading) = vec![
+        json!({ "type": "text", "value": "On " }),
+        json!({ "type": "strong", "children": [{ "type": "text", "value": "reading" }] }),
+        json!({ "type": "text", "value": " slowly" }),
+    ];
+    let mut kinds = kinds(&w.save(doc, &native));
+    kinds.sort();
+    // The old text run becomes "On "; the rest is new.
+    assert_eq!(kinds, ["edit_text", "insert_node", "insert_node", "insert_node"]);
+}
+
+#[test]
+fn saving_refuses_trees_it_cannot_match() {
+    let (w, doc, mut native) = edited_prose();
+    let state = w.seq.state();
+    let mut anonymous = native.clone();
+    at(&mut anonymous, &[0, 0]).as_object_mut().unwrap().remove("id");
+    assert_eq!(update_document(state, doc, &parse(anonymous)), Err(ImportError::MissingId("heading".into())));
+
+    let first = at(&mut native, &[0, 0]).clone();
+    let id: NodeId = first["id"].as_str().unwrap().parse().unwrap();
+    children(at(&mut native, &[0])).push(first);
+    assert_eq!(update_document(state, doc, &parse(native)), Err(ImportError::DuplicateId(id)));
+
+    let missing = DocumentId::new();
+    let empty = parse(json!({ "type": "root", "children": [] }));
+    assert_eq!(update_document(state, missing, &empty), Err(ImportError::UnknownDocument(missing)));
+}
+
+/// A small deterministic generator, so failures reproduce.
+struct Rng(u64);
+
+impl Rng {
+    fn below(&mut self, n: usize) -> usize {
+        self.0 ^= self.0 << 13;
+        self.0 ^= self.0 >> 7;
+        self.0 ^= self.0 << 17;
+        (self.0 % n as u64) as usize
+    }
+}
+
+/// Paths of every node under `value` that has a `children` array.
+fn parents(value: &Value, path: &mut Vec<usize>, out: &mut Vec<Vec<usize>>) {
+    if let Some(Value::Array(children)) = value.get("children") {
+        out.push(path.clone());
+        for (i, c) in children.iter().enumerate() {
+            path.push(i);
+            parents(c, path, out);
+            path.pop();
+        }
+    }
+}
+
+/// Paths of every node under the root (not the root itself).
+fn descendants(value: &Value) -> Vec<Vec<usize>> {
+    let mut parent_paths = Vec::new();
+    parents(value, &mut Vec::new(), &mut parent_paths);
+    parent_paths
+        .iter()
+        .flat_map(|p| {
+            let mut v = value;
+            for &i in p {
+                v = &v["children"][i];
+            }
+            (0..v["children"].as_array().unwrap().len()).map(move |i| [p.as_slice(), &[i]].concat())
+        })
+        .collect()
+}
+
+#[test]
+fn random_edits_always_save_exactly() {
+    for name in FIXTURES {
+        let mut w = World::new();
+        let doc = w.import(&parse(fixture(name)));
+        let mut tree = w.export(doc, Flavor::Native);
+        let mut rng = Rng(0x9E37_79B9_7F4A_7C15 ^ name.len() as u64);
+        for step in 0..60 {
+            let nodes = descendants(&tree);
+            match rng.below(5) {
+                // Delete a node.
+                0 if !nodes.is_empty() => {
+                    let path = &nodes[rng.below(nodes.len())];
+                    let (last, parent) = path.split_last().unwrap();
+                    children(at(&mut tree, parent)).remove(*last);
+                }
+                // Move a node anywhere that takes children, outside itself.
+                1 if !nodes.is_empty() => {
+                    let path = nodes[rng.below(nodes.len())].clone();
+                    let (last, parent) = path.split_last().unwrap();
+                    let node = children(at(&mut tree, parent)).remove(*last);
+                    let mut targets = Vec::new();
+                    parents(&tree, &mut Vec::new(), &mut targets);
+                    let target = &targets[rng.below(targets.len())];
+                    let list = children(at(&mut tree, target));
+                    let index = rng.below(list.len() + 1);
+                    list.insert(index, node);
+                }
+                // Edit some text.
+                2 => {
+                    if let Some(path) = nodes.iter().find(|p| at(&mut tree, p)["type"] == "text") {
+                        at(&mut tree, path)["value"] = json!(format!("edit {step}"));
+                    }
+                }
+                // Change an attribute.
+                3 if !nodes.is_empty() => {
+                    let path = &nodes[rng.below(nodes.len())];
+                    let node = at(&mut tree, path);
+                    if node["type"] != "text" {
+                        node["data-step"] = json!(step);
+                    }
+                }
+                // Insert a new paragraph.
+                _ => {
+                    let mut targets = Vec::new();
+                    parents(&tree, &mut Vec::new(), &mut targets);
+                    let target = &targets[rng.below(targets.len())];
+                    let list = children(at(&mut tree, target));
+                    let index = rng.below(list.len() + 1);
+                    let p = json!({ "type": "paragraph", "id": NodeId::new(), "children": [{ "type": "text", "value": "new" }] });
+                    list.insert(index, p);
+                }
+            }
+            let update = w.save(doc, &tree);
+            rename(&mut tree, &update.renamed);
+        }
+    }
 }

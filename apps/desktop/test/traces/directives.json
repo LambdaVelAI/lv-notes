@@ -1,0 +1,1596 @@
+[
+ {
+  "edit": "load",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b82-765b-816d-2c5223d6a585",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b83-77f7-97c6-54cb01967b8f",
+     "children": [
+      {
+       "type": "mystDirective",
+       "name": "note",
+       "args": "Read this first",
+       "options": {
+        "class": "dropdown"
+       },
+       "value": "Arguments are cheap.",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1,
+         "offset": 0
+        },
+        "end": {
+         "line": 3,
+         "column": 4,
+         "offset": 52
+        }
+       },
+       "children": [
+        {
+         "type": "admonition",
+         "kind": "note",
+         "class": "dropdown",
+         "children": [
+          {
+           "type": "admonitionTitle",
+           "children": [
+            {
+             "type": "text",
+             "value": "Read this first"
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fa-8fc5-2abfbdd6543d"
+          },
+          {
+           "type": "paragraph",
+           "children": [
+            {
+             "type": "text",
+             "value": "Arguments are cheap."
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fb-a892-94038d4e0fdc"
+          }
+         ],
+         "id": "node_01a17ea3-5b83-77f9-97ee-c8281954248c"
+        }
+       ],
+       "id": "node_01a17ea3-5b83-77f8-8ca2-f85c5e2ccf48"
+      },
+      {
+       "type": "mystTarget",
+       "label": "eq-energy",
+       "id": "node_01a17ea3-5b84-7669-b0a0-bd18757c9957"
+      },
+      {
+       "type": "math",
+       "identifier": "eq-energy",
+       "label": "eq-energy",
+       "enumerated": true,
+       "enumerator": "1",
+       "id": "node_01a17ea3-5b84-766a-bf93-49cd51c107c2",
+       "value": "E = mc^2"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b84-766b-b9a6-4b4f4d4029b4",
+       "children": [
+        {
+         "type": "text",
+         "value": "Inline "
+        },
+        {
+         "type": "inlineMath",
+         "value": "\\alpha"
+        },
+        {
+         "type": "text",
+         "value": " and a role "
+        },
+        {
+         "type": "mystRole",
+         "name": "sub",
+         "value": "2",
+         "children": [
+          {
+           "type": "subscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766c-84d2-bbb447780ca8"
+        },
+        {
+         "type": "text",
+         "value": " plus "
+        },
+        {
+         "type": "mystRole",
+         "name": "abbr",
+         "value": "MyST (Markedly Structured Text)",
+         "id": "node_01a17ea3-5b84-766d-bec6-1df98dd6913d"
+        }
+       ]
+      },
+      {
+       "type": "mystDirective",
+       "name": "figure",
+       "args": "fig/graph.png",
+       "options": {
+        "label": "fig-graph",
+        "width": "80%"
+       },
+       "children": [
+        {
+         "type": "container",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "enumerated": true,
+         "enumerator": "1",
+         "children": [
+          {
+           "type": "image",
+           "url": "fig/graph.png",
+           "width": "80%",
+           "id": "node_01a17ea3-5b84-7670-9555-fa5df1682c00"
+          },
+          {
+           "type": "caption",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "The note graph."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7672-90e4-c61c53f496bd"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7671-8072-e63e402df0bd"
+          },
+          {
+           "type": "legend",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "Nodes are notes."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7674-be35-ee48e30b53df"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7673-8498-3fb14ee935e9"
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766f-bf21-16086bbf7106"
+        }
+       ],
+       "id": "node_01a17ea3-5b84-766e-a3e4-525bf3733504"
+      },
+      {
+       "type": "mystComment",
+       "value": "TODO: tighten this section",
+       "id": "node_01a17ea3-5b84-7675-a02f-5b69030271b5"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "type at the start of a paragraph",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b82-765b-816d-2c5223d6a585",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b83-77f7-97c6-54cb01967b8f",
+     "children": [
+      {
+       "type": "mystDirective",
+       "name": "note",
+       "args": "Read this first",
+       "options": {
+        "class": "dropdown"
+       },
+       "value": "Arguments are cheap.",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1,
+         "offset": 0
+        },
+        "end": {
+         "line": 3,
+         "column": 4,
+         "offset": 52
+        }
+       },
+       "children": [
+        {
+         "type": "admonition",
+         "kind": "note",
+         "class": "dropdown",
+         "children": [
+          {
+           "type": "admonitionTitle",
+           "children": [
+            {
+             "type": "text",
+             "value": "Read this first"
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fa-8fc5-2abfbdd6543d"
+          },
+          {
+           "type": "paragraph",
+           "children": [
+            {
+             "type": "text",
+             "value": "Arguments are cheap."
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fb-a892-94038d4e0fdc"
+          }
+         ],
+         "id": "node_01a17ea3-5b83-77f9-97ee-c8281954248c"
+        }
+       ],
+       "id": "node_01a17ea3-5b83-77f8-8ca2-f85c5e2ccf48"
+      },
+      {
+       "type": "mystTarget",
+       "label": "eq-energy",
+       "id": "node_01a17ea3-5b84-7669-b0a0-bd18757c9957"
+      },
+      {
+       "type": "math",
+       "identifier": "eq-energy",
+       "label": "eq-energy",
+       "enumerated": true,
+       "enumerator": "1",
+       "id": "node_01a17ea3-5b84-766a-bf93-49cd51c107c2",
+       "value": "E = mc^2"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b84-766b-b9a6-4b4f4d4029b4",
+       "children": [
+        {
+         "type": "text",
+         "value": "Indeed, Inline "
+        },
+        {
+         "type": "inlineMath",
+         "value": "\\alpha"
+        },
+        {
+         "type": "text",
+         "value": " and a role "
+        },
+        {
+         "type": "mystRole",
+         "name": "sub",
+         "value": "2",
+         "children": [
+          {
+           "type": "subscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766c-84d2-bbb447780ca8"
+        },
+        {
+         "type": "text",
+         "value": " plus "
+        },
+        {
+         "type": "mystRole",
+         "name": "abbr",
+         "value": "MyST (Markedly Structured Text)",
+         "id": "node_01a17ea3-5b84-766d-bec6-1df98dd6913d"
+        }
+       ]
+      },
+      {
+       "type": "mystDirective",
+       "name": "figure",
+       "args": "fig/graph.png",
+       "options": {
+        "label": "fig-graph",
+        "width": "80%"
+       },
+       "children": [
+        {
+         "type": "container",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "enumerated": true,
+         "enumerator": "1",
+         "children": [
+          {
+           "type": "image",
+           "url": "fig/graph.png",
+           "width": "80%",
+           "id": "node_01a17ea3-5b84-7670-9555-fa5df1682c00"
+          },
+          {
+           "type": "caption",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "The note graph."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7672-90e4-c61c53f496bd"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7671-8072-e63e402df0bd"
+          },
+          {
+           "type": "legend",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "Nodes are notes."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7674-be35-ee48e30b53df"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7673-8498-3fb14ee935e9"
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766f-bf21-16086bbf7106"
+        }
+       ],
+       "id": "node_01a17ea3-5b84-766e-a3e4-525bf3733504"
+      },
+      {
+       "type": "mystComment",
+       "value": "TODO: tighten this section",
+       "id": "node_01a17ea3-5b84-7675-a02f-5b69030271b5"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "bold a word",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b82-765b-816d-2c5223d6a585",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b83-77f7-97c6-54cb01967b8f",
+     "children": [
+      {
+       "type": "mystDirective",
+       "name": "note",
+       "args": "Read this first",
+       "options": {
+        "class": "dropdown"
+       },
+       "value": "Arguments are cheap.",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1,
+         "offset": 0
+        },
+        "end": {
+         "line": 3,
+         "column": 4,
+         "offset": 52
+        }
+       },
+       "children": [
+        {
+         "type": "admonition",
+         "kind": "note",
+         "class": "dropdown",
+         "children": [
+          {
+           "type": "admonitionTitle",
+           "children": [
+            {
+             "type": "text",
+             "value": "Read this first"
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fa-8fc5-2abfbdd6543d"
+          },
+          {
+           "type": "paragraph",
+           "children": [
+            {
+             "type": "text",
+             "value": "Arguments are cheap."
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fb-a892-94038d4e0fdc"
+          }
+         ],
+         "id": "node_01a17ea3-5b83-77f9-97ee-c8281954248c"
+        }
+       ],
+       "id": "node_01a17ea3-5b83-77f8-8ca2-f85c5e2ccf48"
+      },
+      {
+       "type": "mystTarget",
+       "label": "eq-energy",
+       "id": "node_01a17ea3-5b84-7669-b0a0-bd18757c9957"
+      },
+      {
+       "type": "math",
+       "identifier": "eq-energy",
+       "label": "eq-energy",
+       "enumerated": true,
+       "enumerator": "1",
+       "id": "node_01a17ea3-5b84-766a-bf93-49cd51c107c2",
+       "value": "E = mc^2"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b84-766b-b9a6-4b4f4d4029b4",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "Ind"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Inline "
+        },
+        {
+         "type": "inlineMath",
+         "value": "\\alpha"
+        },
+        {
+         "type": "text",
+         "value": " and a role "
+        },
+        {
+         "type": "mystRole",
+         "name": "sub",
+         "value": "2",
+         "children": [
+          {
+           "type": "subscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766c-84d2-bbb447780ca8"
+        },
+        {
+         "type": "text",
+         "value": " plus "
+        },
+        {
+         "type": "mystRole",
+         "name": "abbr",
+         "value": "MyST (Markedly Structured Text)",
+         "id": "node_01a17ea3-5b84-766d-bec6-1df98dd6913d"
+        }
+       ]
+      },
+      {
+       "type": "mystDirective",
+       "name": "figure",
+       "args": "fig/graph.png",
+       "options": {
+        "label": "fig-graph",
+        "width": "80%"
+       },
+       "children": [
+        {
+         "type": "container",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "enumerated": true,
+         "enumerator": "1",
+         "children": [
+          {
+           "type": "image",
+           "url": "fig/graph.png",
+           "width": "80%",
+           "id": "node_01a17ea3-5b84-7670-9555-fa5df1682c00"
+          },
+          {
+           "type": "caption",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "The note graph."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7672-90e4-c61c53f496bd"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7671-8072-e63e402df0bd"
+          },
+          {
+           "type": "legend",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "Nodes are notes."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7674-be35-ee48e30b53df"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7673-8498-3fb14ee935e9"
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766f-bf21-16086bbf7106"
+        }
+       ],
+       "id": "node_01a17ea3-5b84-766e-a3e4-525bf3733504"
+      },
+      {
+       "type": "mystComment",
+       "value": "TODO: tighten this section",
+       "id": "node_01a17ea3-5b84-7675-a02f-5b69030271b5"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "split a paragraph",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b82-765b-816d-2c5223d6a585",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b83-77f7-97c6-54cb01967b8f",
+     "children": [
+      {
+       "type": "mystDirective",
+       "name": "note",
+       "args": "Read this first",
+       "options": {
+        "class": "dropdown"
+       },
+       "value": "Arguments are cheap.",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1,
+         "offset": 0
+        },
+        "end": {
+         "line": 3,
+         "column": 4,
+         "offset": 52
+        }
+       },
+       "children": [
+        {
+         "type": "admonition",
+         "kind": "note",
+         "class": "dropdown",
+         "children": [
+          {
+           "type": "admonitionTitle",
+           "children": [
+            {
+             "type": "text",
+             "value": "Read this first"
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fa-8fc5-2abfbdd6543d"
+          },
+          {
+           "type": "paragraph",
+           "children": [
+            {
+             "type": "text",
+             "value": "Arguments are cheap."
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fb-a892-94038d4e0fdc"
+          }
+         ],
+         "id": "node_01a17ea3-5b83-77f9-97ee-c8281954248c"
+        }
+       ],
+       "id": "node_01a17ea3-5b83-77f8-8ca2-f85c5e2ccf48"
+      },
+      {
+       "type": "mystTarget",
+       "label": "eq-energy",
+       "id": "node_01a17ea3-5b84-7669-b0a0-bd18757c9957"
+      },
+      {
+       "type": "math",
+       "identifier": "eq-energy",
+       "label": "eq-energy",
+       "enumerated": true,
+       "enumerator": "1",
+       "id": "node_01a17ea3-5b84-766a-bf93-49cd51c107c2",
+       "value": "E = mc^2"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b84-766b-b9a6-4b4f4d4029b4",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b85-77d1-94e2-08a67a701fad",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Inline "
+        },
+        {
+         "type": "inlineMath",
+         "value": "\\alpha"
+        },
+        {
+         "type": "text",
+         "value": " and a role "
+        },
+        {
+         "type": "mystRole",
+         "name": "sub",
+         "value": "2",
+         "children": [
+          {
+           "type": "subscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766c-84d2-bbb447780ca8"
+        },
+        {
+         "type": "text",
+         "value": " plus "
+        },
+        {
+         "type": "mystRole",
+         "name": "abbr",
+         "value": "MyST (Markedly Structured Text)",
+         "id": "node_01a17ea3-5b84-766d-bec6-1df98dd6913d"
+        }
+       ]
+      },
+      {
+       "type": "mystDirective",
+       "name": "figure",
+       "args": "fig/graph.png",
+       "options": {
+        "label": "fig-graph",
+        "width": "80%"
+       },
+       "children": [
+        {
+         "type": "container",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "enumerated": true,
+         "enumerator": "1",
+         "children": [
+          {
+           "type": "image",
+           "url": "fig/graph.png",
+           "width": "80%",
+           "id": "node_01a17ea3-5b84-7670-9555-fa5df1682c00"
+          },
+          {
+           "type": "caption",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "The note graph."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7672-90e4-c61c53f496bd"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7671-8072-e63e402df0bd"
+          },
+          {
+           "type": "legend",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "Nodes are notes."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7674-be35-ee48e30b53df"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7673-8498-3fb14ee935e9"
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766f-bf21-16086bbf7106"
+        }
+       ],
+       "id": "node_01a17ea3-5b84-766e-a3e4-525bf3733504"
+      },
+      {
+       "type": "mystComment",
+       "value": "TODO: tighten this section",
+       "id": "node_01a17ea3-5b84-7675-a02f-5b69030271b5"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "paragraph to heading",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b82-765b-816d-2c5223d6a585",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b83-77f7-97c6-54cb01967b8f",
+     "children": [
+      {
+       "type": "mystDirective",
+       "name": "note",
+       "args": "Read this first",
+       "options": {
+        "class": "dropdown"
+       },
+       "value": "Arguments are cheap.",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1,
+         "offset": 0
+        },
+        "end": {
+         "line": 3,
+         "column": 4,
+         "offset": 52
+        }
+       },
+       "children": [
+        {
+         "type": "admonition",
+         "kind": "note",
+         "class": "dropdown",
+         "children": [
+          {
+           "type": "admonitionTitle",
+           "children": [
+            {
+             "type": "text",
+             "value": "Read this first"
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fa-8fc5-2abfbdd6543d"
+          },
+          {
+           "type": "paragraph",
+           "children": [
+            {
+             "type": "text",
+             "value": "Arguments are cheap."
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fb-a892-94038d4e0fdc"
+          }
+         ],
+         "id": "node_01a17ea3-5b83-77f9-97ee-c8281954248c"
+        }
+       ],
+       "id": "node_01a17ea3-5b83-77f8-8ca2-f85c5e2ccf48"
+      },
+      {
+       "type": "mystTarget",
+       "label": "eq-energy",
+       "id": "node_01a17ea3-5b84-7669-b0a0-bd18757c9957"
+      },
+      {
+       "type": "math",
+       "identifier": "eq-energy",
+       "label": "eq-energy",
+       "enumerated": true,
+       "enumerator": "1",
+       "id": "node_01a17ea3-5b84-766a-bf93-49cd51c107c2",
+       "value": "E = mc^2"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b84-766b-b9a6-4b4f4d4029b4",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b86-7463-8cc0-9aff919fce2c",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Inline "
+        },
+        {
+         "type": "inlineMath",
+         "value": "\\alpha"
+        },
+        {
+         "type": "text",
+         "value": " and a role "
+        },
+        {
+         "type": "mystRole",
+         "name": "sub",
+         "value": "2",
+         "children": [
+          {
+           "type": "subscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766c-84d2-bbb447780ca8"
+        },
+        {
+         "type": "text",
+         "value": " plus "
+        },
+        {
+         "type": "mystRole",
+         "name": "abbr",
+         "value": "MyST (Markedly Structured Text)",
+         "id": "node_01a17ea3-5b84-766d-bec6-1df98dd6913d"
+        }
+       ]
+      },
+      {
+       "type": "mystDirective",
+       "name": "figure",
+       "args": "fig/graph.png",
+       "options": {
+        "label": "fig-graph",
+        "width": "80%"
+       },
+       "children": [
+        {
+         "type": "container",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "enumerated": true,
+         "enumerator": "1",
+         "children": [
+          {
+           "type": "image",
+           "url": "fig/graph.png",
+           "width": "80%",
+           "id": "node_01a17ea3-5b84-7670-9555-fa5df1682c00"
+          },
+          {
+           "type": "caption",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "The note graph."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7672-90e4-c61c53f496bd"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7671-8072-e63e402df0bd"
+          },
+          {
+           "type": "legend",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "Nodes are notes."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7674-be35-ee48e30b53df"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7673-8498-3fb14ee935e9"
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766f-bf21-16086bbf7106"
+        }
+       ],
+       "id": "node_01a17ea3-5b84-766e-a3e4-525bf3733504"
+      },
+      {
+       "type": "mystComment",
+       "value": "TODO: tighten this section",
+       "id": "node_01a17ea3-5b84-7675-a02f-5b69030271b5"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "new paragraph at the end",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b82-765b-816d-2c5223d6a585",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b83-77f7-97c6-54cb01967b8f",
+     "children": [
+      {
+       "type": "mystDirective",
+       "name": "note",
+       "args": "Read this first",
+       "options": {
+        "class": "dropdown"
+       },
+       "value": "Arguments are cheap.",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1,
+         "offset": 0
+        },
+        "end": {
+         "line": 3,
+         "column": 4,
+         "offset": 52
+        }
+       },
+       "children": [
+        {
+         "type": "admonition",
+         "kind": "note",
+         "class": "dropdown",
+         "children": [
+          {
+           "type": "admonitionTitle",
+           "children": [
+            {
+             "type": "text",
+             "value": "Read this first"
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fa-8fc5-2abfbdd6543d"
+          },
+          {
+           "type": "paragraph",
+           "children": [
+            {
+             "type": "text",
+             "value": "Arguments are cheap."
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fb-a892-94038d4e0fdc"
+          }
+         ],
+         "id": "node_01a17ea3-5b83-77f9-97ee-c8281954248c"
+        }
+       ],
+       "id": "node_01a17ea3-5b83-77f8-8ca2-f85c5e2ccf48"
+      },
+      {
+       "type": "mystTarget",
+       "label": "eq-energy",
+       "id": "node_01a17ea3-5b84-7669-b0a0-bd18757c9957"
+      },
+      {
+       "type": "math",
+       "identifier": "eq-energy",
+       "label": "eq-energy",
+       "enumerated": true,
+       "enumerator": "1",
+       "id": "node_01a17ea3-5b84-766a-bf93-49cd51c107c2",
+       "value": "E = mc^2"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b84-766b-b9a6-4b4f4d4029b4",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b86-7463-8cc0-9aff919fce2c",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Inline "
+        },
+        {
+         "type": "inlineMath",
+         "value": "\\alpha"
+        },
+        {
+         "type": "text",
+         "value": " and a role "
+        },
+        {
+         "type": "mystRole",
+         "name": "sub",
+         "value": "2",
+         "children": [
+          {
+           "type": "subscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766c-84d2-bbb447780ca8"
+        },
+        {
+         "type": "text",
+         "value": " plus "
+        },
+        {
+         "type": "mystRole",
+         "name": "abbr",
+         "value": "MyST (Markedly Structured Text)",
+         "id": "node_01a17ea3-5b84-766d-bec6-1df98dd6913d"
+        }
+       ]
+      },
+      {
+       "type": "mystDirective",
+       "name": "figure",
+       "args": "fig/graph.png",
+       "options": {
+        "label": "fig-graph",
+        "width": "80%"
+       },
+       "children": [
+        {
+         "type": "container",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "enumerated": true,
+         "enumerator": "1",
+         "children": [
+          {
+           "type": "image",
+           "url": "fig/graph.png",
+           "width": "80%",
+           "id": "node_01a17ea3-5b84-7670-9555-fa5df1682c00"
+          },
+          {
+           "type": "caption",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "The note graph."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7672-90e4-c61c53f496bd"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7671-8072-e63e402df0bd"
+          },
+          {
+           "type": "legend",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "Nodes are notes."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7674-be35-ee48e30b53df"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7673-8498-3fb14ee935e9"
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766f-bf21-16086bbf7106"
+        }
+       ],
+       "id": "node_01a17ea3-5b84-766e-a3e4-525bf3733504"
+      },
+      {
+       "type": "mystComment",
+       "value": "TODO: tighten this section",
+       "id": "node_01a17ea3-5b84-7675-a02f-5b69030271b5"
+      }
+     ]
+    },
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b86-7464-8494-c200d90564c2",
+     "children": [
+      {
+       "type": "text",
+       "value": "The end."
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "move the last block first",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b82-765b-816d-2c5223d6a585",
+   "children": [
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b86-7464-8494-c200d90564c2",
+     "children": [
+      {
+       "type": "text",
+       "value": "The end."
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b83-77f7-97c6-54cb01967b8f",
+     "children": [
+      {
+       "type": "mystDirective",
+       "name": "note",
+       "args": "Read this first",
+       "options": {
+        "class": "dropdown"
+       },
+       "value": "Arguments are cheap.",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1,
+         "offset": 0
+        },
+        "end": {
+         "line": 3,
+         "column": 4,
+         "offset": 52
+        }
+       },
+       "children": [
+        {
+         "type": "admonition",
+         "kind": "note",
+         "class": "dropdown",
+         "children": [
+          {
+           "type": "admonitionTitle",
+           "children": [
+            {
+             "type": "text",
+             "value": "Read this first"
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fa-8fc5-2abfbdd6543d"
+          },
+          {
+           "type": "paragraph",
+           "children": [
+            {
+             "type": "text",
+             "value": "Arguments are cheap."
+            }
+           ],
+           "id": "node_01a17ea3-5b83-77fb-a892-94038d4e0fdc"
+          }
+         ],
+         "id": "node_01a17ea3-5b83-77f9-97ee-c8281954248c"
+        }
+       ],
+       "id": "node_01a17ea3-5b83-77f8-8ca2-f85c5e2ccf48"
+      },
+      {
+       "type": "mystTarget",
+       "label": "eq-energy",
+       "id": "node_01a17ea3-5b84-7669-b0a0-bd18757c9957"
+      },
+      {
+       "type": "math",
+       "identifier": "eq-energy",
+       "label": "eq-energy",
+       "enumerated": true,
+       "enumerator": "1",
+       "id": "node_01a17ea3-5b84-766a-bf93-49cd51c107c2",
+       "value": "E = mc^2"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ea3-5b84-766b-b9a6-4b4f4d4029b4",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "In"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "heading",
+       "id": "node_01a17ea3-5b86-7463-8cc0-9aff919fce2c",
+       "depth": 2,
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "d"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Inline "
+        },
+        {
+         "type": "inlineMath",
+         "value": "\\alpha"
+        },
+        {
+         "type": "text",
+         "value": " and a role "
+        },
+        {
+         "type": "mystRole",
+         "name": "sub",
+         "value": "2",
+         "children": [
+          {
+           "type": "subscript",
+           "children": [
+            {
+             "type": "text",
+             "value": "2"
+            }
+           ]
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766c-84d2-bbb447780ca8"
+        },
+        {
+         "type": "text",
+         "value": " plus "
+        },
+        {
+         "type": "mystRole",
+         "name": "abbr",
+         "value": "MyST (Markedly Structured Text)",
+         "id": "node_01a17ea3-5b84-766d-bec6-1df98dd6913d"
+        }
+       ]
+      },
+      {
+       "type": "mystDirective",
+       "name": "figure",
+       "args": "fig/graph.png",
+       "options": {
+        "label": "fig-graph",
+        "width": "80%"
+       },
+       "children": [
+        {
+         "type": "container",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "enumerated": true,
+         "enumerator": "1",
+         "children": [
+          {
+           "type": "image",
+           "url": "fig/graph.png",
+           "width": "80%",
+           "id": "node_01a17ea3-5b84-7670-9555-fa5df1682c00"
+          },
+          {
+           "type": "caption",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "The note graph."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7672-90e4-c61c53f496bd"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7671-8072-e63e402df0bd"
+          },
+          {
+           "type": "legend",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "Nodes are notes."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7674-be35-ee48e30b53df"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7673-8498-3fb14ee935e9"
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766f-bf21-16086bbf7106"
+        }
+       ],
+       "id": "node_01a17ea3-5b84-766e-a3e4-525bf3733504"
+      },
+      {
+       "type": "mystComment",
+       "value": "TODO: tighten this section",
+       "id": "node_01a17ea3-5b84-7675-a02f-5b69030271b5"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "delete across blocks",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17ea3-5b82-765b-816d-2c5223d6a585",
+   "children": [
+    {
+     "type": "paragraph",
+     "id": "node_01a17ea3-5b86-7464-8494-c200d90564c2",
+     "children": [
+      {
+       "type": "inlineMath",
+       "value": "\\alpha"
+      },
+      {
+       "type": "text",
+       "value": " and a role "
+      },
+      {
+       "type": "mystRole",
+       "name": "sub",
+       "value": "2",
+       "children": [
+        {
+         "type": "subscript",
+         "children": [
+          {
+           "type": "text",
+           "value": "2"
+          }
+         ]
+        }
+       ],
+       "id": "node_01a17ea3-5b84-766c-84d2-bbb447780ca8"
+      },
+      {
+       "type": "text",
+       "value": " plus "
+      },
+      {
+       "type": "mystRole",
+       "name": "abbr",
+       "value": "MyST (Markedly Structured Text)",
+       "id": "node_01a17ea3-5b84-766d-bec6-1df98dd6913d"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "id": "node_01a17ea3-5b83-77f7-97c6-54cb01967b8f",
+     "children": [
+      {
+       "type": "mystDirective",
+       "name": "figure",
+       "args": "fig/graph.png",
+       "options": {
+        "label": "fig-graph",
+        "width": "80%"
+       },
+       "children": [
+        {
+         "type": "container",
+         "kind": "figure",
+         "identifier": "fig-graph",
+         "label": "fig-graph",
+         "enumerated": true,
+         "enumerator": "1",
+         "children": [
+          {
+           "type": "image",
+           "url": "fig/graph.png",
+           "width": "80%",
+           "id": "node_01a17ea3-5b84-7670-9555-fa5df1682c00"
+          },
+          {
+           "type": "caption",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "The note graph."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7672-90e4-c61c53f496bd"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7671-8072-e63e402df0bd"
+          },
+          {
+           "type": "legend",
+           "children": [
+            {
+             "type": "paragraph",
+             "children": [
+              {
+               "type": "text",
+               "value": "Nodes are notes."
+              }
+             ],
+             "id": "node_01a17ea3-5b84-7674-be35-ee48e30b53df"
+            }
+           ],
+           "id": "node_01a17ea3-5b84-7673-8498-3fb14ee935e9"
+          }
+         ],
+         "id": "node_01a17ea3-5b84-766f-bf21-16086bbf7106"
+        }
+       ],
+       "id": "node_01a17ea3-5b84-766e-a3e4-525bf3733504"
+      },
+      {
+       "type": "mystComment",
+       "value": "TODO: tighten this section",
+       "id": "node_01a17ea3-5b84-7675-a02f-5b69030271b5"
+      }
+     ]
+    }
+   ]
+  }
+ }
+]
