@@ -184,18 +184,47 @@ consecutive `seq` values.
   its author (the principal of `OpenChangeSet`), its base version and its
   rationale.
 
-### Rebase rules (sequencer, v1)
+### Sequencer rules (v1, implemented)
 
-Because ops address IDs, most concurrent ops commute without change. The
-sequencer refuses, with a code, when:
+Because ops address IDs, rebasing means checking the op again at the head;
+the op itself is never rewritten. `ProjectState::apply` (`state.rs`) is the
+one definition of op semantics. The sequencer validates against it, and
+replaying the log through it rebuilds the project. The full list of codes is
+`RefusalCode` in `refusal.rs`. The main rules:
 
 | Code | When |
 |---|---|
-| `NODE_DELETED` | the target or the `after` anchor was deleted after `base` (an `after` anchor alone could instead fall back to "after its nearest surviving left sibling"; propose doing that) |
-| `CYCLE` | a `MoveNode` would make a node its own ancestor |
-| `STALE_TEXT` | two `EditText::Replace` on one node since `base` (goes away with the CRDT) |
-| `FORBIDDEN` | `authorize` refused |
 | `WRONG_PROJECT` | `op.project` ≠ this sequencer's project |
+| `BASE_IN_FUTURE` | `op.base` is after the head |
+| `DUPLICATE_OP` | the op ID was accepted before, or appears twice in the batch |
+| `FORBIDDEN` | `authorize` refused: unknown grant, or a grant held by someone else |
+| `NODE_DELETED` / `DOCUMENT_DELETED` | the target, or the parent of an insert or move, is a tombstone |
+| `CYCLE` | a move would put a node inside its own subtree |
+| `STALE_TEXT` | a *different* principal replaced the node's text after `op.base` (goes away with the CRDT) |
+| `CHANGE_SET_CONFLICT` | an open change set no longer applies on top of the current project |
+| `CHANGE_SET_CLOSED` | adding to, accepting or rejecting a change set already accepted or rejected |
+| `INVALID_OP` | e.g. `set_attrs` on `type`/`id`/`children`/`value`, or a relation on a non-link node |
+
+Details decided while implementing:
+
+- **Anchors.** Tombstones keep their place among siblings, so an insert
+  after a deleted anchor lands right after its nearest surviving left
+  sibling. An anchor that is no longer a sibling (it was moved) means first
+  child. An anchor that never existed is `UNKNOWN_NODE`. Of two inserts after
+  the same anchor, the later-sequenced one comes first.
+- **Deletes are idempotent.** Deleting a tombstone is accepted and changes
+  nothing.
+- **Pipelining.** `STALE_TEXT` ignores the principal's own earlier edits, so a
+  client may send several replaces on one base.
+- **Change sets.** Each op in a change set is checked against the project
+  *with that change set applied*, so an agent can insert a node and then
+  edit it inside the same proposal. Accepting replays the set on the current
+  project; if any op no longer applies, the accept is refused and the set
+  stays open. `OpenChangeSet` belongs to the set it opens. Accept and reject
+  belong to no set.
+- **Batches** are checked op by op on a copy of the state, written to the
+  log, and only then made current. A log failure leaves the sequencer
+  unchanged.
 
 ## 5. What the storage layer will look like (preview only)
 
@@ -233,9 +262,17 @@ format version column leaves room to move to a binary format later.
   revoking are therefore not yet in the op log's audit trail. They should
   probably become ops before sharing (roadmap step 5).
 - **The store checks integrity, not permission.** It refuses wrong-project,
-  non-contiguous, duplicate or unregistered-principal ops. Whether the
-  principal may use the grant is `authorize`'s job in the sequencer, which
-  is not written yet.
+  non-contiguous, duplicate or unregistered-principal ops. Permission is
+  `authorize` (`auth.rs`). It currently checks only that the grant exists
+  and belongs to the op's principal, so **an agent may accept its own
+  change set** by submitting the accept outside the set. Restricting
+  accept/reject to the person is the first real policy to add.
+- **Cost per submit.** The sequencer validates on a full copy of the
+  in-memory state, and change-set ops also replay their set on a copy. That
+  is O(project size) per submit: fine for v1-sized projects, but it calls for
+  persistent maps (e.g. `imbl`) or an undo journal before large corpora.
+- **Revoked grants.** `grants.revoked_at` exists, but there is no revoke API
+  and `authorize` does not look at it yet.
 - **wasm.** The crate builds without the `sqlite` feature. On
   `wasm32-unknown-unknown`, `OpId::new()` and `Timestamp::now()` will also need
   `uuid`'s `js` feature and a JS clock.

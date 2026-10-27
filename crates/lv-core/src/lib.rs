@@ -5,9 +5,13 @@
 //! modules, so it can also compile to WebAssembly. SQLite storage is behind
 //! the `sqlite` feature for that reason.
 
+pub mod auth;
 pub mod ids;
 pub mod myst;
 pub mod op;
 pub mod principal;
+pub mod refusal;
+pub mod sequencer;
+pub mod state;
 #[cfg(feature = "sqlite")]
 pub mod store;
