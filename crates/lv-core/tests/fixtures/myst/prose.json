@@ -1,0 +1,76 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "block",
+      "children": [
+        {
+          "type": "heading",
+          "depth": 1,
+          "identifier": "on-reading-slowly",
+          "label": "On reading slowly",
+          "html_id": "on-reading-slowly",
+          "position": { "start": { "line": 1, "column": 1 }, "end": { "line": 1, "column": 20 } },
+          "children": [{ "type": "text", "value": "On reading slowly" }]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            { "type": "text", "value": "Close reading is " },
+            { "type": "emphasis", "children": [{ "type": "text", "value": "not" }] },
+            { "type": "text", "value": " the same as " },
+            { "type": "strong", "children": [{ "type": "text", "value": "slow" }] },
+            { "type": "text", "value": " reading; see " },
+            {
+              "type": "link",
+              "url": "https://example.org/essay",
+              "title": "An essay",
+              "children": [{ "type": "text", "value": "this essay" }]
+            },
+            { "type": "text", "value": " and " },
+            { "type": "inlineCode", "value": "grep -c" },
+            { "type": "text", "value": "." },
+            { "type": "break" },
+            { "type": "delete", "children": [{ "type": "text", "value": "struck" }] }
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "start": 3,
+          "spread": false,
+          "children": [
+            {
+              "type": "listItem",
+              "spread": false,
+              "children": [{ "type": "paragraph", "children": [{ "type": "text", "value": "Annotate" }] }]
+            },
+            {
+              "type": "listItem",
+              "spread": false,
+              "checked": true,
+              "children": [{ "type": "paragraph", "children": [{ "type": "text", "value": "Summarize" }] }]
+            }
+          ]
+        },
+        {
+          "type": "blockquote",
+          "children": [
+            { "type": "paragraph", "children": [{ "type": "text", "value": "Festina lente." }] }
+          ]
+        },
+        { "type": "thematicBreak" },
+        { "type": "code", "lang": "python", "meta": "linenos", "value": "print('hi')\n" },
+        { "type": "image", "url": "fig/marginalia.png", "alt": "Marginalia", "width": "50%" },
+        { "type": "html", "value": "<kbd>Ctrl</kbd>" }
+      ]
+    },
+    {
+      "type": "block",
+      "meta": "{\"tags\": [\"draft\"]}",
+      "children": [
+        { "type": "paragraph", "children": [{ "type": "text", "value": "Second block." }] }
+      ]
+    }
+  ]
+}

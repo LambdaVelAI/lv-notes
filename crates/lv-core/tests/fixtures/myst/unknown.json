@@ -1,0 +1,37 @@
+{
+  "type": "root",
+  "frontmatter": { "title": "Edge cases", "authors": [{ "name": "A. Scholar" }] },
+  "children": [
+    {
+      "type": "block",
+      "key": "k8Xq2",
+      "children": [
+        {
+          "type": "heading",
+          "depth": 2,
+          "enumerated": false,
+          "data": { "custom": [1, 2.5, true, null] },
+          "children": [{ "type": "text", "value": "Unmodelled fields", "key": "t1" }]
+        },
+        {
+          "type": "proof",
+          "kind": "theorem",
+          "enumerated": true,
+          "children": [
+            { "type": "admonitionTitle", "children": [{ "type": "text", "value": "Fermat" }] },
+            { "type": "paragraph", "children": [{ "type": "text", "value": "No three positive integers..." }] }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            { "type": "abbreviation", "title": "HyperText Markup Language", "children": [{ "type": "text", "value": "HTML" }] },
+            { "type": "text", "value": "" }
+          ]
+        },
+        { "type": "paragraph", "children": [] },
+        { "type": "list", "ordered": false, "children": [] }
+      ]
+    }
+  ]
+}

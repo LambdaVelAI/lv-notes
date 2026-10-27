@@ -1,0 +1,71 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "block",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            { "type": "text", "value": "As " },
+            {
+              "type": "citeGroup",
+              "kind": "narrative",
+              "children": [
+                { "type": "cite", "kind": "narrative", "label": "knuth1984", "identifier": "knuth1984", "children": [{ "type": "text", "value": "Knuth (1984)" }] }
+              ]
+            },
+            { "type": "text", "value": " argued, programs are literature " },
+            {
+              "type": "citeGroup",
+              "kind": "parenthetical",
+              "children": [
+                { "type": "cite", "label": "knuth1984", "identifier": "knuth1984", "prefix": "see", "suffix": "p. 97" },
+                { "type": "cite", "label": "ramsey1994", "identifier": "ramsey1994" }
+              ]
+            },
+            { "type": "text", "value": ". See " },
+            {
+              "type": "crossReference",
+              "kind": "figure",
+              "identifier": "fig-graph",
+              "label": "fig-graph",
+              "children": [{ "type": "text", "value": "Figure 1" }]
+            },
+            { "type": "text", "value": " and the footnote" },
+            { "type": "footnoteReference", "identifier": "fn1", "label": "fn1" },
+            { "type": "text", "value": "." }
+          ]
+        },
+        {
+          "type": "table",
+          "align": ["left", null, "right"],
+          "children": [
+            {
+              "type": "tableRow",
+              "children": [
+                { "type": "tableCell", "header": true, "align": "left", "children": [{ "type": "text", "value": "Relation" }] },
+                { "type": "tableCell", "header": true, "children": [{ "type": "text", "value": "Meaning" }] },
+                { "type": "tableCell", "header": true, "align": "right", "children": [{ "type": "text", "value": "Count" }] }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "children": [
+                { "type": "tableCell", "align": "left", "children": [{ "type": "inlineCode", "value": "supports" }] },
+                { "type": "tableCell", "children": [{ "type": "text", "value": "evidence for" }] },
+                { "type": "tableCell", "align": "right", "children": [{ "type": "text", "value": "12" }] }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "footnoteDefinition",
+          "identifier": "fn1",
+          "label": "fn1",
+          "children": [{ "type": "paragraph", "children": [{ "type": "text", "value": "A footnote with " }, { "type": "underline", "children": [{ "type": "text", "value": "emphasis" }] }, { "type": "superscript", "children": [{ "type": "text", "value": "2" }] }] }]
+        }
+      ]
+    }
+  ]
+}

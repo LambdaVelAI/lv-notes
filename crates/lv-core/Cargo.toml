@@ -1,0 +1,22 @@
+[package]
+name = "lv-core"
+version = "0.1.0"
+description = "Core engine for lv-notes: MyST AST, op log, sequencer and projections"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rusqlite = { version = "0.40.2", features = ["bundled"], optional = true }
+serde.workspace = true
+serde_json.workspace = true
+thiserror = "2.0.21"
+uuid = { version = "1.26.1", features = ["v7", "serde"] }
+
+[features]
+default = ["sqlite"]
+# Project storage. Off for targets without SQLite (e.g. wasm in the browser).
+sqlite = ["dep:rusqlite"]
+
+[dev-dependencies]
+tempfile = "3.27.0"

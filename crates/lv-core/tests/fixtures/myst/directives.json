@@ -1,0 +1,79 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "block",
+      "children": [
+        {
+          "type": "mystDirective",
+          "name": "note",
+          "args": "Read this first",
+          "options": { "class": "dropdown" },
+          "value": "Arguments are cheap.",
+          "position": { "start": { "line": 1, "column": 1, "offset": 0 }, "end": { "line": 3, "column": 4, "offset": 52 } },
+          "children": [
+            {
+              "type": "admonition",
+              "kind": "note",
+              "class": "dropdown",
+              "children": [
+                { "type": "admonitionTitle", "children": [{ "type": "text", "value": "Read this first" }] },
+                { "type": "paragraph", "children": [{ "type": "text", "value": "Arguments are cheap." }] }
+              ]
+            }
+          ]
+        },
+        { "type": "mystTarget", "label": "eq-energy" },
+        {
+          "type": "math",
+          "identifier": "eq-energy",
+          "label": "eq-energy",
+          "enumerated": true,
+          "enumerator": "1",
+          "value": "E = mc^2"
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            { "type": "text", "value": "Inline " },
+            { "type": "inlineMath", "value": "\\alpha" },
+            { "type": "text", "value": " and a role " },
+            {
+              "type": "mystRole",
+              "name": "sub",
+              "value": "2",
+              "children": [{ "type": "subscript", "children": [{ "type": "text", "value": "2" }] }]
+            },
+            { "type": "text", "value": " plus " },
+            { "type": "mystRole", "name": "abbr", "value": "MyST (Markedly Structured Text)" }
+          ]
+        },
+        {
+          "type": "mystDirective",
+          "name": "figure",
+          "args": "fig/graph.png",
+          "options": { "label": "fig-graph", "width": "80%" },
+          "children": [
+            {
+              "type": "container",
+              "kind": "figure",
+              "identifier": "fig-graph",
+              "label": "fig-graph",
+              "enumerated": true,
+              "enumerator": "1",
+              "children": [
+                { "type": "image", "url": "fig/graph.png", "width": "80%" },
+                {
+                  "type": "caption",
+                  "children": [{ "type": "paragraph", "children": [{ "type": "text", "value": "The note graph." }] }]
+                },
+                { "type": "legend", "children": [{ "type": "paragraph", "children": [{ "type": "text", "value": "Nodes are notes." }] }] }
+              ]
+            }
+          ]
+        },
+        { "type": "mystComment", "value": "TODO: tighten this section" }
+      ]
+    }
+  ]
+}
