@@ -69,9 +69,13 @@ pub struct Common {
 ```
 
 It is `Option` because imported Markdown does not have IDs yet; import
-assigns them before anything reaches the log. Markdown export drops them. A
-re-import is therefore a new set of nodes, unless we later add a hidden ID
-comment to the export (not proposed for v1).
+assigns them before anything reaches the log. Inside a project every node,
+text runs included, has a `NodeId`, because `insert_node` addresses one. Text
+run IDs are internal: they are never exported, and nothing should hold on
+to them. Native MyST export (section 6) keeps the other IDs, so it
+re-imports as the same nodes. Markdown export drops them, so a re-imported
+Markdown file is a new set of nodes unless we later add a hidden ID comment
+to the export (not proposed for v1).
 
 ## 2. Principals and grants (invariant 1)
 
@@ -292,6 +296,45 @@ How projections stay correct:
 Queries so far: `Store::children`, `Store::search` (FTS5 syntax) and
 `Store::backlinks` (by ID or label, with relation).
 
+## 6. MyST import and export (implemented)
+
+`convert.rs` turns a MyST AST into ops and reads a document back out of a
+`ProjectState`.
+
+- **Import** (`import_document`, `import_nodes` for a pasted fragment):
+  - emits `create_document`, then one `insert_node` per node in document
+    order, each `after` its previous sibling;
+  - keeps a node's lv-notes `id` if it has one, and assigns a new one
+    otherwise;
+  - turns a `relation` field on a link, cross-reference or citation into a
+    `set_relation` op;
+  - refuses: a document whose top node isn't `root`, a duplicate `id`, an
+    `id` that is not a `node_…` ID, and children that are not nodes.
+  - The result is ordinary ops, so an import goes through the sequencer
+    like any edit: one batch, all or nothing, attributed and permission
+    checked.
+- **The root is a node.** An imported document has a single top-level
+  `root` node. Its own fields (frontmatter, …) are edited with `set_attrs`
+  like any other node's. A document built by ops without a `root`
+  materializes under a synthesized one.
+- **Export** (`materialize`) builds the live tree in sibling order, with
+  tombstones left out, in one of two flavors:
+  - `Plain` is standard MyST.
+  - `Native` adds `id` to every node except text runs (`TEXT_RUN_TYPES`:
+    `text`, `emphasis`, `strong`, `inlineCode`, …), and `relation` to typed
+    links.
+- **Ops keep documents valid MyST.** `insert_node` and `set_attrs` refuse
+  content that does not parse as its MyST type, for example a `heading`
+  whose `depth` is a string, with `INVALID_OP`. Inserting under a MyST
+  leaf (`text`, `code`, …) is refused too. That makes `materialize`
+  infallible in practice.
+
+Tests (`tests/convert.rs`): each fixture goes through AST → ops → state →
+AST and must come back unchanged. A native export must equal the plain
+export plus `id`/`relation`, and must re-import into another project
+unchanged. Further tests cover edits and fragments, relations, the import
+refusals and invalid-content ops, and reloading from a project file.
+
 ## Decisions
 
 1. UUIDv7 with typed text prefixes (`node_…`, `doc_…`, …).
@@ -325,6 +368,16 @@ Queries so far: `Store::children`, `Store::search` (FTS5 syntax) and
   per project, but nothing enforces that yet.
 - **Revoked grants.** `grants.revoked_at` exists, but there is no revoke API
   and `authorize` does not look at it yet.
+- **Explicit empty `children` on optional parents.** A `cite`,
+  `mystDirective`, `mystRole` or unknown node with `"children": []` exports
+  without the field, since state does not record whether an empty list was
+  present. Known parent types always export it.
+- **Document title vs. frontmatter title.** The document's `title` (an op)
+  and the root's `frontmatter.title` (an attribute) are separate. Import
+  takes the title as an argument, and nothing keeps the two in sync.
+- **`relation` is an lv-notes extension field.** A foreign MyST file with
+  its own `relation` field on a link would be read as a typed link. Fine
+  until the relation vocabulary is settled.
 - **wasm.** The crate builds without the `sqlite` feature. On
   `wasm32-unknown-unknown`, `OpId::new()` and `Timestamp::now()` will also need
   `uuid`'s `js` feature and a JS clock.

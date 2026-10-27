@@ -147,6 +147,33 @@ node_struct!(MystComment { value: String });
 
 // ---- The node enum ------------------------------------------------------
 
+/// Whether nodes of a type serialize a `children` array.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ChildrenPolicy {
+    /// Always present, possibly empty.
+    Always,
+    /// Present only when there are children (optional parents, unknown types).
+    Optional,
+    /// A leaf: never has children.
+    Never,
+}
+
+/// Inline formatting and text: the nodes that get no stable ID in exported
+/// MyST. Positions inside them belong to the text CRDT, not to node IDs.
+pub const TEXT_RUN_TYPES: [&str; 11] = [
+    "text",
+    "emphasis",
+    "strong",
+    "underline",
+    "subscript",
+    "superscript",
+    "delete",
+    "inlineCode",
+    "inlineMath",
+    "break",
+    "abbreviation",
+];
+
 macro_rules! nodes {
     (
         parents { $($p:ident = $pt:literal,)* }
@@ -162,6 +189,15 @@ macro_rules! nodes {
             /// A node type this model does not know, kept as raw JSON
             /// (including its `type` field).
             Unknown(Map<String, Value>),
+        }
+
+        /// Which MyST types carry `children`. Unknown types may or may not.
+        pub fn children_policy(type_name: &str) -> ChildrenPolicy {
+            match type_name {
+                $($pt => ChildrenPolicy::Always,)*
+                $($lt => ChildrenPolicy::Never,)*
+                _ => ChildrenPolicy::Optional,
+            }
         }
 
         impl Node {

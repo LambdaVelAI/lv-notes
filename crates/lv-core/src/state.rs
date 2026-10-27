@@ -14,6 +14,8 @@
 //!   parent, e.g. because it was moved, means "first child".
 //! - Of two inserts after the same anchor, the later-sequenced one comes first.
 //! - Deleting something already deleted is accepted and changes nothing.
+//! - Node content must read as a MyST node of its type, and MyST leaves
+//!   (`text`, `code`, ...) take no children.
 //! - Ops in an open change set are checked against the project with that
 //!   change set applied, but only reach the project when it is accepted.
 //!   Acceptance replays them on the current project; if any no longer
@@ -25,6 +27,7 @@ use std::collections::{BTreeSet, HashMap};
 use serde_json::Value;
 
 use crate::ids::{ChangeSetId, DocumentId, NodeId, Version};
+use crate::myst::{ChildrenPolicy, children_policy};
 use crate::op::{DocKind, NodeContent, OpBody, Parent, Relation, Sequenced, TextEdit};
 use crate::principal::Principal;
 use crate::refusal::{Refusal, RefusalCode as Code};
@@ -315,11 +318,14 @@ impl ProjectState {
                 if let Some(key) = set.keys().chain(unset).find(|k| RESERVED_ATTRS.contains(&k.as_str())) {
                     return Err(Refusal::new(Code::InvalidOp, format!("`{key}` cannot be changed with set_attrs")));
                 }
-                let n = self.nodes.get_mut(node).expect("live");
+                let mut content = self.nodes[node].content.clone();
                 for key in unset {
-                    n.content.fields.remove(key);
+                    content.fields.remove(key);
                 }
-                n.content.fields.extend(set.iter().map(|(k, v)| (k.clone(), v.clone())));
+                content.fields.extend(set.iter().map(|(k, v)| (k.clone(), v.clone())));
+                content.check().map_err(|e| Refusal::new(Code::InvalidOp, e))?;
+                let n = self.nodes.get_mut(node).expect("live");
+                n.content = content;
                 n.updated = s.seq;
                 fx.nodes.insert(*node);
             }
@@ -425,7 +431,16 @@ impl ProjectState {
     fn live_parent(&self, parent: Parent) -> Result<DocumentId, Refusal> {
         match parent {
             Parent::DocumentRoot(doc) => self.live_document(doc).map(|_| doc),
-            Parent::Node(node) => self.live_node(node).map(|n| n.document),
+            Parent::Node(node) => {
+                let n = self.live_node(node)?;
+                if children_policy(&n.content.node_type) == ChildrenPolicy::Never {
+                    return Err(Refusal::new(
+                        Code::InvalidOp,
+                        format!("{node} is a `{}`, which has no children", n.content.node_type),
+                    ));
+                }
+                Ok(n.document)
+            }
         }
     }
 
@@ -496,7 +511,7 @@ fn check_content(content: &NodeContent) -> Result<(), Refusal> {
     if let Some(key) = ["id", "children"].into_iter().find(|k| content.fields.contains_key(*k)) {
         return Err(Refusal::new(Code::InvalidOp, format!("node content may not contain `{key}`")));
     }
-    Ok(())
+    content.check().map_err(|e| Refusal::new(Code::InvalidOp, e))
 }
 
 fn not_in_change_set(change_set: Option<ChangeSetId>) -> Result<(), Refusal> {

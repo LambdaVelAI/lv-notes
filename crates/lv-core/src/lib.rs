@@ -6,6 +6,7 @@
 //! the `sqlite` feature for that reason.
 
 pub mod auth;
+pub mod convert;
 pub mod ids;
 pub mod myst;
 pub mod op;

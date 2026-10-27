@@ -92,6 +92,22 @@ impl NodeContent {
         };
         NodeContent { node_type, fields }
     }
+
+    /// The node as a MyST JSON object (`type` plus fields), without children.
+    pub fn to_json(&self) -> Map<String, Value> {
+        let mut map = Map::with_capacity(self.fields.len() + 1);
+        map.insert("type".to_owned(), Value::String(self.node_type.clone()));
+        map.extend(self.fields.iter().map(|(k, v)| (k.clone(), v.clone())));
+        map
+    }
+
+    /// Whether this content reads as a MyST node of its type, e.g. a
+    /// `heading` whose `depth` is a number.
+    pub fn check(&self) -> Result<(), String> {
+        serde_json::from_value::<Node>(Value::Object(self.to_json()))
+            .map(drop)
+            .map_err(|e| format!("not a valid `{}` node: {e}", self.node_type))
+    }
 }
 
 /// An edit to the text value of one node.
