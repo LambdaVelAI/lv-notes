@@ -62,4 +62,15 @@ pub struct Grant {
     pub id: GrantId,
     pub holder: Principal,
     pub scope: GrantScope,
+    /// For agent grants: the agent may accept its own change sets without
+    /// the person's approval ("auto mode"). Ignored for person grants.
+    #[serde(default)]
+    pub auto_accept: bool,
+}
+
+impl Grant {
+    /// A grant with auto-accept off.
+    pub fn new(holder: Principal, scope: GrantScope) -> Grant {
+        Grant { id: GrantId::new(), holder, scope, auto_accept: false }
+    }
 }

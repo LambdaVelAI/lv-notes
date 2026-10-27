@@ -31,6 +31,8 @@ CREATE TABLE grants (
     person_id   BLOB    NOT NULL REFERENCES person(id),
     agent_id    BLOB    REFERENCES agent(id),
     scope       TEXT    NOT NULL CHECK (scope IN ('owner', 'delegated')),
+    -- Agent may accept its own change sets without approval.
+    auto_accept INTEGER NOT NULL DEFAULT 0 CHECK (auto_accept IN (0, 1)),
     created_at  INTEGER NOT NULL,
     revoked_at  INTEGER
 ) STRICT;

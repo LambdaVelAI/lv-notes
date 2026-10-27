@@ -42,6 +42,11 @@ impl MemoryLog {
     pub fn add_grant(&mut self, grant: Grant) {
         self.grants.insert(grant.id, grant);
     }
+
+    /// Turns auto-accept on or off for a grant. Returns false if there is no such grant.
+    pub fn set_auto_accept(&mut self, id: GrantId, on: bool) -> bool {
+        self.grants.get_mut(&id).map(|g| g.auto_accept = on).is_some()
+    }
 }
 
 impl ProjectLog for MemoryLog {
@@ -139,7 +144,9 @@ impl Sequencer {
                 return Err(refuse(RefusalCode::DuplicateOp, format!("{} was already submitted", op.id)));
             }
             let grant = log.grant(op.grant).map_err(SubmitError::Log)?;
-            authorize(&op, grant.as_ref()).map_err(|r| r.for_op(op.id))?;
+            // Against the state so far in this batch, so an agent can open,
+            // fill and (with auto-accept) accept a change set in one batch.
+            authorize(&op, grant.as_ref(), &next).map_err(|r| r.for_op(op.id))?;
 
             seq = seq.next();
             let s = Sequenced { seq, op };

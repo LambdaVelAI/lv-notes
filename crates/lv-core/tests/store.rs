@@ -16,12 +16,8 @@ impl Fixture {
     fn new(store: Store) -> Fixture {
         let person = PersonId::new();
         let agent = AgentId::new();
-        let owner = Grant { id: GrantId::new(), holder: Principal::Person { person }, scope: GrantScope::Owner };
-        let delegated = Grant {
-            id: GrantId::new(),
-            holder: Principal::Agent { agent, on_behalf_of: person },
-            scope: GrantScope::Delegated,
-        };
+        let owner = Grant::new(Principal::Person { person }, GrantScope::Owner);
+        let delegated = Grant::new(Principal::Agent { agent, on_behalf_of: person }, GrantScope::Delegated);
         store.add_person(person, "A. Scholar").unwrap();
         store.add_agent(agent, "In-app agent").unwrap();
         store.add_grant(&owner).unwrap();
@@ -135,6 +131,17 @@ fn open_rejects_files_that_are_not_projects() {
     std::fs::write(&path, b"").unwrap();
     assert!(matches!(Store::open(&path), Err(StoreError::NotAProject)));
     assert!(Store::open(dir.path().join("missing.lvn")).is_err());
+}
+
+#[test]
+fn auto_accept_toggle_persists() {
+    let f = Fixture::in_memory();
+    assert!(!f.store.grant(f.agent.id).unwrap().unwrap().auto_accept);
+    assert!(f.store.set_auto_accept(f.agent.id, true).unwrap());
+    assert!(f.store.grant(f.agent.id).unwrap().unwrap().auto_accept);
+    assert!(f.store.set_auto_accept(f.agent.id, false).unwrap());
+    assert!(!f.store.grant(f.agent.id).unwrap().unwrap().auto_accept);
+    assert!(!f.store.set_auto_accept(GrantId::new(), true).unwrap());
 }
 
 #[test]

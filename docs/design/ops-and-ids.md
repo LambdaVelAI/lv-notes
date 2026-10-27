@@ -226,6 +226,30 @@ Details decided while implementing:
   log, and only then made current. A log failure leaves the sequencer
   unchanged.
 
+### Agent approval and auto mode (implemented)
+
+Agent work always arrives as change sets. Whether a person must approve it
+is a per-grant toggle, `Grant::auto_accept`, off by default. Each agent
+session has its own delegated grant, so the toggle is per session and can
+change mid-session (`Store::set_auto_accept`); it takes effect on the next op.
+
+| Agent op | Auto-accept off | Auto-accept on |
+|---|---|---|
+| Edit outside a change set | `FORBIDDEN` | `FORBIDDEN` |
+| Edit inside its own open change set | allowed | allowed |
+| Accept its own change set | `FORBIDDEN` (needs the person) | allowed |
+| Reject (withdraw) its own change set | allowed | allowed |
+| Accept or reject anyone else's | `FORBIDDEN` | `FORBIDDEN` |
+
+Auto mode does not lose attribution. The change set records the agent as
+author, its ops carry the agent's principal, grant and time, and the accept
+op does too. The log therefore shows the change was self-approved, and the
+set stays one reviewable unit that can be inspected (and later reverted)
+after the fact. Auto-accept can happen in the same batch as the edits.
+
+The UX for the toggle (where it lives, how self-accepted sets are
+surfaced for later review) is still to be designed.
+
 ## 5. What the storage layer will look like (preview only)
 
 One SQLite file per project. These tables come next, after this proposal is
@@ -263,14 +287,14 @@ format version column leaves room to move to a binary format later.
   probably become ops before sharing (roadmap step 5).
 - **The store checks integrity, not permission.** It refuses wrong-project,
   non-contiguous, duplicate or unregistered-principal ops. Permission is
-  `authorize` (`auth.rs`). It currently checks only that the grant exists
-  and belongs to the op's principal, so **an agent may accept its own
-  change set** by submitting the accept outside the set. Restricting
-  accept/reject to the person is the first real policy to add.
+  `authorize` (`auth.rs`).
 - **Cost per submit.** The sequencer validates on a full copy of the
   in-memory state, and change-set ops also replay their set on a copy. That
   is O(project size) per submit: fine for v1-sized projects, but it calls for
   persistent maps (e.g. `imbl`) or an undo journal before large corpora.
+- **The toggle itself is not logged.** Grants are a registry table, so
+  turning auto mode on or off is not in the op log yet; it should become an
+  op along with grant changes generally.
 - **Revoked grants.** `grants.revoked_at` exists, but there is no revoke API
   and `authorize` does not look at it yet.
 - **wasm.** The crate builds without the `sqlite` feature. On

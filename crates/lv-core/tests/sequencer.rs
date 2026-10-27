@@ -21,7 +21,7 @@ struct World {
 }
 
 fn grant(holder: Principal, scope: GrantScope) -> Grant {
-    Grant { id: GrantId::new(), holder, scope }
+    Grant::new(holder, scope)
 }
 
 impl World {
@@ -368,14 +368,96 @@ fn change_set_rules() {
     let a = w.para(None);
     assert_eq!(w.refused(w.by_agent(cs, replace(a, "x"))), RefusalCode::UnknownChangeSet);
 
-    let outside = w.op(&w.agent, OpBody::OpenChangeSet { change_set: cs, rationale: "r".into() });
+    let outside = w.by_person(OpBody::OpenChangeSet { change_set: cs, rationale: "r".into() });
     assert_eq!(w.refused(outside), RefusalCode::InvalidOp);
 
     w.ok(w.by_agent(cs, OpBody::OpenChangeSet { change_set: cs, rationale: "r".into() }));
-    let self_accept = w.by_agent(cs, OpBody::AcceptChangeSet { change_set: cs });
-    assert_eq!(w.refused(self_accept), RefusalCode::InvalidOp);
+    let mut accept_inside = w.by_person(OpBody::AcceptChangeSet { change_set: cs });
+    accept_inside.change_set = Some(cs);
+    assert_eq!(w.refused(accept_inside), RefusalCode::InvalidOp);
     let reopen = w.by_agent(cs, OpBody::OpenChangeSet { change_set: cs, rationale: "r".into() });
     assert_eq!(w.refused(reopen), RefusalCode::ChangeSetExists);
+}
+
+// ---- Agent approval and auto-accept -------------------------------------
+
+#[test]
+fn agent_edits_must_be_in_a_change_set() {
+    let mut w = World::new();
+    let a = w.para(None);
+    assert_eq!(w.refused(w.op(&w.agent, replace(a, "direct"))), RefusalCode::Forbidden);
+    w.log.set_auto_accept(w.agent.id, true);
+    assert_eq!(w.refused(w.op(&w.agent, replace(a, "direct"))), RefusalCode::Forbidden, "auto mode still uses change sets");
+}
+
+#[test]
+fn agent_needs_approval_unless_auto_accept_is_on() {
+    let mut w = World::new();
+    let (cs, para, _) = propose(&mut w);
+
+    assert_eq!(w.refused(w.op(&w.agent, OpBody::AcceptChangeSet { change_set: cs })), RefusalCode::Forbidden);
+
+    assert!(w.log.set_auto_accept(w.agent.id, true));
+    let accepted = w.ok(w.op(&w.agent, OpBody::AcceptChangeSet { change_set: cs }));
+    assert_eq!(w.root(), [para]);
+
+    // The log records that the agent approved its own change set, and when.
+    assert_eq!(accepted.op.principal, w.agent.holder);
+    assert_eq!(accepted.op.grant, w.agent.id);
+    assert!(accepted.op.created_at.0 > 0);
+    assert_eq!(w.seq.state().change_set(cs).unwrap().author, w.agent.holder);
+
+    // Turning auto mode off again takes effect on the next op.
+    w.log.set_auto_accept(w.agent.id, false);
+    let (cs2, ..) = propose(&mut w);
+    assert_eq!(w.refused(w.op(&w.agent, OpBody::AcceptChangeSet { change_set: cs2 })), RefusalCode::Forbidden);
+}
+
+#[test]
+fn auto_accept_works_within_one_batch() {
+    let mut w = World::new();
+    w.log.set_auto_accept(w.agent.id, true);
+    let cs = ChangeSetId::new();
+    let para = NodeId::new();
+    let batch = vec![
+        w.by_agent(cs, OpBody::OpenChangeSet { change_set: cs, rationale: "Quick fix".into() }),
+        w.by_agent(cs, insert(para, Parent::DocumentRoot(w.doc), None, "paragraph")),
+        w.op(&w.agent, OpBody::AcceptChangeSet { change_set: cs }),
+    ];
+    w.submit(batch).unwrap();
+    assert_eq!(w.root(), [para]);
+}
+
+#[test]
+fn agents_decide_only_on_their_own_change_sets() {
+    let mut w = World::new();
+    let rival = Grant {
+        auto_accept: true,
+        ..grant(Principal::Agent { agent: AgentId::new(), on_behalf_of: w.person.holder.person() }, GrantScope::Delegated)
+    };
+    w.log.add_grant(rival.clone());
+    w.log.set_auto_accept(w.agent.id, true);
+
+    let (cs, ..) = propose(&mut w);
+    assert_eq!(w.refused(w.op(&rival, OpBody::AcceptChangeSet { change_set: cs })), RefusalCode::Forbidden);
+    let reject = OpBody::RejectChangeSet { change_set: cs, reason: None };
+    assert_eq!(w.refused(w.op(&rival, reject)), RefusalCode::Forbidden);
+}
+
+#[test]
+fn agent_may_withdraw_its_own_proposal_without_auto_accept() {
+    let mut w = World::new();
+    let (cs, ..) = propose(&mut w);
+    w.ok(w.op(&w.agent, OpBody::RejectChangeSet { change_set: cs, reason: Some("Superseded".into()) }));
+    assert_eq!(w.seq.state().change_set(cs).unwrap().status, ChangeSetStatus::Rejected);
+}
+
+#[test]
+fn unknown_change_set_is_reported_as_such_to_agents() {
+    let mut w = World::new();
+    w.log.set_auto_accept(w.agent.id, true);
+    let code = w.refused(w.op(&w.agent, OpBody::AcceptChangeSet { change_set: ChangeSetId::new() }));
+    assert_eq!(code, RefusalCode::UnknownChangeSet);
 }
 
 // ---- Replay -------------------------------------------------------------

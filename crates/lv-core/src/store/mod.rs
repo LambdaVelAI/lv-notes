@@ -139,13 +139,14 @@ impl Store {
 
     pub fn add_grant(&self, grant: &Grant) -> Result<()> {
         self.conn.execute(
-            "INSERT INTO grants (id, person_id, agent_id, scope, created_at)
-             VALUES (?1, ?2, ?3, ?4, ?5)",
+            "INSERT INTO grants (id, person_id, agent_id, scope, auto_accept, created_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
             params![
                 grant.id,
                 grant.holder.person(),
                 grant.holder.agent(),
                 grant.scope.as_str(),
+                grant.auto_accept,
                 Timestamp::now().0,
             ],
         )?;
@@ -156,22 +157,30 @@ impl Store {
         let row = self
             .conn
             .query_row(
-                "SELECT person_id, agent_id, scope FROM grants WHERE id = ?1",
+                "SELECT person_id, agent_id, scope, auto_accept FROM grants WHERE id = ?1",
                 [id],
                 |r| {
                     Ok((
                         r.get::<_, PersonId>(0)?,
                         r.get::<_, Option<AgentId>>(1)?,
                         r.get::<_, String>(2)?,
+                        r.get::<_, bool>(3)?,
                     ))
                 },
             )
             .optional()?;
-        row.map(|(person, agent, scope)| {
+        row.map(|(person, agent, scope, auto_accept)| {
             let scope = GrantScope::parse(&scope).ok_or(StoreError::BadGrantScope(id))?;
-            Ok(Grant { id, holder: principal(person, agent), scope })
+            Ok(Grant { id, holder: principal(person, agent), scope, auto_accept })
         })
         .transpose()
+    }
+
+    /// Turns auto-accept on or off for a grant. Takes effect on the next
+    /// submitted op. Returns false if there is no such grant.
+    pub fn set_auto_accept(&self, id: GrantId, on: bool) -> Result<bool> {
+        let changed = self.conn.execute("UPDATE grants SET auto_accept = ?2 WHERE id = ?1", params![id, on])?;
+        Ok(changed == 1)
     }
 
     // ---- Op log ------------------------------------------------------------
@@ -354,7 +363,7 @@ mod tests {
         let project = ProjectId::new();
         let mut store = Store::create_in_memory(project, "t").unwrap();
         let person = PersonId::new();
-        let grant = Grant { id: GrantId::new(), holder: Principal::Person { person }, scope: GrantScope::Owner };
+        let grant = Grant::new(Principal::Person { person }, GrantScope::Owner);
         store.add_person(person, "P").unwrap();
         store.add_grant(&grant).unwrap();
         let op = Op {
