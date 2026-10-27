@@ -37,8 +37,9 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
   server the app exposes) use the same ops with a delegated grant. No back
   doors.
 - **The project carries its own schema.** A registry, stored in the project
-  and changed by ops, declares block kinds (theorem, lemma, ...) and edge
-  types (cites, proves, ...) as data, not code. A project copy carries its own
+  and changed by ops, declares document kinds (note, article, deck), block
+  kinds (theorem, lemma, ...) and edge types (cites, proves, ...) as data,
+  not code. A project copy carries its own
   "installed extensions"; nothing depends on what a client has installed.
   Built-in kinds are pre-filled entries, not hard-coded.
 
@@ -89,6 +90,14 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
   with a `kind` attribute, not a node type per kind. References to them are
   ordinary graph edges; relations like `proves` or `uses` come later as
   vocabulary.
+- Document kinds declare a layout model. Flow documents (notes, articles)
+  reflow; canvas documents (decks, later posters) are a sequence of
+  fixed-aspect frames. Slides are explicit container blocks with stable IDs,
+  never derived from headings. Speaker notes, columns and incremental reveal
+  are registry kinds or attributes; positions are attributes on block IDs in
+  frame-relative units. Quarto's reveal.js conventions are the import and
+  export format. Slides embed blocks from notes by reference, so a result
+  lives once and appears in paper, deck and notes.
 - Math: MyST `inlineMath` and `math` nodes; the LaTeX string is the source of
   truth. Equations are blocks with stable IDs; labels are names on top.
   Numbering is a projection. Macros are project state.
@@ -120,4 +129,8 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
   entry (fields, counters, allowed children).
 - Math editing: source with live preview first; whether a visual editor
   (MathLive) is worth its noisy LaTeX rewrites.
+- Layout inside a canvas frame: flow by default with layouts and absolute
+  positioning as an escape hatch (Quarto), or free placement throughout
+  (Keynote)? Leaning flow-first: it reflows across aspect ratios and agents
+  edit it reliably.
 - Op log compaction policy.
