@@ -124,8 +124,6 @@ typed.
   reconciled. That is fine for notes; long drafts may want per-block saves.
 - **Anyone who opens a file becomes an owner** (v1 is single-user), and
   the local identity is a UUID in the app's settings file.
-- **Toolchain:** Tauri is held at 2.11 because 2.12 needs Rust 1.90 and
-  this repository's toolchain is 1.89.
 - **Not checked in a real window yet.** The UI was checked in a browser
   with the in-memory stand-in, and the commands through the mock IPC. The
   built app launches cleanly, but nobody has used it end to end in its

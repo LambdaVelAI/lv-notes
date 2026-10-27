@@ -42,10 +42,13 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
 - `crates/lv-core`: the core. `cargo test -p lv-core`.
 - `apps/desktop`: the desktop app.
   - Web UI in `src/`, Tauri crate `lv-desktop` in `src-tauri/`.
+  - The root `package.json` forwards to it, so these work from the root or
+    from `apps/desktop`.
   - Setup: `npm install` and `npm run build` (the Rust crate embeds `dist/`).
   - Run: `npm run tauri dev`.
   - Browser preview with an in-memory backend: `npm run dev`.
   - Tests: `npm test`, and `cargo test -p lv-desktop`.
+- Rust 1.90 or later (Tauri 2.12's minimum).
 - Design notes: `docs/design/` (`ops-and-ids.md`, `desktop-shell.md`).
 
 ## Invariants (do not compromise; retrofitting means migrating the op log)

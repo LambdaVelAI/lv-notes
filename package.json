@@ -1,0 +1,12 @@
+{
+  "name": "lv-notes",
+  "private": true,
+  "description": "Forwards to the desktop app in apps/desktop, so its commands also work from the repository root.",
+  "scripts": {
+    "postinstall": "npm --prefix apps/desktop install",
+    "tauri": "npm --prefix apps/desktop run tauri --",
+    "dev": "npm --prefix apps/desktop run dev",
+    "build": "npm --prefix apps/desktop run build",
+    "test": "npm --prefix apps/desktop test"
+  }
+}
