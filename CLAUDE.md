@@ -36,6 +36,11 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
 - **Agents are just clients.** The in-app agent and outside agents (via an MCP
   server the app exposes) use the same ops with a delegated grant. No back
   doors.
+- **The project carries its own schema.** A registry, stored in the project
+  and changed by ops, declares block kinds (theorem, lemma, ...) and edge
+  types (cites, proves, ...) as data, not code. A project copy carries its own
+  "installed extensions"; nothing depends on what a client has installed.
+  Built-in kinds are pre-filled entries, not hard-coded.
 
 ## Layout and commands
 
@@ -64,12 +69,29 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
    suggestions, agent proposals and later offline edits share one mechanism.
 7. Search and graph tables are projections, rebuildable from the op log.
    Derived data records the model and version that produced it.
+8. Ops are validated against the project schema in one place in the core, like
+   the permission check. Clients ask; they do not decide conformance.
 
 ## Document model
 
 - MyST AST is the contract; Markdown is import, export and interchange.
 - Graph edges are typed (cites, supports, contradicts, ...) from an extensible
   vocabulary. Links may start untyped and gain a type later, as a separate op.
+- Conformance has three layers. Structure: a small fixed set of node types the
+  core enforces. Meaning: `kind` values and edge types, checked against the
+  project registry. Presentation: per client, always with a generic fallback,
+  so an unfamiliar kind is shown plainly and never lost.
+- Unknown kinds: Markdown import is lenient (preserve losslessly, then
+  register or flag as undeclared); ops are strict (refused with
+  `undeclared_kind`). Declaring, renaming or merging kinds are ops too, so
+  agents can propose vocabulary in change sets.
+- Theorems and proofs follow MyST's `prf:` directives: one `proof` node type
+  with a `kind` attribute, not a node type per kind. References to them are
+  ordinary graph edges; relations like `proves` or `uses` come later as
+  vocabulary.
+- Math: MyST `inlineMath` and `math` nodes; the LaTeX string is the source of
+  truth. Equations are blocks with stable IDs; labels are names on top.
+  Numbering is a projection. Macros are project state.
 
 ## Agent surface (MCP)
 
@@ -94,5 +116,8 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
   Loro) or build our own sequence CRDT? Leaning CRDT over server-side rebasing.
 - Primitive structural ops (split, merge, move, re-nest) and how they carry
   anchors and ink.
-- Starting relation vocabulary for typed links.
+- Starting relation vocabulary for typed links, and the shape of a registry
+  entry (fields, counters, allowed children).
+- Math editing: source with live preview first; whether a visual editor
+  (MathLive) is worth its noisy LaTeX rewrites.
 - Op log compaction policy.
