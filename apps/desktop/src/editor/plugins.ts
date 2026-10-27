@@ -6,7 +6,7 @@ import { InputRule, inputRules, textblockTypeInputRule, wrappingInputRule } from
 import { keymap } from "prosemirror-keymap";
 import { type Node as PMNode } from "prosemirror-model";
 import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-list";
-import { type Command, type EditorState, Plugin, type Transaction } from "prosemirror-state";
+import { type Command, type EditorState, Plugin, Selection, TextSelection, type Transaction } from "prosemirror-state";
 import { newNodeId } from "./ids";
 import { claimMystIds, mapMystIds, mystIds } from "./myst";
 import { schema } from "./schema";
@@ -130,6 +130,37 @@ export const commands = {
   redo,
 };
 
+/**
+ * Leaves a code or math block for a new paragraph after it:
+ * - `emptyLine`: the cursor is on an empty last line, which is dropped
+ *   (Enter twice leaves);
+ * - `lastLine` / `atEnd`: the cursor is on the last line / at the end, and
+ *   nothing follows to move to (arrow keys at the end of a note);
+ * - `anywhere`.
+ */
+export function leaveCode(how: "emptyLine" | "lastLine" | "atEnd" | "anywhere"): Command {
+  return (state, dispatch, view) => {
+    const { $head, empty } = state.selection;
+    const block = $head.parent;
+    if (!empty || !block.type.spec.code) return false;
+    const atEnd = $head.parentOffset === block.content.size;
+    if (how === "emptyLine" && !(atEnd && block.textContent.endsWith("\n"))) return false;
+    if (how === "lastLine" || how === "atEnd") {
+      const nothingAfter = !Selection.findFrom(state.doc.resolve($head.after()), 1, true);
+      const onLastLine = atEnd || (how === "lastLine" && !!view?.endOfTextblock("down"));
+      if (!nothingAfter || !onLastLine) return false;
+    }
+    if (dispatch) {
+      const tr = state.tr;
+      if (how === "emptyLine") tr.delete($head.pos - 1, $head.pos);
+      const after = tr.mapping.map($head.after());
+      tr.insert(after, n.paragraph.create());
+      dispatch(tr.setSelection(TextSelection.create(tr.doc, after + 1)).scrollIntoView());
+    }
+    return true;
+  };
+}
+
 const insertBreak: Command = (state, dispatch) => {
   dispatch?.(state.tr.replaceSelectionWith(n.break.create()).scrollIntoView());
   return true;
@@ -172,7 +203,10 @@ export function plugins(): Plugin[] {
       "Mod-Alt-2": commands.heading(2),
       "Mod-Alt-3": commands.heading(3),
       "Shift-Enter": chainCommands(exitCode, insertBreak),
-      Enter: splitListItem(n.listItem),
+      "Mod-Enter": leaveCode("anywhere"),
+      Enter: chainCommands(leaveCode("emptyLine"), splitListItem(n.listItem)),
+      ArrowDown: leaveCode("lastLine"),
+      ArrowRight: leaveCode("atEnd"),
       Tab: sinkListItem(n.listItem),
       "Shift-Tab": liftListItem(n.listItem),
     }),

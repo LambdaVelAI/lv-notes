@@ -3,7 +3,7 @@ import { EditorState, TextSelection } from "prosemirror-state";
 import { describe, expect, it } from "vitest";
 import { isNodeId, newNodeId } from "../src/editor/ids";
 import { type Myst, mystIds, mystToPm, pmToMyst } from "../src/editor/myst";
-import { assignIds, plugins, renameIds } from "../src/editor/plugins";
+import { assignIds, leaveCode, plugins, renameIds } from "../src/editor/plugins";
 import { schema } from "../src/editor/schema";
 
 const fixtures = import.meta.glob<{ default: Myst }>("../../../crates/lv-core/tests/fixtures/myst/*.json", { eager: true });
@@ -156,5 +156,44 @@ describe("node IDs", () => {
     s = s.apply(renameIds(s, [[old, fresh]])!);
     expect(s.doc.firstChild!.attrs.id).toBe(fresh);
     expect(pmToMyst(s.doc).children[0].id).toBe(fresh);
+  });
+});
+
+describe("leaving a code block", () => {
+  const codeAtEnd = (value: string) => {
+    let s = state({ type: "root", children: [{ type: "code", value }] });
+    s = s.apply(assignIds(s)!);
+    return s.apply(s.tr.setSelection(TextSelection.create(s.doc, 1 + value.length)));
+  };
+  const run = (s: EditorState, command: ReturnType<typeof leaveCode>) => {
+    let next: EditorState | null = null;
+    const handled = command(s, (tr) => (next = s.apply(tr)));
+    return { handled, next: next as EditorState | null };
+  };
+  const shape = (s: EditorState) => s.doc.content.content.map((n) => `${n.type.name}:${JSON.stringify(n.textContent)}`);
+
+  it("Enter on an empty last line leaves and drops the line", () => {
+    const { handled, next } = run(codeAtEnd("x = 1\n"), leaveCode("emptyLine"));
+    expect(handled).toBe(true);
+    expect(shape(next!)).toEqual(['code:"x = 1"', 'paragraph:""']);
+    expect(next!.selection.$head.parent.type.name).toBe("paragraph");
+  });
+
+  it("Enter elsewhere is a newline", () => {
+    expect(run(codeAtEnd("x = 1"), leaveCode("emptyLine")).handled).toBe(false);
+  });
+
+  it("an arrow at the end of the note leaves; with something after, it moves as usual", () => {
+    const { next } = run(codeAtEnd("x = 1"), leaveCode("atEnd"));
+    expect(shape(next!)).toEqual(['code:"x = 1"', 'paragraph:""']);
+
+    let s = state({ type: "root", children: [{ type: "code", value: "x" }, { type: "paragraph", children: [{ type: "text", value: "after" }] }] });
+    s = s.apply(s.tr.setSelection(TextSelection.create(s.doc, 2)));
+    expect(run(s, leaveCode("atEnd")).handled).toBe(false);
+  });
+
+  it("does nothing outside code", () => {
+    const s = state({ type: "root", children: [{ type: "paragraph", children: [{ type: "text", value: "p" }] }] });
+    expect(run(s, leaveCode("anywhere")).handled).toBe(false);
   });
 });
