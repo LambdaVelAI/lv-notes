@@ -1,9 +1,10 @@
 //! The project as of some version: what the op log means.
 //!
 //! [`ProjectState::apply`] is the one definition of op semantics. The
-//! sequencer uses it to validate ops against the head, and replaying a log
-//! through it rebuilds the project. It is pure and deterministic: the same
-//! log always gives the same state.
+//! sequencer uses it to validate ops against the head, replaying a log
+//! through it rebuilds the project, and the [`Effects`] it returns tell
+//! projections exactly which rows to rewrite. It is pure and deterministic:
+//! the same log always gives the same state.
 //!
 //! Semantics worth knowing:
 //! - Deleted documents and nodes are tombstones. A deleted node keeps its
@@ -16,9 +17,10 @@
 //! - Ops in an open change set are checked against the project with that
 //!   change set applied, but only reach the project when it is accepted.
 //!   Acceptance replays them on the current project; if any no longer
-//!   applies, the accept is refused.
+//!   applies, the accept is refused. Replayed ops keep their own positions
+//!   as their `updated` version.
 
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 
 use serde_json::Value;
 
@@ -30,13 +32,16 @@ use crate::refusal::{Refusal, RefusalCode as Code};
 /// Attribute keys `SetAttrs` may not touch: they have dedicated ops or are structural.
 const RESERVED_ATTRS: [&str; 4] = ["type", "id", "children", "value"];
 /// Node types that are graph edges and can carry a relation.
-const EDGE_TYPES: [&str; 3] = ["link", "crossReference", "cite"];
+pub const EDGE_TYPES: [&str; 3] = ["link", "crossReference", "cite"];
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct DocumentState {
     pub kind: DocKind,
     pub title: String,
     pub deleted: bool,
+    pub created: Version,
+    /// Last document-level op (title, delete); node edits do not count.
+    pub updated: Version,
     /// Top-level nodes in order, tombstones included.
     children: Vec<NodeId>,
 }
@@ -49,6 +54,8 @@ pub struct NodeState {
     pub content: NodeContent,
     pub relation: Option<Relation>,
     pub deleted: bool,
+    /// Last op that changed this node itself (not its position among siblings).
+    pub updated: Version,
     /// Children in order, tombstones included.
     children: Vec<NodeId>,
     /// The last whole-text replacement: when, and by whom.
@@ -59,6 +66,10 @@ impl NodeState {
     pub fn text(&self) -> Option<&str> {
         self.content.fields.get("value").and_then(Value::as_str)
     }
+
+    pub fn is_edge(&self) -> bool {
+        EDGE_TYPES.contains(&self.content.node_type.as_str())
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -68,14 +79,51 @@ pub enum ChangeSetStatus {
     Rejected,
 }
 
+impl ChangeSetStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ChangeSetStatus::Open => "open",
+            ChangeSetStatus::Accepted => "accepted",
+            ChangeSetStatus::Rejected => "rejected",
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct ChangeSetState {
     pub author: Principal,
     pub base: Version,
     pub rationale: String,
     pub status: ChangeSetStatus,
+    pub opened: Version,
+    /// When it was accepted or rejected.
+    pub closed: Option<Version>,
     /// The proposed ops, in log order (not including `OpenChangeSet`).
     pub ops: Vec<Sequenced>,
+}
+
+/// What an applied op changed, for projections to rewrite.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Effects {
+    pub documents: BTreeSet<DocumentId>,
+    /// Nodes whose own row changed (content, parent, document, deletion).
+    pub nodes: BTreeSet<NodeId>,
+    /// Parents whose child order changed.
+    pub parents: BTreeSet<Parent>,
+    pub change_sets: BTreeSet<ChangeSetId>,
+}
+
+impl Effects {
+    pub fn is_empty(&self) -> bool {
+        self.documents.is_empty() && self.nodes.is_empty() && self.parents.is_empty() && self.change_sets.is_empty()
+    }
+
+    pub fn merge(&mut self, other: Effects) {
+        self.documents.extend(other.documents);
+        self.nodes.extend(other.nodes);
+        self.parents.extend(other.parents);
+        self.change_sets.extend(other.change_sets);
+    }
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -102,42 +150,70 @@ impl ProjectState {
         self.change_sets.get(&id)
     }
 
+    pub fn documents(&self) -> impl Iterator<Item = (DocumentId, &DocumentState)> {
+        self.documents.iter().map(|(id, d)| (*id, d))
+    }
+
+    pub fn nodes(&self) -> impl Iterator<Item = (NodeId, &NodeState)> {
+        self.nodes.iter().map(|(id, n)| (*id, n))
+    }
+
+    pub fn change_sets(&self) -> impl Iterator<Item = (ChangeSetId, &ChangeSetState)> {
+        self.change_sets.iter().map(|(id, c)| (*id, c))
+    }
+
     /// Live (not deleted) children of `parent`, in order.
     pub fn children(&self, parent: Parent) -> Vec<NodeId> {
-        self.siblings(parent)
+        self.child_slots(parent)
             .iter()
             .copied()
             .filter(|id| self.nodes.get(id).is_some_and(|n| !n.deleted))
             .collect()
     }
 
-    /// The project with open change set `id` applied, as its author sees it.
-    pub fn with_change_set(&self, id: ChangeSetId) -> Result<ProjectState, Refusal> {
-        let cs = self.open_change_set(id)?;
-        let mut view = self.clone();
-        for s in &cs.ops {
-            view.apply_now(s).map_err(|r| conflict(id, s, r))?;
+    /// All children of `parent` in order, tombstones included. A node's index
+    /// here is its stable sibling position.
+    pub fn child_slots(&self, parent: Parent) -> &[NodeId] {
+        match parent {
+            Parent::DocumentRoot(doc) => self.documents.get(&doc).map_or(&[], |d| &d.children),
+            Parent::Node(id) => self.nodes.get(&id).map_or(&[], |n| &n.children),
         }
-        Ok(view)
     }
 
-    /// Applies an accepted op. On refusal the state is unchanged.
-    pub fn apply(&mut self, s: &Sequenced) -> Result<(), Refusal> {
+    /// The project with open change set `id` applied, as its author sees it.
+    pub fn with_change_set(&self, id: ChangeSetId) -> Result<ProjectState, Refusal> {
+        self.replay_change_set(id).map(|(view, _)| view)
+    }
+
+    fn replay_change_set(&self, id: ChangeSetId) -> Result<(ProjectState, Effects), Refusal> {
+        let cs = self.open_change_set(id)?;
+        let mut view = self.clone();
+        let mut effects = Effects::default();
+        for s in &cs.ops {
+            effects.merge(view.apply_now(s).map_err(|r| conflict(id, s, r))?);
+        }
+        Ok((view, effects))
+    }
+
+    /// Applies an accepted op and reports what it changed. On refusal the
+    /// state is unchanged.
+    pub fn apply(&mut self, s: &Sequenced) -> Result<Effects, Refusal> {
         let result = match (s.op.change_set, &s.op.body) {
             (Some(_), OpBody::OpenChangeSet { .. }) | (None, _) => self.apply_now(s),
             (Some(id), _) => {
                 // Checked against the change set's own view; recorded, not applied.
                 self.with_change_set(id)?.apply_now(s)?;
                 self.change_sets.get_mut(&id).expect("checked open").ops.push(s.clone());
-                Ok(())
+                Ok(Effects::default())
             }
         };
         result.map_err(|r| r.for_op(s.op.id))
     }
 
     /// Applies `s` to this state directly, ignoring its change set.
-    fn apply_now(&mut self, s: &Sequenced) -> Result<(), Refusal> {
+    fn apply_now(&mut self, s: &Sequenced) -> Result<Effects, Refusal> {
         let op = &s.op;
+        let mut fx = Effects::default();
         match &op.body {
             OpBody::CreateDocument { doc, kind, title } => {
                 if self.documents.contains_key(doc) {
@@ -145,16 +221,31 @@ impl ProjectState {
                 }
                 self.documents.insert(
                     *doc,
-                    DocumentState { kind: *kind, title: title.clone(), deleted: false, children: Vec::new() },
+                    DocumentState {
+                        kind: *kind,
+                        title: title.clone(),
+                        deleted: false,
+                        created: s.seq,
+                        updated: s.seq,
+                        children: Vec::new(),
+                    },
                 );
+                fx.documents.insert(*doc);
             }
             OpBody::SetDocumentTitle { doc, title } => {
                 self.live_document(*doc)?;
-                self.documents.get_mut(doc).expect("live").title = title.clone();
+                let d = self.documents.get_mut(doc).expect("live");
+                d.title = title.clone();
+                d.updated = s.seq;
+                fx.documents.insert(*doc);
             }
             OpBody::DeleteDocument { doc } => {
                 let d = self.documents.get_mut(doc).ok_or_else(|| unknown_document(*doc))?;
-                d.deleted = true;
+                if !d.deleted {
+                    d.deleted = true;
+                    d.updated = s.seq;
+                    fx.documents.insert(*doc);
+                }
             }
 
             OpBody::InsertNode { node, parent, after, content } => {
@@ -172,11 +263,14 @@ impl ProjectState {
                         content: content.clone(),
                         relation: None,
                         deleted: false,
+                        updated: s.seq,
                         children: Vec::new(),
                         last_text_edit: None,
                     },
                 );
                 self.place(*node, *parent, *after);
+                fx.nodes.insert(*node);
+                fx.parents.insert(*parent);
             }
             OpBody::MoveNode { node, parent, after } => {
                 self.live_node(*node)?;
@@ -192,15 +286,26 @@ impl ProjectState {
                 self.siblings_mut(old).retain(|id| id != node);
                 self.nodes.get_mut(node).expect("live").parent = *parent;
                 self.place(*node, *parent, *after);
+                fx.parents.extend([old, *parent]);
                 for id in self.subtree(*node) {
-                    self.nodes.get_mut(&id).expect("in subtree").document = document;
+                    let n = self.nodes.get_mut(&id).expect("in subtree");
+                    if id == *node || n.document != document {
+                        n.document = document;
+                        n.updated = s.seq;
+                        fx.nodes.insert(id);
+                    }
                 }
             }
             OpBody::DeleteNode { node } => {
                 let n = self.nodes.get(node).ok_or_else(|| unknown_node(*node))?;
                 if !n.deleted {
                     for id in self.subtree(*node) {
-                        self.nodes.get_mut(&id).expect("in subtree").deleted = true;
+                        let n = self.nodes.get_mut(&id).expect("in subtree");
+                        if !n.deleted {
+                            n.deleted = true;
+                            n.updated = s.seq;
+                            fx.nodes.insert(id);
+                        }
                     }
                 }
             }
@@ -210,11 +315,13 @@ impl ProjectState {
                 if let Some(key) = set.keys().chain(unset).find(|k| RESERVED_ATTRS.contains(&k.as_str())) {
                     return Err(Refusal::new(Code::InvalidOp, format!("`{key}` cannot be changed with set_attrs")));
                 }
-                let fields = &mut self.nodes.get_mut(node).expect("live").content.fields;
+                let n = self.nodes.get_mut(node).expect("live");
                 for key in unset {
-                    fields.remove(key);
+                    n.content.fields.remove(key);
                 }
-                fields.extend(set.iter().map(|(k, v)| (k.clone(), v.clone())));
+                n.content.fields.extend(set.iter().map(|(k, v)| (k.clone(), v.clone())));
+                n.updated = s.seq;
+                fx.nodes.insert(*node);
             }
             OpBody::EditText { node, edit } => {
                 let n = self.live_node(*node)?;
@@ -234,17 +341,22 @@ impl ProjectState {
                     }
                 }
                 n.last_text_edit = Some((s.seq, op.principal));
+                n.updated = s.seq;
+                fx.nodes.insert(*node);
             }
 
             OpBody::SetRelation { node, relation } => {
                 let n = self.live_node(*node)?;
-                if !EDGE_TYPES.contains(&n.content.node_type.as_str()) {
+                if !n.is_edge() {
                     return Err(Refusal::new(
                         Code::InvalidOp,
                         format!("{node} is a `{}`; only links, citations and references take a relation", n.content.node_type),
                     ));
                 }
-                self.nodes.get_mut(node).expect("live").relation = relation.clone();
+                let n = self.nodes.get_mut(node).expect("live");
+                n.relation = relation.clone();
+                n.updated = s.seq;
+                fx.nodes.insert(*node);
             }
 
             OpBody::OpenChangeSet { change_set, rationale } => {
@@ -261,23 +373,33 @@ impl ProjectState {
                         base: op.base,
                         rationale: rationale.clone(),
                         status: ChangeSetStatus::Open,
+                        opened: s.seq,
+                        closed: None,
                         ops: Vec::new(),
                     },
                 );
+                fx.change_sets.insert(*change_set);
             }
             OpBody::AcceptChangeSet { change_set } => {
                 not_in_change_set(op.change_set)?;
-                let mut next = self.with_change_set(*change_set)?;
-                next.change_sets.get_mut(change_set).expect("open").status = ChangeSetStatus::Accepted;
+                let (mut next, replayed) = self.replay_change_set(*change_set)?;
+                let cs = next.change_sets.get_mut(change_set).expect("open");
+                cs.status = ChangeSetStatus::Accepted;
+                cs.closed = Some(s.seq);
                 *self = next;
+                fx.merge(replayed);
+                fx.change_sets.insert(*change_set);
             }
             OpBody::RejectChangeSet { change_set, .. } => {
                 not_in_change_set(op.change_set)?;
                 self.open_change_set(*change_set)?;
-                self.change_sets.get_mut(change_set).expect("open").status = ChangeSetStatus::Rejected;
+                let cs = self.change_sets.get_mut(change_set).expect("open");
+                cs.status = ChangeSetStatus::Rejected;
+                cs.closed = Some(s.seq);
+                fx.change_sets.insert(*change_set);
             }
         }
-        Ok(())
+        Ok(fx)
     }
 
     // ---- Checks --------------------------------------------------------
@@ -321,7 +443,7 @@ impl ProjectState {
             .get(&id)
             .ok_or_else(|| Refusal::new(Code::UnknownChangeSet, format!("{id} does not exist")))?;
         if cs.status != ChangeSetStatus::Open {
-            return Err(Refusal::new(Code::ChangeSetClosed, format!("{id} is {:?}", cs.status).to_lowercase()));
+            return Err(Refusal::new(Code::ChangeSetClosed, format!("{id} is {}", cs.status.as_str())));
         }
         Ok(cs)
     }
@@ -339,13 +461,6 @@ impl ProjectState {
     }
 
     // ---- Tree mechanics --------------------------------------------------
-
-    fn siblings(&self, parent: Parent) -> &[NodeId] {
-        match parent {
-            Parent::DocumentRoot(doc) => self.documents.get(&doc).map_or(&[], |d| &d.children),
-            Parent::Node(id) => self.nodes.get(&id).map_or(&[], |n| &n.children),
-        }
-    }
 
     fn siblings_mut(&mut self, parent: Parent) -> &mut Vec<NodeId> {
         match parent {

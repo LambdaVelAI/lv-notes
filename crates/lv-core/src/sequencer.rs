@@ -19,7 +19,7 @@ use crate::ids::{GrantId, OpId, ProjectId, Version};
 use crate::op::{Op, Sequenced};
 use crate::principal::Grant;
 use crate::refusal::{Refusal, RefusalCode};
-use crate::state::ProjectState;
+use crate::state::{Effects, ProjectState};
 
 /// Where accepted ops go, and where grants are looked up.
 pub trait ProjectLog {
@@ -27,8 +27,10 @@ pub trait ProjectLog {
 
     fn grant(&self, id: GrantId) -> Result<Option<Grant>, Self::Error>;
 
-    /// Persists the batch atomically. The sequencer only advances after this succeeds.
-    fn append(&mut self, batch: &[Sequenced]) -> Result<(), Self::Error>;
+    /// Persists the batch atomically. `state` is the project after the
+    /// batch and `effects` what the batch changed, for logs that keep
+    /// projections. The sequencer only advances after this succeeds.
+    fn append(&mut self, batch: &[Sequenced], state: &ProjectState, effects: &Effects) -> Result<(), Self::Error>;
 }
 
 /// An in-memory log, for tests and for clients without storage.
@@ -56,7 +58,7 @@ impl ProjectLog for MemoryLog {
         Ok(self.grants.get(&id).cloned())
     }
 
-    fn append(&mut self, batch: &[Sequenced]) -> Result<(), Infallible> {
+    fn append(&mut self, batch: &[Sequenced], _: &ProjectState, _: &Effects) -> Result<(), Infallible> {
         self.ops.extend_from_slice(batch);
         Ok(())
     }
@@ -129,6 +131,7 @@ impl Sequencer {
         }
 
         let mut next = self.state.clone();
+        let mut effects = Effects::default();
         let mut seen = HashSet::new();
         let mut sequenced = Vec::with_capacity(batch.len());
         let mut seq = self.head;
@@ -150,11 +153,11 @@ impl Sequencer {
 
             seq = seq.next();
             let s = Sequenced { seq, op };
-            next.apply(&s)?;
+            effects.merge(next.apply(&s)?);
             sequenced.push(s);
         }
 
-        log.append(&sequenced).map_err(SubmitError::Log)?;
+        log.append(&sequenced, &next, &effects).map_err(SubmitError::Log)?;
         self.state = next;
         self.head = seq;
         self.accepted.extend(sequenced.iter().map(|s| s.op.id));
@@ -170,7 +173,29 @@ impl ProjectLog for crate::store::Store {
         crate::store::Store::grant(self, id)
     }
 
-    fn append(&mut self, batch: &[Sequenced]) -> Result<(), Self::Error> {
-        crate::store::Store::append(self, batch)
+    fn append(&mut self, batch: &[Sequenced], state: &ProjectState, effects: &Effects) -> Result<(), Self::Error> {
+        self.commit(batch, state, effects)
+    }
+}
+
+#[cfg(feature = "sqlite")]
+#[derive(Debug, thiserror::Error)]
+pub enum LoadError {
+    #[error(transparent)]
+    Store(#[from] crate::store::StoreError),
+    #[error(transparent)]
+    Replay(#[from] ReplayError),
+}
+
+#[cfg(feature = "sqlite")]
+impl Sequencer {
+    /// Replays a project file's log, and rebuilds its projections if they
+    /// are behind the log or were built by another version.
+    pub fn load(store: &mut crate::store::Store) -> Result<Sequencer, LoadError> {
+        let sequencer = Sequencer::replay(store.project(), store.ops_since(Version::EMPTY)?)?;
+        if !store.projections_current()? {
+            store.rebuild_projections(sequencer.state())?;
+        }
+        Ok(sequencer)
     }
 }

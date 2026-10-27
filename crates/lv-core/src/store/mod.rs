@@ -1,18 +1,27 @@
 //! Project storage: one SQLite file per project.
 //!
-//! The store persists the op log and the principal registry. It checks
-//! storage integrity (right project, contiguous positions, known principals
-//! and grants) but not permissions: those go through the sequencer's single
-//! permission check. Projection tables are created here and filled by the
-//! projection code.
+//! The store persists the op log, the principal registry and the
+//! projections. It checks storage integrity (right project, contiguous
+//! positions, known principals and grants) but not permissions: those go
+//! through the sequencer's single permission check.
+//!
+//! Projections are written in the same transaction as the ops they reflect
+//! ([`Store::commit`]), so they never drift from the log. If they are behind
+//! or were built by another version, the next commit or
+//! [`Store::rebuild_projections`] rebuilds them from the state.
+
+mod projection;
+
+pub use projection::{PROJECTION_VERSION, PROJECTIONS};
 
 use std::path::Path;
 
 use rusqlite::{Connection, OpenFlags, OptionalExtension, Transaction, params};
 
-use crate::ids::{AgentId, ChangeSetId, GrantId, OpId, PersonId, ProjectId, Version};
-use crate::op::{Op, OpBody, Sequenced, Timestamp};
+use crate::ids::{AgentId, ChangeSetId, DocumentId, GrantId, NodeId, OpId, PersonId, ProjectId, Version};
+use crate::op::{Op, OpBody, Parent, Relation, Sequenced, Timestamp};
 use crate::principal::{Grant, GrantScope, Principal};
+use crate::state::{Effects, ProjectState};
 
 /// `PRAGMA application_id` of lv-notes project files ("LVNP").
 pub const APPLICATION_ID: i32 = 0x4C56_4E50;
@@ -107,6 +116,7 @@ impl Store {
             "INSERT INTO project (id, name, created_at) VALUES (?1, ?2, ?3)",
             params![project, name, Timestamp::now().0],
         )?;
+        projection::mark_built(&tx, Version::EMPTY)?;
         tx.commit()?;
         Ok(Store { conn, project })
     }
@@ -194,17 +204,101 @@ impl Store {
     ///
     /// Positions must continue the log without gaps, every op must belong to
     /// this project and be new, and its principal and grant must be
-    /// registered.
+    /// registered. This writes the log only and leaves projections behind;
+    /// prefer [`Store::commit`].
     pub fn append(&mut self, batch: &[Sequenced]) -> Result<()> {
         let tx = self.conn.transaction()?;
-        let mut expected = head(&tx)?.next();
-        for sequenced in batch {
-            check(self.project, expected, sequenced)?;
-            insert(&tx, sequenced)?;
-            expected = expected.next();
-        }
+        append_log(&tx, self.project, batch)?;
         tx.commit()?;
         Ok(())
+    }
+
+    /// Appends `batch` and updates the projections to `state`, the project
+    /// after the batch, in one transaction. `effects` names what the batch
+    /// changed; if the projections were not current before the batch they
+    /// are rebuilt from `state` instead.
+    pub fn commit(&mut self, batch: &[Sequenced], state: &ProjectState, effects: &Effects) -> Result<()> {
+        let tx = self.conn.transaction()?;
+        tx.pragma_update(None, "defer_foreign_keys", true)?;
+        let was_current = projection::is_current(&tx, head(&tx)?)?;
+        append_log(&tx, self.project, batch)?;
+        if was_current {
+            projection::write_effects(&tx, state, effects)?;
+        } else {
+            projection::rebuild(&tx, state)?;
+        }
+        projection::mark_built(&tx, head(&tx)?)?;
+        tx.commit()?;
+        Ok(())
+    }
+
+    /// Whether the projections were built by this version up to the head.
+    pub fn projections_current(&self) -> Result<bool> {
+        projection::is_current(&self.conn, self.head()?)
+    }
+
+    /// Rewrites every projection from `state`, which must be the project at
+    /// the log's head (e.g. from replaying the log).
+    pub fn rebuild_projections(&mut self, state: &ProjectState) -> Result<()> {
+        let tx = self.conn.transaction()?;
+        tx.pragma_update(None, "defer_foreign_keys", true)?;
+        projection::rebuild(&tx, state)?;
+        projection::mark_built(&tx, head(&tx)?)?;
+        tx.commit()?;
+        Ok(())
+    }
+
+    /// Every projection row as sorted text, for comparing two files.
+    #[doc(hidden)]
+    pub fn projection_snapshot(&self) -> Result<Vec<String>> {
+        projection::snapshot(&self.conn)
+    }
+
+    // ---- Projection queries -------------------------------------------------
+
+    /// Live children of `parent`, in order.
+    pub fn children(&self, parent: Parent) -> Result<Vec<NodeId>> {
+        let (doc, parent_id): (Option<DocumentId>, Option<NodeId>) = match parent {
+            Parent::DocumentRoot(doc) => (Some(doc), None),
+            Parent::Node(id) => (None, Some(id)),
+        };
+        let mut stmt = self.conn.prepare_cached(
+            "SELECT id FROM node
+             WHERE deleted = 0
+               AND ((?1 IS NOT NULL AND document_id = ?1 AND parent_id IS NULL) OR parent_id = ?2)
+             ORDER BY position",
+        )?;
+        let rows = stmt.query_map(params![doc, parent_id], |r| r.get(0))?;
+        Ok(rows.collect::<rusqlite::Result<_>>()?)
+    }
+
+    /// Live nodes whose text matches an FTS5 `query`, best match first.
+    pub fn search(&self, query: &str) -> Result<Vec<NodeId>> {
+        let mut stmt = self.conn.prepare_cached(
+            "SELECT node.id FROM search
+             JOIN node ON node.num = search.rowid
+             JOIN document ON document.id = node.document_id AND document.deleted = 0
+             WHERE search MATCH ?1
+             ORDER BY rank",
+        )?;
+        let rows = stmt.query_map([query], |r| r.get(0))?;
+        Ok(rows.collect::<rusqlite::Result<_>>()?)
+    }
+
+    /// Live links, references and citations pointing at `target`, either by
+    /// its ID or by its MyST label, with their relation if typed.
+    pub fn backlinks(&self, target: NodeId) -> Result<Vec<(NodeId, Option<Relation>)>> {
+        let mut stmt = self.conn.prepare_cached(
+            "SELECT edge.source_node, edge.relation FROM edge
+             JOIN document ON document.id = edge.source_doc AND document.deleted = 0
+             WHERE edge.target_node = ?1
+                OR edge.target = (SELECT identifier FROM node WHERE id = ?1 AND deleted = 0)
+             ORDER BY edge.source_node",
+        )?;
+        let rows = stmt.query_map([target], |r| {
+            Ok((r.get(0)?, r.get::<_, Option<String>>(1)?.map(Relation)))
+        })?;
+        Ok(rows.collect::<rusqlite::Result<_>>()?)
     }
 
     /// All ops after position `after`, in log order.
@@ -229,6 +323,16 @@ fn principal(person: PersonId, agent: Option<AgentId>) -> Principal {
         None => Principal::Person { person },
         Some(agent) => Principal::Agent { agent, on_behalf_of: person },
     }
+}
+
+fn append_log(tx: &Transaction<'_>, project: ProjectId, batch: &[Sequenced]) -> Result<()> {
+    let mut expected = head(tx)?.next();
+    for sequenced in batch {
+        check(project, expected, sequenced)?;
+        insert(tx, sequenced)?;
+        expected = expected.next();
+    }
+    Ok(())
 }
 
 fn head(conn: &Connection) -> Result<Version> {

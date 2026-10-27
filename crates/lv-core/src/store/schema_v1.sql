@@ -82,21 +82,25 @@ CREATE TABLE document (
 ) STRICT;
 
 -- Projection: the node tree of every document. `parent_id` NULL means the
--- node sits at its document's root. `order_key` sorts siblings.
+-- node sits at its document's root. `position` is the node's index among
+-- its siblings, tombstones included. `num` is a file-local row number used
+-- only to key the search index; it is never shared or exported.
 CREATE TABLE node (
-    id           BLOB    PRIMARY KEY CHECK (length(id) = 16),
+    num          INTEGER PRIMARY KEY,
+    id           BLOB    NOT NULL UNIQUE CHECK (length(id) = 16),
     document_id  BLOB    NOT NULL REFERENCES document(id),
     parent_id    BLOB    REFERENCES node(id),
-    order_key    TEXT    NOT NULL,
+    position     INTEGER NOT NULL,
     type         TEXT    NOT NULL,
+    identifier   TEXT,   -- MyST label target, for resolving references
     attrs        TEXT    NOT NULL DEFAULT '{}' CHECK (json_valid(attrs)),
     text         TEXT,
-    change_set   BLOB,   -- set while the node exists only in a pending proposal
     updated_seq  INTEGER NOT NULL,
     deleted      INTEGER NOT NULL DEFAULT 0 CHECK (deleted IN (0, 1))
 ) STRICT;
 
-CREATE INDEX node_children ON node (document_id, parent_id, order_key);
+CREATE INDEX node_children ON node (document_id, parent_id, position);
+CREATE INDEX node_identifier ON node (identifier) WHERE identifier IS NOT NULL;
 
 -- Projection: change sets and their review state.
 CREATE TABLE change_set (
@@ -110,22 +114,24 @@ CREATE TABLE change_set (
     closed_seq  INTEGER
 ) STRICT;
 
--- Projection: graph edges, read from link, cite and reference nodes.
+-- Projection: graph edges, one per live link, cite or reference node.
+-- `target` is the raw target as written: a URL, a label, a citation key,
+-- or an lv-notes ID (`node_…`, `doc_…`), which also fills target_node or
+-- target_doc. Labels resolve at query time by joining node.identifier.
 CREATE TABLE edge (
     source_node  BLOB    PRIMARY KEY REFERENCES node(id),
     source_doc   BLOB    NOT NULL REFERENCES document(id),
+    kind         TEXT    NOT NULL CHECK (kind IN ('link', 'crossReference', 'cite')),
+    target       TEXT,
     target_node  BLOB,
     target_doc   BLOB,
-    target_ext   TEXT,    -- citation key or URL when the target is outside the project
     relation     TEXT     -- NULL while untyped
 ) STRICT;
+
+CREATE INDEX edge_target ON edge (target) WHERE target IS NOT NULL;
 
 CREATE INDEX edge_target_node ON edge (target_node);
 CREATE INDEX edge_target_doc ON edge (target_doc);
 
--- Projection: full-text search over node text.
-CREATE VIRTUAL TABLE search USING fts5 (
-    text,
-    node_id UNINDEXED,
-    document_id UNINDEXED
-);
+-- Projection: full-text search over live node text, keyed by node.num.
+CREATE VIRTUAL TABLE search USING fts5 (text);

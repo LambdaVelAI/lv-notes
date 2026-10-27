@@ -250,24 +250,47 @@ after the fact. Auto-accept can happen in the same batch as the edits.
 The UX for the toggle (where it lives, how self-accepted sets are
 surfaced for later review) is still to be designed.
 
-## 5. What the storage layer will look like (preview only)
+## 5. Storage and projections (implemented)
 
-One SQLite file per project. These tables come next, after this proposal is
-agreed:
+One SQLite file per project; the schema is in `store/schema_v1.sql`.
 
-- `project` (a single row: id, created_at, schema version)
-- `person`, `agent`, `grant`
-- `op_log` (`seq INTEGER PRIMARY KEY`, `op_id BLOB UNIQUE`, `base`, principal
-  columns, `grant_id`, `change_set`, `created_at`, `body` as JSON plus
-  `body_format` version)
-- `change_set` (id, author, base, rationale, state)
-- projections: `document`, `node` (id, doc, parent, order key, type, attrs
-  JSON, text, deleted), `edge` (from node, target, relation), `search` (FTS5),
-  plus `projection_meta` (name, producer and version, `built_through_seq`),
-  which records invariant 7's provenance.
+- **Source of truth:** `op_log`, which is append-only (enforced by
+  triggers), plus the `person`, `agent` and `grants` registry. Op bodies are
+  JSON with a `body_format` column, so the format can change later.
+- **Projections:**
+  - `document` and `node`: the tree, with sibling `position`, MyST
+    `identifier`, attributes, text and tombstones.
+  - `edge`: one row per live link, cross-reference or citation, with its
+    raw target and relation.
+  - `change_set`: author, rationale and review state.
+  - `search`: FTS5 over live node text.
+  - `projection_meta`: records which version built the projections and up
+    to which op (invariant 7).
 
-Op bodies are stored as **JSON** in v1: easy to debug and to migrate. The
-format version column leaves room to move to a binary format later.
+How projections stay correct:
+
+- **No SQL semantics.** `ProjectState::apply` returns `Effects`: the
+  documents, nodes, re-ordered parents and change sets an op changed. The
+  store rewrites exactly those rows from the new state. A rebuild writes
+  every row from a replayed state, and a test checks after every op that
+  both give identical tables.
+- **Same transaction as the log.** `Store::commit` appends ops and updates
+  projections atomically. If the projections were not current before a
+  commit (e.g. after a log-only `append`, or a file from another
+  `PROJECTION_VERSION`), the commit rebuilds them instead.
+  `Sequencer::load` rebuilds them on open for the same reasons.
+- **Pending proposals are not projected.** Open change sets appear only as
+  `change_set` rows. A UI shows a proposal with
+  `ProjectState::with_change_set`.
+- **References by label.** Edges keep their target as written. Labels
+  (`#slow-reading`, `{ref}` identifiers) resolve at query time by joining
+  `node.identifier`, so adding or renaming a label needs no edge rewrite.
+  IDs (`node_…`, `doc_…`) also fill `target_node` / `target_doc`.
+- **`node.num`** is a file-local row number keying the FTS index. It is
+  never shared or exported, so invariant 4 holds.
+
+Queries so far: `Store::children`, `Store::search` (FTS5 syntax) and
+`Store::backlinks` (by ID or label, with relation).
 
 ## Decisions
 
@@ -289,12 +312,17 @@ format version column leaves room to move to a binary format later.
   non-contiguous, duplicate or unregistered-principal ops. Permission is
   `authorize` (`auth.rs`).
 - **Cost per submit.** The sequencer validates on a full copy of the
-  in-memory state, and change-set ops also replay their set on a copy. That
+  in-memory state (projection writes are proportional to what changed), and change-set ops also replay their set on a copy. That
   is O(project size) per submit: fine for v1-sized projects, but it calls for
   persistent maps (e.g. `imbl`) or an undo journal before large corpora.
 - **The toggle itself is not logged.** Grants are a registry table, so
   turning auto mode on or off is not in the op log yet; it should become an
   op along with grant changes generally.
+- **Updated versions after accept.** Ops replayed by an accept keep their
+  own position as the node's `updated` version, not the accept's.
+- **Label resolution is project-wide and first-match.** Two nodes with the
+  same `identifier` both match a backlink query. MyST requires unique labels
+  per project, but nothing enforces that yet.
 - **Revoked grants.** `grants.revoked_at` exists, but there is no revoke API
   and `authorize` does not look at it yet.
 - **wasm.** The crate builds without the `sqlite` feature. On
