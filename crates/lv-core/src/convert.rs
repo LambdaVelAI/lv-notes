@@ -55,6 +55,9 @@ pub enum ImportError {
     MissingId(String),
     #[error("a `{0}` node's `value` must be a string")]
     BadValue(String),
+    /// A parsed file did not form a MyST tree.
+    #[error("not a MyST document: {0}")]
+    Invalid(String),
 }
 
 #[derive(Debug, PartialEq, Eq, thiserror::Error)]

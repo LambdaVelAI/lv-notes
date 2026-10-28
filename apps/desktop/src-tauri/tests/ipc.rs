@@ -92,14 +92,20 @@ fn the_ui_round_trip() {
     assert_eq!((links[0]["source_doc"].as_str(), links[0]["target"].as_str()), (Some(other.as_str()), Some(block.as_str())));
     let registry = invoke(&window, "registry", json!({})).unwrap();
     assert!(registry.as_array().unwrap().iter().any(|e| e["namespace"] == "relation" && e["name"] == "supports" && e["label"] == "Supports"));
-    let exported = invoke(&window, "export_project", json!({ "dir": files.path() })).unwrap();
+    let exported = invoke(&window, "export_project", json!({ "dir": files.path(), "format": "obsidian" })).unwrap();
     assert_eq!(exported["files"], 2);
+    let imported = invoke(&window, "import_folder", json!({ "dir": exported["path"], "format": "obsidian" })).unwrap();
+    assert_eq!((imported["notes"].as_u64(), imported["info"]["documents"].as_array().map(Vec::len)), (Some(2), Some(4)));
+    let book = invoke(&window, "export_project", json!({ "dir": files.path(), "format": "book" })).unwrap();
+    assert_eq!(book["files"], 4);
     let one = files.path().join("hello.md");
     invoke(&window, "export_document", json!({ "doc": doc, "path": one })).unwrap();
     assert!(std::fs::read_to_string(&one).unwrap().contains("Hello"));
     invoke(&window, "delete_document", json!({ "doc": other })).unwrap();
     assert_eq!(invoke(&window, "backlinks", json!({ "doc": doc })).unwrap(), json!([]));
 
+    // The imported copies stay.
     let info = invoke(&window, "delete_document", json!({ "doc": doc })).unwrap();
-    assert_eq!(info["documents"], json!([]));
+    let titles: Vec<&str> = info["documents"].as_array().unwrap().iter().map(|d| d["title"].as_str().unwrap()).collect();
+    assert_eq!(titles, ["Hello", "Other"]);
 }

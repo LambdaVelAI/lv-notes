@@ -35,7 +35,8 @@ The UI never builds ops. It sends whole documents:
 | `search_blocks(text, limit?)` | Blocks whose text matches every word (as a prefix), best first |
 | `locate(target)` | Where a `doc_…` / `node_…` link target is now, or null if it is gone |
 | `registry()` | The project's vocabulary: document kinds, block kinds, relations (`registry.md`) |
-| `export_project(dir)` | Writes every note as MyST Markdown into a new folder in `dir` |
+| `export_project(dir, format)` | Writes every note into a new folder in `dir`, as a Jupyter Book (`book`) or an Obsidian vault (`obsidian`) |
+| `import_folder(dir, format)` | Imports a Jupyter Book or Obsidian vault as new notes, in one batch |
 | `export_document(doc, path)` | Writes one note as MyST Markdown to `path` |
 
 After every accepted batch the app emits `project-changed {version,
@@ -139,14 +140,17 @@ links are links with any other url.
 - The in-memory preview backend answers the same three queries by walking
   its stored trees.
 
-## Export
+## Import and export
 
-"Export all…" in the sidebar asks for a folder and writes every note into
-a new subfolder named after the project (`my-thesis`, then `my-thesis-2`,
-...), so an export never overwrites anything. "Export note…" saves the open
-note to a file the save dialog picks. Both use `lv_core::export`
-(`docs/design/ops-and-ids.md`, section 6); the shell only writes the files.
-The browser preview can't export.
+The sidebar's **Export…** menu saves the open note as MyST Markdown, or
+writes every note into a new subfolder named after the project
+(`my-thesis`, then `my-thesis-2`, ...) as a Jupyter Book 2 project or an
+Obsidian vault, so an export never overwrites anything. **Import…** reads a
+Jupyter Book folder or an Obsidian vault into new notes, opens the first,
+and reports skipped notebooks and links that point outside the folder. The
+formats, and how links and IDs survive a round trip, are in
+`interchange.md`; the shell only reads and writes files. The browser
+preview can't import or export.
 
 ## Tests
 

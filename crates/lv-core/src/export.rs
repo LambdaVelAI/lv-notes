@@ -1,4 +1,5 @@
-//! Markdown export: a project's documents as MyST Markdown files.
+//! Markdown export: a project's documents as MyST Markdown files, as a
+//! Jupyter Book 2 project, or as an Obsidian vault.
 //!
 //! Each live document becomes one `.md` file with its title in the
 //! frontmatter. Links inside the project are rewritten from IDs to paths: a
@@ -8,6 +9,12 @@
 //! resolves. Other lv-notes fields (IDs, relations) are not exported; see
 //! `docs/design/ops-and-ids.md`.
 //!
+//! The Obsidian flavor ([`obsidian_vault`]) names files by title, writes
+//! links as `[[Title]]` and `[[Title#^n-…]]` with a matching `^n-…` block
+//! ID on the target, turns admonitions and proofs into callouts, and keeps
+//! MyST-only lines (targets, comments, block breaks) in `%% … %%` comments,
+//! so `import::import_folder` reads a vault back with the same block IDs.
+//!
 //! Nothing here touches the file system: callers write the files.
 
 use std::collections::{HashMap, HashSet};
@@ -15,14 +22,15 @@ use std::fmt::Write as _;
 
 use serde_json::{Map, Value};
 
-use crate::convert::{Flavor, enclosing_block, materialize};
+use crate::convert::{Flavor, enclosing_block, materialize, plain_text};
 use crate::ids::{DocumentId, NodeId};
 use crate::state::ProjectState;
 
-/// One exported document.
+/// One exported file.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ExportedFile {
-    pub doc: DocumentId,
+    /// The document it holds; `None` for project files like `myst.yml`.
+    pub doc: Option<DocumentId>,
     /// The file name, unique within the export (`reading-notes.md`).
     pub name: String,
     pub markdown: String,
@@ -31,14 +39,53 @@ pub struct ExportedFile {
 /// Every live document as Markdown, oldest first, with links between them
 /// rewritten to relative paths.
 pub fn project_markdown(state: &ProjectState) -> Vec<ExportedFile> {
-    let exporter = Exporter::new(state);
+    let exporter = Exporter::new(state, Style::Myst);
     exporter.docs.iter().map(|&doc| exporter.file(doc)).collect()
+}
+
+/// The project as a Jupyter Book 2 (mystmd) project: [`project_markdown`]
+/// plus a `myst.yml` listing the notes in order.
+pub fn jupyter_book(state: &ProjectState, project_title: &str) -> Vec<ExportedFile> {
+    let mut files = project_markdown(state);
+    let mut yml = String::from("# A Jupyter Book 2 (mystmd) project, exported from lv-notes.\nversion: 1\nproject:\n");
+    writeln!(yml, "  title: {}", Value::String(project_title.to_owned())).unwrap();
+    yml.push_str("  toc:\n");
+    for f in &files {
+        writeln!(yml, "    - file: {}", f.name).unwrap();
+    }
+    yml.push_str("site:\n  template: book-theme\n");
+    files.push(ExportedFile { doc: None, name: "myst.yml".to_owned(), markdown: yml });
+    files
+}
+
+/// The project as an Obsidian vault: one `Title.md` per note.
+pub fn obsidian_vault(state: &ProjectState) -> Vec<ExportedFile> {
+    let exporter = Exporter::new(state, Style::Obsidian);
+    exporter.docs.iter().map(|&doc| exporter.file(doc)).collect()
+}
+
+/// Which Markdown dialect to write.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Style {
+    /// MyST Markdown (Jupyter Book 2).
+    Myst,
+    /// Obsidian Markdown.
+    Obsidian,
+}
+
+/// A file name Obsidian accepts for `title`, keeping the title readable:
+/// characters it forbids in note names become spaces.
+pub fn obsidian_name(title: &str) -> String {
+    let cleaned: String = title.chars().map(|c| if "*\"\\/<>:|?#^[]".contains(c) { ' ' } else { c }).collect();
+    let cleaned = cleaned.split_whitespace().collect::<Vec<_>>().join(" ");
+    let cleaned = cleaned.trim_start_matches('.').to_owned();
+    if cleaned.is_empty() { "Untitled".to_owned() } else { cleaned.chars().take(120).collect() }
 }
 
 /// One document as Markdown. Links to other documents point at the file
 /// names a whole-project export would give them.
 pub fn document_markdown(state: &ProjectState, doc: DocumentId) -> Option<ExportedFile> {
-    let exporter = Exporter::new(state);
+    let exporter = Exporter::new(state, Style::Myst);
     exporter.names.contains_key(&doc).then(|| exporter.file(doc))
 }
 
@@ -58,6 +105,7 @@ pub fn slug(title: &str) -> String {
 
 struct Exporter<'a> {
     state: &'a ProjectState,
+    style: Style,
     docs: Vec<DocumentId>,
     names: HashMap<DocumentId, String>,
     /// Labels for linked blocks, and whether the export must add a target.
@@ -65,7 +113,7 @@ struct Exporter<'a> {
 }
 
 impl<'a> Exporter<'a> {
-    fn new(state: &'a ProjectState) -> Exporter<'a> {
+    fn new(state: &'a ProjectState, style: Style) -> Exporter<'a> {
         let mut docs: Vec<_> = state.documents().filter(|(_, d)| !d.deleted).map(|(id, d)| (d.created, id)).collect();
         docs.sort();
         let docs: Vec<DocumentId> = docs.into_iter().map(|(_, id)| id).collect();
@@ -73,11 +121,16 @@ impl<'a> Exporter<'a> {
         let mut taken = HashSet::new();
         let mut names = HashMap::new();
         for &doc in &docs {
-            let base = slug(&state.document(doc).expect("live").title);
+            let title = &state.document(doc).expect("live").title;
+            let (base, sep) = match style {
+                Style::Myst => (slug(title), "-"),
+                Style::Obsidian => (obsidian_name(title), " "),
+            };
             let mut name = format!("{base}.md");
             let mut n = 2;
-            while !taken.insert(name.clone()) {
-                name = format!("{base}-{n}.md");
+            // Obsidian matches names without regard to case.
+            while !taken.insert(name.to_lowercase()) {
+                name = format!("{base}{sep}{n}.md");
                 n += 1;
             }
             names.insert(doc, name);
@@ -94,15 +147,20 @@ impl<'a> Exporter<'a> {
             };
             let Some(block) = enclosing_block(state, target) else { continue };
             let Some(b) = state.node(block).filter(|b| !b.deleted && names.contains_key(&b.document)) else { continue };
-            let label = b.content.fields.get("identifier").and_then(Value::as_str).filter(|_| b.content.fields.contains_key("label"));
-            let anchor = match label {
-                Some(label) => (label.to_owned(), false),
-                None => (format!("node-{}", block.to_string().trim_start_matches("node_")), true),
+            let uuid = block.to_string().trim_start_matches("node_").to_owned();
+            let anchor = match style {
+                // Obsidian links headings by their text, other blocks by a block ID.
+                Style::Obsidian if b.content.node_type == "heading" => (plain_text(state, block), false),
+                Style::Obsidian => (format!("n-{uuid}"), true),
+                Style::Myst => match b.content.fields.get("identifier").and_then(Value::as_str).filter(|_| b.content.fields.contains_key("label")) {
+                    Some(label) => (label.to_owned(), false),
+                    None => (format!("node-{uuid}"), true),
+                },
             };
             anchors.insert(target, anchor.clone());
             anchors.insert(block, anchor);
         }
-        Exporter { state, docs, names, anchors }
+        Exporter { state, style, docs, names, anchors }
     }
 
     fn file(&self, doc: DocumentId) -> ExportedFile {
@@ -114,8 +172,24 @@ impl<'a> Exporter<'a> {
             let id: NodeId = id.parse().ok()?;
             self.anchors.get(&id).filter(|(_, add)| *add).map(|(label, _)| label.clone())
         };
-        let markdown = Writer { links: &links, targets: &targets }.document(&root, title);
-        ExportedFile { doc, name: self.names[&doc].clone(), markdown }
+        let wiki = |url: &str| self.wiki(doc, url);
+        let writer = Writer { links: &links, targets: &targets, wiki: &wiki, style: self.style };
+        let markdown = writer.document(&root, if self.style == Style::Obsidian { "" } else { title });
+        ExportedFile { doc: Some(doc), name: self.names[&doc].clone(), markdown }
+    }
+
+    /// An Obsidian wikilink target (`Title`, `Title#^n-…`, `#^n-…`) for an
+    /// internal url; `None` for other urls.
+    fn wiki(&self, from: DocumentId, url: &str) -> Option<String> {
+        let note = |doc: &DocumentId| self.names.get(doc).map(|n| n.trim_end_matches(".md").to_owned());
+        if let Ok(doc) = url.parse::<DocumentId>() {
+            return note(&doc);
+        }
+        let node: NodeId = url.parse().ok()?;
+        let n = self.state.node(node).filter(|n| !n.deleted)?;
+        let (label, block_id) = self.anchors.get(&node)?;
+        let fragment = if *block_id { format!("#^{label}") } else { format!("#{label}") };
+        Some(if n.document == from { fragment } else { format!("{}{fragment}", note(&n.document)?) })
     }
 
     /// A link url as it should read in `from`'s file.
@@ -138,6 +212,9 @@ pub struct Writer<'a> {
     pub links: &'a dyn Fn(&str) -> Option<String>,
     /// A target label to add before the block with this `id`, if any.
     pub targets: &'a dyn Fn(&str) -> Option<String>,
+    /// Obsidian only: the wikilink target for an internal url.
+    pub wiki: &'a dyn Fn(&str) -> Option<String>,
+    pub style: Style,
 }
 
 fn s<'v>(node: &'v Value, key: &str) -> Option<&'v str> {
@@ -261,6 +338,7 @@ impl Writer<'_> {
                     Some(meta) => format!("+++ {meta}"),
                     None => "+++".to_owned(),
                 };
+                let marker = self.hidden(marker);
                 if i > 0 || child.get("meta").is_some() {
                     parts.push(marker);
                 }
@@ -286,9 +364,34 @@ impl Writer<'_> {
     fn block(&self, node: &Value) -> String {
         let body = self.block_body(node);
         match s(node, "id").and_then(|id| (self.targets)(id)) {
-            Some(label) if !body.is_empty() => format!("({label})=\n{body}"),
+            Some(label) if !body.is_empty() => match self.style {
+                Style::Myst => format!("({label})=\n{body}"),
+                // A block ID ends a paragraph's or heading's last line, and
+                // follows any other block on a line of its own.
+                Style::Obsidian if matches!(ty(node), "paragraph" | "heading") => format!("{body} ^{label}"),
+                Style::Obsidian => format!("{body}\n\n^{label}"),
+            },
             _ => body,
         }
+    }
+
+    /// A line only lv-notes reads back: as is in MyST, in a `%%` comment
+    /// (hidden by Obsidian) otherwise.
+    fn hidden(&self, line: String) -> String {
+        match self.style {
+            Style::Myst => line,
+            Style::Obsidian => format!("%% {line} %%"),
+        }
+    }
+
+    /// An Obsidian callout: `> [!kind] Title`, then the body.
+    fn callout(&self, kind: &str, node: &Value) -> String {
+        let (title, body): (Vec<&Value>, Vec<&Value>) = kids(node).iter().partition(|c| ty(c) == "admonitionTitle");
+        let title = title.first().map(|t| self.inline(kids(t))).unwrap_or_default();
+        let body = self.flow(&body.into_iter().cloned().collect::<Vec<_>>(), false);
+        let head = if title.is_empty() { format!("[!{kind}]") } else { format!("[!{kind}] {title}") };
+        let all = if body.is_empty() { head } else { format!("{head}\n{body}") };
+        indent(&all, "> ", "> ")
     }
 
     fn block_body(&self, node: &Value) -> String {
@@ -319,8 +422,22 @@ impl Writer<'_> {
             }
             "html" => s(node, "value").unwrap_or("").to_owned(),
             "image" => self.image(node),
-            "mystTarget" => format!("({})=", s(node, "label").unwrap_or("")),
+            "mystTarget" => self.hidden(format!("({})=", s(node, "label").unwrap_or(""))),
+            "mystComment" if self.style == Style::Obsidian => format!("%% {} %%", s(node, "value").unwrap_or("")),
             "mystComment" => indent(s(node, "value").unwrap_or(""), "% ", "% "),
+            "admonition" if self.style == Style::Obsidian => self.callout(s(node, "kind").unwrap_or("note"), node),
+            "proof" if self.style == Style::Obsidian => {
+                let kind = s(node, "kind").unwrap_or("proof");
+                let known = crate::markdown::is_proof_kind(kind);
+                self.callout(&if known { kind.to_owned() } else { format!("prf:{kind}") }, node)
+            }
+            // Obsidian has callouts for these: write the parsed content.
+            "mystDirective"
+                if self.style == Style::Obsidian
+                    && kids(node).first().is_some_and(|c| matches!(ty(c), "admonition" | "proof")) =>
+            {
+                self.block_body(&kids(node)[0])
+            }
             "mystDirective" => self.directive(node),
             "admonition" => {
                 let kind = s(node, "kind").unwrap_or("note");
@@ -501,10 +618,21 @@ impl Writer<'_> {
 
     fn phrase(&self, node: &Value) -> String {
         match ty(node) {
+            // Brackets stay plain in Obsidian, where `[[...]]` and `![[...]]`
+            // left as text are links and embeds to things outside the vault.
+            "text" if self.style == Style::Obsidian => escape(s(node, "value").unwrap_or("")).replace("\\[", "[").replace("\\]", "]"),
             "text" => escape(s(node, "value").unwrap_or("")),
             "emphasis" => format!("*{}*", self.inline(kids(node))),
             "strong" => format!("**{}**", self.inline(kids(node))),
             "delete" => format!("~~{}~~", self.inline(kids(node))),
+            "underline" | "subscript" | "superscript" if self.style == Style::Obsidian => {
+                let tag = match ty(node) {
+                    "underline" => "u",
+                    "subscript" => "sub",
+                    _ => "sup",
+                };
+                format!("<{tag}>{}</{tag}>", self.inline(kids(node)))
+            }
             "underline" => Writer::role("u", &text(node)),
             "subscript" => Writer::role("sub", &text(node)),
             "superscript" => Writer::role("sup", &text(node)),
@@ -519,7 +647,25 @@ impl Writer<'_> {
                 if value.contains('$') { Writer::role("math", value) } else { format!("${value}$") }
             }
             "break" => "\\\n".to_owned(),
+            "html" => s(node, "value").unwrap_or("").to_owned(),
             "image" => format!("![{}]({})", escape(s(node, "alt").unwrap_or("")), link_dest(s(node, "url").unwrap_or(""), s(node, "title"))),
+            "link" if self.style == Style::Obsidian && (self.wiki)(s(node, "url").unwrap_or("")).is_some() => {
+                let target = (self.wiki)(s(node, "url").unwrap_or("")).expect("checked");
+                let shown = text(node);
+                // Unaliased wikilinks were imported showing their own target,
+                // whose block ID may since have changed.
+                let note = target.split('#').next().unwrap_or("");
+                let unaliased = shown.is_empty()
+                    || shown == target
+                    || shown == target.trim_start_matches('#')
+                    || (target.contains('#') && !note.is_empty() && shown.starts_with(&format!("{note}#")))
+                    || (target.starts_with("#^") && shown.starts_with('^'));
+                if unaliased {
+                    format!("[[{target}]]")
+                } else {
+                    format!("[[{target}|{}]]", shown.replace(['[', ']', '|'], " "))
+                }
+            }
             "link" => {
                 let url = s(node, "url").unwrap_or("");
                 let url = (self.links)(url).unwrap_or_else(|| url.to_owned());
@@ -536,6 +682,10 @@ impl Writer<'_> {
             }
             "cite" => self.cite(node),
             "footnoteReference" => format!("[^{}]", s(node, "label").or(s(node, "identifier")).unwrap_or("")),
+            "mystRole" if self.style == Style::Obsidian && matches!(s(node, "name"), Some("sub" | "sup" | "u")) => {
+                let tag = s(node, "name").unwrap_or("");
+                format!("<{tag}>{}</{tag}>", escape(s(node, "value").unwrap_or("")))
+            }
             "mystRole" => Writer::role(s(node, "name").unwrap_or(""), s(node, "value").unwrap_or("")),
             "abbreviation" => match s(node, "title") {
                 Some(title) => Writer::role("abbr", &format!("{} ({title})", text(node))),

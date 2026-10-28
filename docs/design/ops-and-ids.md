@@ -360,6 +360,8 @@ a link into the block it sits in and that block's text.
   leaf (`text`, `code`, …) is refused too. That makes `materialize`
   infallible in practice.
 
+- **Markdown import and Jupyter Book / Obsidian folders**: see
+  `interchange.md`.
 - **Markdown export** (`export.rs`) writes MyST Markdown from the plain
   tree: each live document becomes `<slug of its title>.md` (`-2`, ... on
   clashes) with its title in the frontmatter. Links inside the project are

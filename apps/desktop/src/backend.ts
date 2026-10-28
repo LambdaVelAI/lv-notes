@@ -81,6 +81,21 @@ export interface RegistryEntry {
   inverse_label?: string;
 }
 
+/** A folder format for import and export. */
+export type FolderFormat = "book" | "obsidian";
+
+/** What a folder import brought in. */
+export interface ImportedFolder {
+  notes: number;
+  /** The first note, to open. */
+  first: string | null;
+  /** Files left out (notebooks, for now). */
+  skipped: string[];
+  /** Links to notes or blocks that weren't in the folder. */
+  unresolved: number;
+  info: ProjectInfo;
+}
+
 /** A failed command: a stable code (refusal codes, `STALE_BASE`, ...) and a message. */
 export class BackendError extends Error {
   constructor(readonly code: string, message: string) {
@@ -105,8 +120,13 @@ export interface Backend {
   searchBlocks(text: string): Promise<BlockInfo[]>;
   /** Where a `doc_…` / `node_…` link target is; null if missing. */
   locate(target: string): Promise<Located | null>;
-  /** Asks for a folder and writes every note as Markdown into a new folder there; null if cancelled. */
-  exportProject(): Promise<Exported | null>;
+  /**
+   * Asks for a folder and writes every note into a new folder there, as a
+   * Jupyter Book or an Obsidian vault; null if cancelled.
+   */
+  exportProject(format: FolderFormat): Promise<Exported | null>;
+  /** Asks for a Jupyter Book or Obsidian vault folder and imports its notes; null if cancelled. */
+  importFolder(format: FolderFormat): Promise<ImportedFolder | null>;
   /** Asks where to save `doc` as Markdown; null if cancelled. */
   exportDocument(doc: string, title: string): Promise<Exported | null>;
   /** The project's vocabulary: document kinds, block kinds, relations. */
@@ -153,9 +173,15 @@ async function tauriBackend(): Promise<Backend> {
     backlinks: (doc) => call("backlinks", { doc }),
     searchBlocks: (text) => call("search_blocks", { text }),
     locate: (target) => call("locate", { target }),
-    async exportProject() {
-      const dir = await dialog.open({ title: "Export as Markdown into…", directory: true, multiple: false });
-      return dir ? call("export_project", { dir }) : null;
+    async exportProject(format) {
+      const title = format === "book" ? "Export as a Jupyter Book into…" : "Export as an Obsidian vault into…";
+      const dir = await dialog.open({ title, directory: true, multiple: false });
+      return dir ? call("export_project", { dir, format }) : null;
+    },
+    async importFolder(format) {
+      const title = format === "book" ? "Import a Jupyter Book folder" : "Import an Obsidian vault";
+      const dir = await dialog.open({ title, directory: true, multiple: false });
+      return dir ? call("import_folder", { dir, format }) : null;
     },
     async exportDocument(doc, title) {
       const name = (title || "Untitled").replace(/[\\/:*?"<>|]+/g, "-");
@@ -279,6 +305,9 @@ export function memoryBackend(seed: { title: string; myst: Myst }[] = []): Backe
     },
     async exportProject() {
       throw new BackendError("UNSUPPORTED", "Export needs the desktop app");
+    },
+    async importFolder() {
+      throw new BackendError("UNSUPPORTED", "Import needs the desktop app");
     },
     async exportDocument() {
       throw new BackendError("UNSUPPORTED", "Export needs the desktop app");

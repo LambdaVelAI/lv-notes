@@ -107,7 +107,7 @@ fn links_between_notes_become_relative_paths() {
     assert_eq!(names, ["slow-reading.md", "notes-a-draft.md", "slow-reading-2.md"]);
 
     let anchor = format!("node-{}", plain.to_string().trim_start_matches("node_"));
-    let from = &files.iter().find(|f| f.doc == source).unwrap().markdown;
+    let from = &files.iter().find(|f| f.doc == Some(source)).unwrap().markdown;
     assert!(from.starts_with("---\ntitle: \"Notes: a draft?\"\n---\n\n"), "{from}");
     assert!(from.contains("[note](slow-reading.md)"), "{from}");
     assert!(from.contains("[heading](slow-reading.md#slow)"), "{from}");
@@ -115,7 +115,7 @@ fn links_between_notes_become_relative_paths() {
     assert!(from.contains("[gone](node_"), "a dangling link keeps its url: {from}");
 
     // The plain paragraph gets a target to link to; the labelled heading doesn't need one.
-    let to = &files.iter().find(|f| f.doc == target).unwrap().markdown;
+    let to = &files.iter().find(|f| f.doc == Some(target)).unwrap().markdown;
     assert_eq!(to, &format!("---\ntitle: Slow reading\n---\n\n# Slow\n\n({anchor})=\nA claim.\n"));
 }
 

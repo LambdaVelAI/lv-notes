@@ -4,7 +4,7 @@
 // native MyST with the version it was based on. The core works out the ops,
 // so this file never builds ops itself. One save is in flight at a time.
 
-import { type Backend, BackendError, type Backlink, type Located, type ProjectInfo, type RegistryEntry, connect } from "./backend";
+import { type Backend, BackendError, type Backlink, type FolderFormat, type Located, type ProjectInfo, type RegistryEntry, connect } from "./backend";
 import { MystEditor } from "./editor/editor";
 import { isInternalTarget } from "./editor/links";
 import type { Myst } from "./editor/myst";
@@ -30,7 +30,8 @@ const ui = {
   editorPane: $("#editor-pane"),
   backlinks: $("#backlinks"),
   linkButton: $<HTMLButtonElement>("#link-button"),
-  exportNote: $<HTMLButtonElement>("#export-note"),
+  importMenu: $<HTMLButtonElement>("#import-menu"),
+  exportMenu: $<HTMLButtonElement>("#export-menu"),
 };
 
 interface Open {
@@ -83,8 +84,51 @@ async function exportWith(task: () => Promise<{ path: string; files: number } | 
   }
 }
 
+/** A small menu above `anchor`: each item is a label and what it does. */
+function showMenu(anchor: HTMLElement, items: [string, (() => void) | null][]) {
+  document.querySelector(".menu")?.remove();
+  const menu = document.createElement("div");
+  menu.className = "menu";
+  for (const [label, action] of items) {
+    const item = document.createElement("button");
+    item.textContent = label;
+    item.disabled = !action;
+    item.onclick = () => {
+      menu.remove();
+      action?.();
+    };
+    menu.append(item);
+  }
+  document.body.append(menu);
+  const at = anchor.getBoundingClientRect();
+  menu.style.left = `${at.left}px`;
+  menu.style.bottom = `${window.innerHeight - at.top + 6}px`;
+  const close = (e: MouseEvent) => {
+    if (!menu.contains(e.target as Node)) {
+      menu.remove();
+      document.removeEventListener("mousedown", close, true);
+    }
+  };
+  setTimeout(() => document.addEventListener("mousedown", close, true));
+}
+
+async function importFolder(format: FolderFormat) {
+  await flush();
+  try {
+    const done = await backend.importFolder(format);
+    if (!done) return;
+    showProject(done.info);
+    const notes = `Imported ${done.notes} ${done.notes === 1 ? "note" : "notes"}`;
+    const skipped = done.skipped.length ? `; skipped ${done.skipped.length} (notebooks aren't imported yet)` : "";
+    const unresolved = done.unresolved ? `; ${done.unresolved} links point outside the folder` : "";
+    if (done.first) await openDocument(done.first);
+    setStatus(notes + skipped + unresolved);
+  } catch (e) {
+    setStatus(`Not imported: ${e instanceof Error ? e.message : String(e)}`, "error");
+  }
+}
+
 function renderDocuments() {
-  ui.exportNote.disabled = !open;
   ui.documents.replaceChildren(
     ...(project?.documents ?? []).map((d) => {
       const li = document.createElement("li");
@@ -414,11 +458,19 @@ async function start() {
     }
   };
   $("#new-document").onclick = () => void newDocument();
-  ui.exportNote.onclick = () => {
+  ui.importMenu.onclick = () =>
+    showMenu(ui.importMenu, [
+      ["Jupyter Book folder…", () => void importFolder("book")],
+      ["Obsidian vault…", () => void importFolder("obsidian")],
+    ]);
+  ui.exportMenu.onclick = () => {
     const o = open;
-    if (o) void exportWith(() => backend.exportDocument(o.doc, ui.title.value.trim()));
+    showMenu(ui.exportMenu, [
+      ["This note as Markdown…", o ? () => void exportWith(() => backend.exportDocument(o.doc, ui.title.value.trim())) : null],
+      ["All notes as a Jupyter Book…", () => void exportWith(() => backend.exportProject("book"))],
+      ["All notes as an Obsidian vault…", () => void exportWith(() => backend.exportProject("obsidian"))],
+    ]);
   };
-  $("#export-project").onclick = () => void exportWith(() => backend.exportProject());
   $("#new-document-empty").onclick = () => void newDocument();
   ui.title.onchange = () => void renameOpen();
   ui.title.onfocus = ui.title.onblur = () => refreshToolbar();

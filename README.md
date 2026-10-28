@@ -12,9 +12,10 @@ lv-notes is in early alpha, for macOS (Apple Silicon and Intel).
    project's notes, links and history.
 
 Alpha builds can have bugs, so keep your project files somewhere that's
-backed up. "Export all…" in the sidebar writes every note as Markdown at
-any time. When a new version changes the file format, it keeps a copy of
-the old file next to it before upgrading.
+backed up. **Export…** in the sidebar writes every note out at any time, as
+a Jupyter Book or an Obsidian vault, and **Import…** brings either kind of
+folder back in, links included. When a new version changes the file
+format, it keeps a copy of the old file next to it before upgrading.
 
 ## Developing
 

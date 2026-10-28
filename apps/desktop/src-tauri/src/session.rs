@@ -167,11 +167,68 @@ fn fts_query(text: &str) -> String {
         .join(" ")
 }
 
+/// A folder format for import and export.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FolderFormat {
+    /// A Jupyter Book 2 (mystmd) project.
+    Book,
+    /// An Obsidian vault.
+    Obsidian,
+}
+
+/// What a folder import brought in.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct Imported {
+    pub notes: usize,
+    /// The first note, to open.
+    pub first: Option<DocumentId>,
+    /// Files left out (notebooks, for now), relative to the folder.
+    pub skipped: Vec<String>,
+    /// Links to notes or blocks that aren't in the folder.
+    pub unresolved: usize,
+}
+
+/// Files an import reads: Markdown, notebooks (to report them) and
+/// `myst.yml`. Hidden folders (`.obsidian`, `.git`), build output and
+/// anything over 5 MB are left out.
+fn read_folder(dir: &Path) -> Result<Vec<lv_core::import::SourceFile>> {
+    const MAX_BYTES: u64 = 5 * 1024 * 1024;
+    let mut files = Vec::new();
+    let mut stack = vec![dir.to_owned()];
+    while let Some(folder) = stack.pop() {
+        let entries = std::fs::read_dir(&folder).map_err(|e| Error::Io(folder.clone(), e))?;
+        for entry in entries {
+            let entry = entry.map_err(|e| Error::Io(folder.clone(), e))?;
+            let path = entry.path();
+            let name = entry.file_name().to_string_lossy().into_owned();
+            if name.starts_with('.') || matches!(name.as_str(), "_build" | "node_modules") {
+                continue;
+            }
+            let meta = entry.metadata().map_err(|e| Error::Io(path.clone(), e))?;
+            if meta.is_dir() {
+                stack.push(path);
+                continue;
+            }
+            let wanted = name.ends_with(".md") || name.ends_with(".markdown") || name.ends_with(".ipynb") || (name == "myst.yml" && folder == dir);
+            if !wanted || meta.len() > MAX_BYTES {
+                continue;
+            }
+            let relative = path.strip_prefix(dir).expect("inside").to_string_lossy().replace('\\', "/");
+            let text = if name.ends_with(".ipynb") { String::new() } else { std::fs::read_to_string(&path).map_err(|e| Error::Io(path.clone(), e))? };
+            files.push(lv_core::import::SourceFile { path: relative, text });
+        }
+    }
+    files.sort_by(|a, b| a.path.cmp(&b.path));
+    Ok(files)
+}
+
 /// Where an export went.
 #[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct Exported {
     /// The folder (whole project) or file (one note) written.
     pub path: PathBuf,
+    /// How many notes it holds.
     pub files: usize,
 }
 
@@ -383,11 +440,16 @@ impl Session {
             .collect()
     }
 
-    /// Writes every live document as MyST Markdown into a new folder inside
-    /// `dir`, named after the project (`-2`, `-3`, ... if taken), so an
-    /// export never overwrites anything.
-    pub fn export_project(&self, dir: &Path) -> Result<Exported> {
-        let base = lv_core::export::slug(&self.store.project_name()?);
+    /// Writes every live document into a new folder inside `dir`, named
+    /// after the project (`-2`, `-3`, ... if taken), so an export never
+    /// overwrites anything: a Jupyter Book 2 project (MyST Markdown and
+    /// `myst.yml`), or an Obsidian vault.
+    pub fn export_project(&self, dir: &Path, format: FolderFormat) -> Result<Exported> {
+        let name = self.store.project_name()?;
+        let (base, files) = match format {
+            FolderFormat::Book => (lv_core::export::slug(&name), lv_core::export::jupyter_book(self.state(), &name)),
+            FolderFormat::Obsidian => (lv_core::export::obsidian_name(&name), lv_core::export::obsidian_vault(self.state())),
+        };
         let mut folder = dir.join(&base);
         let mut n = 2;
         while folder.exists() {
@@ -395,12 +457,27 @@ impl Session {
             n += 1;
         }
         std::fs::create_dir_all(&folder).map_err(|e| Error::Io(folder.clone(), e))?;
-        let files = lv_core::export::project_markdown(self.state());
         for file in &files {
             let path = folder.join(&file.name);
             std::fs::write(&path, &file.markdown).map_err(|e| Error::Io(path, e))?;
         }
-        Ok(Exported { path: folder, files: files.len() })
+        let notes = files.iter().filter(|f| f.doc.is_some()).count();
+        Ok(Exported { path: folder, files: notes })
+    }
+
+    /// Imports a Jupyter Book or an Obsidian vault in `dir` as new notes,
+    /// in one batch: all of it or none.
+    pub fn import_folder(&mut self, dir: &Path, format: FolderFormat) -> Result<(Imported, Change)> {
+        let files = read_folder(dir)?;
+        let format = match format {
+            FolderFormat::Book => lv_core::import::FolderFormat::Book,
+            FolderFormat::Obsidian => lv_core::import::FolderFormat::Obsidian,
+        };
+        let import = lv_core::import::import_folder(self.state(), format, &files)?;
+        let first = import.notes.first().map(|n| n.doc);
+        let notes = import.notes.len();
+        let change = self.submit(import.ops)?;
+        Ok((Imported { notes, first, skipped: import.skipped, unresolved: import.unresolved }, change))
     }
 
     /// Writes `doc` as MyST Markdown to `path` (the save dialog has already
@@ -649,13 +726,13 @@ mod tests {
         let (doc, _) = s.create_document("Reading notes", DocKind::note()).unwrap();
         s.create_document("Reading notes", DocKind::note()).unwrap();
 
-        let first = s.export_project(dir.path()).unwrap();
+        let first = s.export_project(dir.path(), FolderFormat::Book).unwrap();
         assert_eq!((first.path.file_name().unwrap().to_str(), first.files), (Some("my-thesis"), 2));
-        let second = s.export_project(dir.path()).unwrap();
+        let second = s.export_project(dir.path(), FolderFormat::Book).unwrap();
         assert_eq!(second.path.file_name().unwrap().to_str(), Some("my-thesis-2"));
         let mut names: Vec<_> = std::fs::read_dir(&first.path).unwrap().map(|e| e.unwrap().file_name()).collect();
         names.sort();
-        assert_eq!(names, ["reading-notes-2.md", "reading-notes.md"]);
+        assert_eq!(names, ["myst.yml", "reading-notes-2.md", "reading-notes.md"]);
 
         let one = dir.path().join("one.md");
         s.export_document(doc, &one).unwrap();
@@ -698,6 +775,41 @@ mod tests {
         s.import_document("Imported", DocKind::note(), &root).unwrap();
         let entry = s.registry().into_iter().find(|e| e.name == "vibes-with").unwrap();
         assert_eq!(entry.entry.status, schema::KindStatus::Provisional);
+    }
+
+    #[test]
+    fn folders_round_trip_through_obsidian_and_jupyter_book() {
+        let (dir, path, me) = project();
+        let mut s = Session::create(&path, "Thesis", &me).unwrap();
+        let (a, _) = s.create_document("Claim", DocKind::note()).unwrap();
+        let (b, _) = s.create_document("Index", DocKind::note()).unwrap();
+        let mut claim = s.load_document(a).unwrap();
+        claim.myst["children"][0]["children"] = json!([{ "type": "text", "value": "Slow is smooth." }]);
+        let block: NodeId = claim.myst["children"][0]["id"].as_str().unwrap().parse().unwrap();
+        s.save_document(a, claim.version, claim.myst).unwrap();
+        let mut index = s.load_document(b).unwrap();
+        index.myst["children"][0]["children"] = json!([
+            { "type": "link", "id": NodeId::new(), "url": block.to_string(), "children": [{ "type": "text", "value": "the claim" }] }
+        ]);
+        s.save_document(b, index.version, index.myst).unwrap();
+
+        for format in [FolderFormat::Obsidian, FolderFormat::Book] {
+            let out = s.export_project(dir.path(), format).unwrap();
+            assert_eq!(out.files, 2);
+            std::fs::write(out.path.join("notebook.ipynb"), "{}").unwrap();
+            std::fs::create_dir_all(out.path.join(".obsidian")).unwrap();
+            std::fs::write(out.path.join(".obsidian/hidden.md"), "no").unwrap();
+
+            let other = dir.path().join(format!("copy-{format:?}.lv"));
+            let mut t = Session::create(&other, "Copy", &me).unwrap();
+            let (imported, change) = t.import_folder(&out.path, format).unwrap();
+            assert_eq!((imported.notes, imported.unresolved), (2, 0));
+            assert_eq!(imported.skipped, ["notebook.ipynb"]);
+            assert_eq!(change.documents.len(), 2);
+            // The claim kept its ID, so the copy shows the same backlink.
+            let doc = t.locate(&block.to_string()).unwrap().doc;
+            assert_eq!(t.backlinks(doc).unwrap()[0].target, Some(block));
+        }
     }
 
     #[test]

@@ -18,7 +18,7 @@ use serde_json::Value;
 use tauri::{AppHandle, Emitter, Manager, Runtime, State};
 
 pub use session::{
-    BacklinkInfo, BlockInfo, Change, DocumentSummary, Error, Exported, Identity, LoadedDocument, Located, RegistryEntry, ProjectInfo, Saved, Session,
+    BacklinkInfo, BlockInfo, Change, DocumentSummary, Error, Exported, FolderFormat, Identity, Imported, LoadedDocument, Located, RegistryEntry, ProjectInfo, Saved, Session,
 };
 
 /// Per-user settings, kept as JSON in the app's config directory.
@@ -194,8 +194,25 @@ fn locate(state: State<App>, target: String) -> Reply<Option<Located>> {
 
 /// Writes every note as Markdown into a new folder inside `dir`.
 #[tauri::command]
-fn export_project(state: State<App>, dir: PathBuf) -> Reply<Exported> {
-    state.with(|s| s.export_project(&dir))
+fn export_project(state: State<App>, dir: PathBuf, format: FolderFormat) -> Reply<Exported> {
+    state.with(|s| s.export_project(&dir, format))
+}
+
+/// Imports a Jupyter Book or Obsidian vault in `dir` as new notes.
+#[tauri::command]
+fn import_folder<R: Runtime>(app: AppHandle<R>, state: State<App>, dir: PathBuf, format: FolderFormat) -> Reply<ImportedFolder> {
+    state.with(|s| {
+        let (imported, change) = s.import_folder(&dir, format)?;
+        changed(&app, &change);
+        Ok(ImportedFolder { imported, info: s.info()? })
+    })
+}
+
+#[derive(Serialize)]
+struct ImportedFolder {
+    #[serde(flatten)]
+    imported: Imported,
+    info: ProjectInfo,
 }
 
 /// Writes one note as Markdown to `path`.
@@ -235,6 +252,7 @@ fn commands<R: Runtime>(builder: tauri::Builder<R>) -> tauri::Builder<R> {
         locate,
         export_project,
         export_document,
+        import_folder,
         registry,
     ])
 }
