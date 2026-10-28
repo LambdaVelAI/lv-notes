@@ -2,7 +2,7 @@ import { EditorState, TextSelection } from "prosemirror-state";
 import { describe, expect, it } from "vitest";
 import { memoryBackend } from "../src/backend";
 import { newNodeId } from "../src/editor/ids";
-import { LINK_REQUEST, findId, isInternalTarget, linkAt, removeLink, requestLink, setLink } from "../src/editor/links";
+import { BROKEN, LINK_REQUEST, brokenLinksPlugin, findId, internalTargets, isInternalTarget, linkAt, removeLink, requestLink, setLink } from "../src/editor/links";
 import { type Myst, mystToPm, pmToMyst } from "../src/editor/myst";
 import { plugins } from "../src/editor/plugins";
 import { shorten } from "../src/linking";
@@ -86,6 +86,23 @@ describe("links", () => {
     expect(requestLink(state(paragraph({ type: "text", value: "x" }), 1), (t) => (tr = t))).toBe(true);
     expect(tr.getMeta(LINK_REQUEST)).toBe(true);
     expect(requestLink(state({ type: "root", children: [{ type: "code", id: newNodeId(), value: "x" }] }, 1))).toBe(false);
+  });
+
+  it("lists link targets and marks the broken ones", () => {
+    const myst = paragraph(
+      { type: "link", id: newNodeId(), url: doc, children: [{ type: "text", value: "ok" }] },
+      { type: "text", value: " " },
+      { type: "link", id: newNodeId(), url: block, children: [{ type: "text", value: "gone" }] },
+      { type: "link", id: newNodeId(), url: "https://example.org", children: [{ type: "text", value: "web" }] },
+    );
+    let s = state(myst, 1);
+    expect(internalTargets(s.doc).sort()).toEqual([doc, block].sort());
+    s = s.apply(s.tr.setMeta(BROKEN, new Set([block])));
+    const marked = () => brokenLinksPlugin.getState(s)!.decorations.find().map((d) => s.doc.textBetween(d.from, d.to));
+    expect(marked()).toEqual(["gone"]);
+    // Edits keep the marks on the same links.
+    s = s.apply(s.tr.insertText("x", 1));
+    expect(marked()).toEqual(["gone"]);
   });
 
   it("shortens block text for labels", () => {

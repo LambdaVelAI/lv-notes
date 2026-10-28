@@ -195,7 +195,7 @@ export class LinkBubble {
     this.root.hidden = false;
     this.root.style.left = `${Math.max(8, Math.min(at.left, window.innerWidth - 360))}px`;
     this.root.style.top = `${at.bottom + 6}px`;
-    this.openButton.hidden = !internal;
+    this.openButton.hidden = !internal && !/^(https?|mailto):/i.test(url);
     this.root.classList.toggle("broken", internal && located === null);
     this.target.title = url;
     if (!internal) this.target.textContent = url;

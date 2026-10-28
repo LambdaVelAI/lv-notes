@@ -8,7 +8,7 @@ import { type Attrs, type Node as PMNode, type NodeType } from "prosemirror-mode
 import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-list";
 import { type Command, type EditorState, Plugin, Selection, TextSelection, type Transaction } from "prosemirror-state";
 import { newNodeId } from "./ids";
-import { LINK_REQUEST, flashPlugin, requestLink } from "./links";
+import { LINK_REQUEST, brokenLinksPlugin, flashPlugin, requestLink } from "./links";
 import { claimMystIds, mapMystIds, mystIds } from "./myst";
 import { schema } from "./schema";
 
@@ -254,5 +254,6 @@ export function plugins(): Plugin[] {
     history(),
     idPlugin,
     flashPlugin,
+    brokenLinksPlugin,
   ];
 }

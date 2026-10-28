@@ -3,7 +3,7 @@
 import { EditorState, NodeSelection, Selection, TextSelection, type Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { type Myst, mystToPm, pmToMyst } from "./myst";
-import { FLASH, LINK_REQUEST, type LinkRange, findId, linkAt, removeLink, setLink } from "./links";
+import { BROKEN, FLASH, LINK_REQUEST, type LinkRange, findId, internalTargets, linkAt, removeLink, setLink } from "./links";
 import { SYSTEM, assignIds, plugins, renameIds } from "./plugins";
 
 export interface EditorOptions {
@@ -90,6 +90,16 @@ export class MystEditor {
 
   removeLink(): boolean {
     return removeLink(this.view.state, this.view.dispatch);
+  }
+
+  /** The note and block IDs this document links to. */
+  linkTargets(): string[] {
+    return internalTargets(this.view.state.doc);
+  }
+
+  /** Marks links to these targets as broken (their target is gone). */
+  markBroken(urls: string[]) {
+    this.view.dispatch(this.view.state.tr.setMeta(BROKEN, new Set(urls)).setMeta(SYSTEM, true));
   }
 
   /** The selected text, e.g. to seed the link picker's query. */

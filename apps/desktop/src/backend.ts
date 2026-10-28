@@ -97,6 +97,8 @@ export interface Backend {
   exportProject(): Promise<Exported | null>;
   /** Asks where to save `doc` as Markdown; null if cancelled. */
   exportDocument(doc: string, title: string): Promise<Exported | null>;
+  /** Opens a web address in the system browser. */
+  openUrl(url: string): Promise<void>;
   onChange(listener: (change: Change) => void): void;
   /** Runs `task` (e.g. a final save) before the window closes. */
   beforeClose?(task: () => Promise<void>): void;
@@ -109,6 +111,7 @@ async function tauriBackend(): Promise<Backend> {
   const { listen } = await import("@tauri-apps/api/event");
   const dialog = await import("@tauri-apps/plugin-dialog");
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
+  const opener = await import("@tauri-apps/plugin-opener");
   const call = async <T>(command: string, args?: Record<string, unknown>): Promise<T> => {
     try {
       return await invoke<T>(command, args);
@@ -145,6 +148,7 @@ async function tauriBackend(): Promise<Backend> {
       const path = await dialog.save({ title: "Export note as Markdown", defaultPath: `${name}.md`, filters: [{ name: "Markdown", extensions: ["md"] }] });
       return path ? call("export_document", { doc, path }) : null;
     },
+    openUrl: (url) => opener.openUrl(url),
     onChange(listener) {
       void listen<Change>("project-changed", (event) => listener(event.payload));
     },
@@ -263,6 +267,9 @@ export function memoryBackend(seed: { title: string; myst: Myst }[] = []): Backe
     },
     async exportDocument() {
       throw new BackendError("UNSUPPORTED", "Export needs the desktop app");
+    },
+    async openUrl(url) {
+      window.open(url, "_blank", "noopener");
     },
     onChange: (l) => void listeners.push(l),
   };

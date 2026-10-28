@@ -183,6 +183,7 @@ button.icon { border: none; background: transparent; padding: 0 6px; font-size: 
 /* Links to notes and blocks: a quieter underline, so they read as part of the text. */
 .myst-editor a.link-internal { text-decoration-style: dotted; }
 .myst-editor a.link-node::after { content: "¶"; font: 0.7em var(--ui-font); vertical-align: super; margin-left: 1px; opacity: 0.6; }
+.myst-editor .link-broken a, .myst-editor a .link-broken, .myst-editor .link-broken { color: var(--muted); text-decoration-line: line-through; text-decoration-color: var(--accent); }
 .myst-editor .flash { animation: flash 1.6s ease-out; border-radius: 4px; }
 @keyframes flash { from { background: var(--accent-soft); box-shadow: 0 0 0 4px var(--accent-soft); } to { background: transparent; box-shadow: 0 0 0 4px transparent; } }
 .myst-editor hr { border: none; border-top: 1px solid var(--line); margin: 1.5em 0; }

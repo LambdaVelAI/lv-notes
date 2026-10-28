@@ -134,3 +134,38 @@ export const flashPlugin: Plugin<DecorationSet> = new Plugin<DecorationSet>({
   },
   props: { decorations: (state): DecorationSet | undefined => flashPlugin.getState(state) },
 });
+
+/** Transactions with this meta set the link targets known to be missing. */
+export const BROKEN = "lv-broken-links";
+
+/** Marks links whose target was deleted, so they read as broken in the text. */
+export const brokenLinksPlugin: Plugin<{ urls: Set<string>; decorations: DecorationSet }> = new Plugin({
+  state: {
+    init: () => ({ urls: new Set<string>(), decorations: DecorationSet.empty }),
+    apply(tr, value) {
+      const urls: Set<string> | undefined = tr.getMeta(BROKEN);
+      if (!urls && !tr.docChanged) return value;
+      const now = urls ?? value.urls;
+      const decorations: Decoration[] = [];
+      if (now.size) {
+        tr.doc.descendants((node, pos) => {
+          const link = node.marks.find((m) => m.type === schema.marks.link);
+          if (node.isInline && link && now.has(link.attrs.url)) {
+            decorations.push(Decoration.inline(pos, pos + node.nodeSize, { class: "link-broken", title: "The target was deleted" }));
+          }
+        });
+      }
+      return { urls: now, decorations: DecorationSet.create(tr.doc, decorations) };
+    },
+  },
+  props: { decorations: (state): DecorationSet | undefined => brokenLinksPlugin.getState(state)?.decorations },
+});
+
+/** The distinct note and block targets the document links to. */
+export function internalTargets(doc: PMNode): string[] {
+  const urls = new Set<string>();
+  doc.descendants((node) => {
+    for (const m of node.marks) if (m.type === schema.marks.link && isInternalTarget(m.attrs.url)) urls.add(m.attrs.url);
+  });
+  return [...urls];
+}

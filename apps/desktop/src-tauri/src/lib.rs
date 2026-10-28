@@ -214,7 +214,7 @@ impl App {
 }
 
 fn commands<R: Runtime>(builder: tauri::Builder<R>) -> tauri::Builder<R> {
-    builder.plugin(tauri_plugin_dialog::init()).invoke_handler(tauri::generate_handler![
+    builder.plugin(tauri_plugin_dialog::init()).plugin(tauri_plugin_opener::init()).invoke_handler(tauri::generate_handler![
         create_project,
         open_project,
         open_last_project,

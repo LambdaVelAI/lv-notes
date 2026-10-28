@@ -126,7 +126,11 @@ links are links with any other url.
   `locate` and cached until the next change), with Open, Edit and Remove.
   ⌘-click also opens it. Opening a block link opens its note, selects the
   block and briefly highlights it (a decoration, so ProseMirror doesn't undo
-  it).
+  it). Web and mail links (`http:`, `https:`, `mailto:` only) open in the
+  system browser through Tauri's opener plugin.
+- **Broken links.** On open and after every change, the editor resolves
+  the note's distinct link targets (`locate`, cached) and struck-through
+  the links whose target was deleted.
 - **Backlinks panel.** Under the note, "Linked from …" groups links by
   source note and shows the text around each one. Clicking one opens the
   source note at the link. The panel refreshes on open and after every
@@ -170,11 +174,6 @@ The browser preview can't export.
   nesting is normalized to schema order (link > strong > emphasis > …).
 - **Not editable yet:** cross-references, citations, directives, tables
   and figures. Link relations (`supports`, ...) can't be set from the UI.
-- **Web links don't open.** ⌘-click or Open on a web link only shows its
-  address; opening it in the browser needs Tauri's opener plugin.
-- **Broken links look like working ones** until the cursor is in them
-  (the bubble then says the target was deleted). Marking them in the text
-  would need the editor to resolve every link target on load.
 - **Wrapping or unwrapping** (into a list or quote) keeps the block's ID,
   but turning a list item into a paragraph replaces the item: links to the
   `listItem` itself dangle (links to the paragraph inside it don't).

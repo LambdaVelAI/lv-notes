@@ -116,6 +116,7 @@ async function openDocument(doc: string, reveal?: string) {
     renderDocuments();
     setStatus("Saved");
     void refreshBacklinks();
+    void checkLinks();
   }
   editor.focus();
   if (reveal) editor.reveal(reveal);
@@ -268,7 +269,9 @@ function refreshBubble() {
 /** Opens what a link points at: a note, or a block in its note. */
 async function follow(url: string) {
   if (!isInternalTarget(url)) {
-    setStatus(`Web links don't open from here yet: ${shorten(url, 60)}`);
+    // Only web and mail addresses: never files or app schemes from a document.
+    if (/^(https?|mailto):/i.test(url)) await backend.openUrl(url).catch((e) => setStatus(`Couldn't open ${shorten(url, 60)}: ${e}`, "error"));
+    else setStatus(`Only web and mail links open from here: ${shorten(url, 60)}`);
     return;
   }
   const located = await locate(url);
@@ -278,6 +281,18 @@ async function follow(url: string) {
   }
   bubble.hide();
   await openDocument(located.doc, located.block?.node);
+}
+
+/** Marks the open note's links whose targets are gone. */
+let linkCheck = 0;
+async function checkLinks() {
+  const o = open;
+  const check = ++linkCheck;
+  if (!o) return;
+  const urls = editor.linkTargets();
+  const found = await Promise.all(urls.map(locate));
+  if (check !== linkCheck || open !== o) return;
+  editor.markBroken(urls.filter((_, i) => !found[i]));
 }
 
 let backlinksRequest = 0;
@@ -352,7 +367,10 @@ async function start() {
     // Any change can add or remove links to the open note, or move targets.
     locations.clear();
     clearTimeout(backlinksTimer);
-    backlinksTimer = window.setTimeout(() => void refreshBacklinks(), 150);
+    backlinksTimer = window.setTimeout(() => {
+      void refreshBacklinks();
+      void checkLinks();
+    }, 150);
     // Someone else (another window, later the agent) changed the open document.
     const o = open;
     if (!o || !change.documents.includes(o.doc) || change.version <= o.version || o.dirty || o.saving) return;
