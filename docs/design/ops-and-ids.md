@@ -349,6 +349,18 @@ a link into the block it sits in and that block's text.
   leaf (`text`, `code`, …) is refused too. That makes `materialize`
   infallible in practice.
 
+- **Markdown export** (`export.rs`) writes MyST Markdown from the plain
+  tree: each live document becomes `<slug of its title>.md` (`-2`, ... on
+  clashes) with its title in the frontmatter. Links inside the project are
+  rewritten from IDs to paths: `doc_…` to the document's file, `node_…` to
+  `file.md#label`. A linked block uses its own label if it has one;
+  otherwise the export adds a `(node-<uuid>)=` target before it. A link
+  whose target is gone keeps its ID as the url. IDs and relations are not
+  exported, so a re-imported Markdown file is new nodes. Directives are
+  written from their source (`value`) when they kept it, and from their
+  parsed content otherwise. `tests/export.rs` checks the fixtures against
+  `tests/fixtures/markdown/*.md` (regenerate with `WRITE_GOLDEN=1`).
+
 Tests (`tests/convert.rs`): each fixture goes through AST → ops → state →
 AST and must come back unchanged. A native export must equal the plain
 export plus `id`/`relation`, and must re-import into another project

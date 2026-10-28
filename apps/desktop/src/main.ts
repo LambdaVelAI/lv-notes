@@ -30,6 +30,7 @@ const ui = {
   editorPane: $("#editor-pane"),
   backlinks: $("#backlinks"),
   linkButton: $<HTMLButtonElement>("#link-button"),
+  exportNote: $<HTMLButtonElement>("#export-note"),
 };
 
 interface Open {
@@ -71,7 +72,18 @@ function showProject(info: ProjectInfo | null) {
   renderDocuments();
 }
 
+async function exportWith(task: () => Promise<{ path: string; files: number } | null>) {
+  await flush();
+  try {
+    const done = await task();
+    if (done) setStatus(`Exported ${done.files} ${done.files === 1 ? "note" : "notes"} to ${done.path}`);
+  } catch (e) {
+    setStatus(`Not exported: ${e instanceof Error ? e.message : String(e)}`, "error");
+  }
+}
+
 function renderDocuments() {
+  ui.exportNote.disabled = !open;
   ui.documents.replaceChildren(
     ...(project?.documents ?? []).map((d) => {
       const li = document.createElement("li");
@@ -366,6 +378,11 @@ async function start() {
     }
   };
   $("#new-document").onclick = () => void newDocument();
+  ui.exportNote.onclick = () => {
+    const o = open;
+    if (o) void exportWith(() => backend.exportDocument(o.doc, ui.title.value.trim()));
+  };
+  $("#export-project").onclick = () => void exportWith(() => backend.exportProject());
   $("#new-document-empty").onclick = () => void newDocument();
   ui.title.onchange = () => void renameOpen();
   ui.title.onfocus = ui.title.onblur = () => refreshToolbar();

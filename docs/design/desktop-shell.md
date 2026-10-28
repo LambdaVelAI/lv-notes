@@ -34,6 +34,8 @@ The UI never builds ops. It sends whole documents:
 | `backlinks(doc)` | Links pointing into `doc`, with the source note's title and the text of the block each link sits in |
 | `search_blocks(text, limit?)` | Blocks whose text matches every word (as a prefix), best first |
 | `locate(target)` | Where a `doc_…` / `node_…` link target is now, or null if it is gone |
+| `export_project(dir)` | Writes every note as MyST Markdown into a new folder in `dir` |
+| `export_document(doc, path)` | Writes one note as MyST Markdown to `path` |
 
 After every accepted batch the app emits `project-changed {version,
 documents}`. An editor with no unsaved edits reloads its document if
@@ -131,6 +133,15 @@ links are links with any other url.
   `project-changed`.
 - The in-memory preview backend answers the same three queries by walking
   its stored trees.
+
+## Export
+
+"Export all…" in the sidebar asks for a folder and writes every note into
+a new subfolder named after the project (`my-thesis`, then `my-thesis-2`,
+...), so an export never overwrites anything. "Export note…" saves the open
+note to a file the save dialog picks. Both use `lv_core::export`
+(`docs/design/ops-and-ids.md`, section 6); the shell only writes the files.
+The browser preview can't export.
 
 ## Tests
 

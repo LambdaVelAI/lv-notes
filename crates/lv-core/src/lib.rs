@@ -7,6 +7,7 @@
 
 pub mod auth;
 pub mod convert;
+pub mod export;
 pub mod ids;
 pub mod myst;
 pub mod op;

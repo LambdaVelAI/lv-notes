@@ -114,6 +114,8 @@ button.icon { border: none; background: transparent; padding: 0 6px; font-size: 
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.sidebar-footer { display: flex; gap: 6px; padding: 8px 10px 12px; border-top: 1px solid var(--line); }
+.sidebar-footer button { flex: 1; font-size: 12px; padding: 3px 6px; background: transparent; }
 .documents .remove { border: none; background: transparent !important; color: var(--muted); padding: 0 8px; visibility: hidden; }
 .documents li:hover .remove { visibility: visible; }
 

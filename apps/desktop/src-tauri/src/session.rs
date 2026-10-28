@@ -53,6 +53,9 @@ pub enum Error {
     /// The document changed after the version the editor based its edit on.
     #[error("{doc} changed at {changed}, after base {base}; reload it")]
     StaleBase { doc: DocumentId, base: Version, changed: Version },
+    /// Writing an export failed.
+    #[error("{0}: {1}")]
+    Io(PathBuf, std::io::Error),
 }
 
 impl Error {
@@ -63,6 +66,7 @@ impl Error {
             Error::Store(_) | Error::Load(_) => "STORE".into(),
             Error::Import(_) | Error::Materialize(_) | Error::BadTree(_) => "INVALID_DOCUMENT".into(),
             Error::StaleBase { .. } => "STALE_BASE".into(),
+            Error::Io(..) => "IO".into(),
         }
     }
 }
@@ -151,6 +155,14 @@ fn fts_query(text: &str) -> String {
         .map(|word| format!("\"{}\"*", word.replace('"', "\"\"")))
         .collect::<Vec<_>>()
         .join(" ")
+}
+
+/// Where an export went.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct Exported {
+    /// The folder (whole project) or file (one note) written.
+    pub path: PathBuf,
+    pub files: usize,
 }
 
 /// What a submit changed, for listeners (other editors, later the agent).
@@ -338,6 +350,35 @@ impl Session {
         }
         let block = self.block_info(target.parse::<NodeId>().ok()?)?;
         Some(Located { doc: block.doc, title: block.title.clone(), block: Some(block) })
+    }
+
+    /// Writes every live document as MyST Markdown into a new folder inside
+    /// `dir`, named after the project (`-2`, `-3`, ... if taken), so an
+    /// export never overwrites anything.
+    pub fn export_project(&self, dir: &Path) -> Result<Exported> {
+        let base = lv_core::export::slug(&self.store.project_name()?);
+        let mut folder = dir.join(&base);
+        let mut n = 2;
+        while folder.exists() {
+            folder = dir.join(format!("{base}-{n}"));
+            n += 1;
+        }
+        std::fs::create_dir_all(&folder).map_err(|e| Error::Io(folder.clone(), e))?;
+        let files = lv_core::export::project_markdown(self.state());
+        for file in &files {
+            let path = folder.join(&file.name);
+            std::fs::write(&path, &file.markdown).map_err(|e| Error::Io(path, e))?;
+        }
+        Ok(Exported { path: folder, files: files.len() })
+    }
+
+    /// Writes `doc` as MyST Markdown to `path` (the save dialog has already
+    /// asked before replacing a file).
+    pub fn export_document(&self, doc: DocumentId, path: &Path) -> Result<Exported> {
+        let file = lv_core::export::document_markdown(self.state(), doc)
+            .ok_or_else(|| Refusal::new(RefusalCode::UnknownDocument, format!("{doc} does not exist")))?;
+        std::fs::write(path, file.markdown).map_err(|e| Error::Io(path.to_owned(), e))?;
+        Ok(Exported { path: path.to_owned(), files: 1 })
     }
 
     pub fn rename_document(&mut self, doc: DocumentId, title: &str) -> Result<Change> {
@@ -559,6 +600,28 @@ mod tests {
         assert_eq!((saved.ops, saved.renamed.len()), (1, 0));
         assert_eq!(s.backlinks(doc).unwrap()[0].target, Some(block));
         assert_eq!(s.locate(&block.to_string()).unwrap().block.unwrap().kind, "heading");
+    }
+
+    #[test]
+    fn exports_never_overwrite_a_folder() {
+        let (dir, path, me) = project();
+        let mut s = Session::create(&path, "My Thesis", &me).unwrap();
+        let (doc, _) = s.create_document("Reading notes", DocKind::Note).unwrap();
+        s.create_document("Reading notes", DocKind::Note).unwrap();
+
+        let first = s.export_project(dir.path()).unwrap();
+        assert_eq!((first.path.file_name().unwrap().to_str(), first.files), (Some("my-thesis"), 2));
+        let second = s.export_project(dir.path()).unwrap();
+        assert_eq!(second.path.file_name().unwrap().to_str(), Some("my-thesis-2"));
+        let mut names: Vec<_> = std::fs::read_dir(&first.path).unwrap().map(|e| e.unwrap().file_name()).collect();
+        names.sort();
+        assert_eq!(names, ["reading-notes-2.md", "reading-notes.md"]);
+
+        let one = dir.path().join("one.md");
+        s.export_document(doc, &one).unwrap();
+        assert!(std::fs::read_to_string(&one).unwrap().starts_with("---\ntitle: Reading notes\n---"));
+        assert_eq!(s.export_document(DocumentId::new(), &one).unwrap_err().code(), "UNKNOWN_DOCUMENT");
+        assert_eq!(s.export_document(doc, &dir.path().join("missing/x.md")).unwrap_err().code(), "IO");
     }
 
     #[test]

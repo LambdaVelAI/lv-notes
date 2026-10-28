@@ -90,6 +90,11 @@ fn the_ui_round_trip() {
     invoke(&window, "save_document", json!({ "doc": other, "base": loaded["version"], "myst": linking })).unwrap();
     let links = invoke(&window, "backlinks", json!({ "doc": doc })).unwrap();
     assert_eq!((links[0]["source_doc"].as_str(), links[0]["target"].as_str()), (Some(other.as_str()), Some(block.as_str())));
+    let exported = invoke(&window, "export_project", json!({ "dir": files.path() })).unwrap();
+    assert_eq!(exported["files"], 2);
+    let one = files.path().join("hello.md");
+    invoke(&window, "export_document", json!({ "doc": doc, "path": one })).unwrap();
+    assert!(std::fs::read_to_string(&one).unwrap().contains("Hello"));
     invoke(&window, "delete_document", json!({ "doc": other })).unwrap();
     assert_eq!(invoke(&window, "backlinks", json!({ "doc": doc })).unwrap(), json!([]));
 

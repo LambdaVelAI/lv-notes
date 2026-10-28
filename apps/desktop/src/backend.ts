@@ -63,6 +63,12 @@ export interface Located {
   block: BlockInfo | null;
 }
 
+/** Where an export went: a folder (whole project) or one file. */
+export interface Exported {
+  path: string;
+  files: number;
+}
+
 /** A failed command: a stable code (refusal codes, `STALE_BASE`, ...) and a message. */
 export class BackendError extends Error {
   constructor(readonly code: string, message: string) {
@@ -87,6 +93,10 @@ export interface Backend {
   searchBlocks(text: string): Promise<BlockInfo[]>;
   /** Where a `doc_…` / `node_…` link target is; null if missing. */
   locate(target: string): Promise<Located | null>;
+  /** Asks for a folder and writes every note as Markdown into a new folder there; null if cancelled. */
+  exportProject(): Promise<Exported | null>;
+  /** Asks where to save `doc` as Markdown; null if cancelled. */
+  exportDocument(doc: string, title: string): Promise<Exported | null>;
   onChange(listener: (change: Change) => void): void;
   /** Runs `task` (e.g. a final save) before the window closes. */
   beforeClose?(task: () => Promise<void>): void;
@@ -126,6 +136,15 @@ async function tauriBackend(): Promise<Backend> {
     backlinks: (doc) => call("backlinks", { doc }),
     searchBlocks: (text) => call("search_blocks", { text }),
     locate: (target) => call("locate", { target }),
+    async exportProject() {
+      const dir = await dialog.open({ title: "Export as Markdown into…", directory: true, multiple: false });
+      return dir ? call("export_project", { dir }) : null;
+    },
+    async exportDocument(doc, title) {
+      const name = (title || "Untitled").replace(/[\\/:*?"<>|]+/g, "-");
+      const path = await dialog.save({ title: "Export note as Markdown", defaultPath: `${name}.md`, filters: [{ name: "Markdown", extensions: ["md"] }] });
+      return path ? call("export_document", { doc, path }) : null;
+    },
     onChange(listener) {
       void listen<Change>("project-changed", (event) => listener(event.payload));
     },
@@ -238,6 +257,12 @@ export function memoryBackend(seed: { title: string; myst: Myst }[] = []): Backe
         }
       }
       return null;
+    },
+    async exportProject() {
+      throw new BackendError("UNSUPPORTED", "Export needs the desktop app");
+    },
+    async exportDocument() {
+      throw new BackendError("UNSUPPORTED", "Export needs the desktop app");
     },
     onChange: (l) => void listeners.push(l),
   };
