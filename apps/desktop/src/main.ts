@@ -288,15 +288,19 @@ ui.editorPane.addEventListener("scroll", () => bubble.hide());
 // ---- Toolbar -------------------------------------------------------------------
 
 function refreshToolbar() {
+  // The toolbar acts on the document, so it has nothing to show while the title is being edited.
+  const inTitle = document.activeElement === ui.title;
   const { $from } = editor.view.state.selection;
   const parent = $from.parent;
-  ui.blockType.value =
-    parent.type === schema.nodes.heading ? `h${parent.attrs.depth}` : parent.type === schema.nodes.code ? "code" : "p";
+  ui.blockType.disabled = inTitle;
+  ui.blockType.value = inTitle
+    ? ""
+    : parent.type === schema.nodes.heading ? `h${parent.attrs.depth}` : parent.type === schema.nodes.code ? "code" : "p";
   for (const button of ui.toolbar.querySelectorAll<HTMLButtonElement>("button[data-command]")) {
     const command = (commands as any)[button.dataset.command!];
-    button.disabled = !command(editor.view.state);
+    button.disabled = inTitle || !command(editor.view.state);
   }
-  ui.linkButton.disabled = !open || !!parent.type.spec.code || !parent.inlineContent;
+  ui.linkButton.disabled = inTitle || !open || !!parent.type.spec.code || !parent.inlineContent;
   refreshBubble();
 }
 
@@ -364,6 +368,7 @@ async function start() {
   $("#new-document").onclick = () => void newDocument();
   $("#new-document-empty").onclick = () => void newDocument();
   ui.title.onchange = () => void renameOpen();
+  ui.title.onfocus = ui.title.onblur = () => refreshToolbar();
   ui.title.onkeydown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
