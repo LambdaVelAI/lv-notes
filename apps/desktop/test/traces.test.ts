@@ -11,6 +11,7 @@ import { setBlockType, toggleMark, joinBackward } from "prosemirror-commands";
 import { wrapInList } from "prosemirror-schema-list";
 import { type Command, EditorState, TextSelection } from "prosemirror-state";
 import { describe, expect, it } from "vitest";
+import { removeLink, setLink } from "../src/editor/links";
 import { type Myst, mystToPm, pmToMyst } from "../src/editor/myst";
 import { assignIds, plugins } from "../src/editor/plugins";
 import { schema } from "../src/editor/schema";
@@ -41,6 +42,10 @@ const EDITS: Edit[] = [
   ["type at the start of a paragraph", (s) => { const p = firstText(s); return p == null ? null : s.apply(s.tr.insertText("Indeed, ", p)); }],
   ["type in a heading", (s) => { const p = firstText(s, schema.nodes.heading); return p == null ? null : s.apply(s.tr.insertText("§ ", p)); }],
   ["bold a word", (s) => { const p = firstText(s); return p == null ? null : run(at(s, p, p + 3), toggleMark(schema.marks.strong)); }],
+  ["link a word to its block", (s) => { const p = firstText(s); return p == null ? null : run(at(s, p, p + 3), setLink(s.doc.resolve(p).parent.attrs.id)); }],
+  ["insert a link to a note", (s) => { const p = firstText(s); return p == null ? null : run(at(s, p), setLink("doc_01a17fe6-3636-7430-a1fe-a8b3500bb89a", "a note")); }],
+  ["retarget the link", (s) => { const p = firstText(s); return p == null ? null : run(at(s, p + 2), setLink("https://example.org")); }],
+  ["remove the link", (s) => { const p = firstText(s); return p == null ? null : run(at(s, p + 2), removeLink); }],
   ["split a paragraph", (s) => { const p = firstText(s); return p == null ? null : s.apply(s.tr.split(p + 2)); }],
   ["join it back", (s) => { const p = firstText(s); if (p == null) return null; const next = s.doc.resolve(p).after() + 1; return run(at(s, next + 1), joinBackward); }],
   ["paragraph to heading", (s) => { const p = firstText(s); return p == null ? null : run(at(s, p), setBlockType(schema.nodes.heading, { depth: 2 })); }],

@@ -3,11 +3,11 @@
   "edit": "load",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -24,7 +24,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -35,7 +35,7 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "text",
@@ -69,7 +69,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -108,18 +108,18 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
         {
          "type": "listItem",
          "spread": false,
-         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "id": "node_01a17fed-a71e-77f5-8d08-061366111814",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
            "children": [
             {
              "type": "text",
@@ -133,11 +133,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -151,11 +151,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -167,37 +167,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -214,11 +214,11 @@
   "edit": "type at the start of a paragraph",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -235,7 +235,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -246,7 +246,7 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "text",
@@ -280,7 +280,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -319,18 +319,18 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
         {
          "type": "listItem",
          "spread": false,
-         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "id": "node_01a17fed-a71e-77f5-8d08-061366111814",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
            "children": [
             {
              "type": "text",
@@ -344,11 +344,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -362,11 +362,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -378,37 +378,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -425,11 +425,11 @@
   "edit": "type in a heading",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -446,7 +446,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -457,7 +457,7 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "text",
@@ -491,7 +491,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -530,18 +530,18 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
         {
          "type": "listItem",
          "spread": false,
-         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "id": "node_01a17fed-a71e-77f5-8d08-061366111814",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
            "children": [
             {
              "type": "text",
@@ -555,11 +555,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -573,11 +573,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -589,37 +589,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -636,11 +636,11 @@
   "edit": "bold a word",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -657,7 +657,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -668,7 +668,7 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "strong",
@@ -711,7 +711,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -750,18 +750,18 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
         {
          "type": "listItem",
          "spread": false,
-         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "id": "node_01a17fed-a71e-77f5-8d08-061366111814",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
            "children": [
             {
              "type": "text",
@@ -775,11 +775,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -793,11 +793,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -809,37 +809,986 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "link a word to its block",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+       "children": [
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "id": "node_01a17fed-a71e-77f5-8d08-061366111814",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "insert a link to a note",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+       "children": [
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71f-747a-8495-6b2a1cc1794b",
+         "url": "doc_01a17fe6-3636-7430-a1fe-a8b3500bb89a",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "a note"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "id": "node_01a17fed-a71e-77f5-8d08-061366111814",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "retarget the link",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+       "children": [
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71f-747a-8495-6b2a1cc1794b",
+         "url": "https://example.org",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "a note"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "id": "node_01a17fed-a71e-77f5-8d08-061366111814",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
+       "children": [
+        {
+         "type": "text",
+         "value": "Second block."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "remove the link",
+  "myst": {
+   "type": "root",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
+   "children": [
+    {
+     "type": "block",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
+     "children": [
+      {
+       "type": "heading",
+       "identifier": "on-reading-slowly",
+       "label": "On reading slowly",
+       "html_id": "on-reading-slowly",
+       "position": {
+        "start": {
+         "line": 1,
+         "column": 1
+        },
+        "end": {
+         "line": 1,
+         "column": 20
+        }
+       },
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
+       "depth": 1,
+       "children": [
+        {
+         "type": "text",
+         "value": "§ On reading slowly"
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "a note"
+          }
+         ]
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": "eed, Close reading is "
+        },
+        {
+         "type": "emphasis",
+         "children": [
+          {
+           "type": "text",
+           "value": "not"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " the same as "
+        },
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "slow"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " reading; see "
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
+         "url": "https://example.org/essay",
+         "title": "An essay",
+         "children": [
+          {
+           "type": "text",
+           "value": "this essay"
+          }
+         ]
+        },
+        {
+         "type": "text",
+         "value": " and "
+        },
+        {
+         "type": "inlineCode",
+         "value": "grep -c"
+        },
+        {
+         "type": "text",
+         "value": "."
+        },
+        {
+         "type": "break"
+        },
+        {
+         "type": "delete",
+         "children": [
+          {
+           "type": "text",
+           "value": "struck"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "list",
+       "spread": false,
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
+       "ordered": true,
+       "start": 3,
+       "children": [
+        {
+         "type": "listItem",
+         "spread": false,
+         "id": "node_01a17fed-a71e-77f5-8d08-061366111814",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
+           "children": [
+            {
+             "type": "text",
+             "value": "Annotate"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "listItem",
+         "spread": false,
+         "checked": true,
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
+         "children": [
+          {
+           "type": "paragraph",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
+           "children": [
+            {
+             "type": "text",
+             "value": "Summarize"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "blockquote",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
+       "children": [
+        {
+         "type": "paragraph",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
+         "children": [
+          {
+           "type": "text",
+           "value": "Festina lente."
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "thematicBreak",
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
+      },
+      {
+       "type": "code",
+       "meta": "linenos",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
+       "lang": "python",
+       "value": "print('hi')\n"
+      },
+      {
+       "type": "image",
+       "width": "50%",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
+       "url": "fig/marginalia.png",
+       "alt": "Marginalia"
+      },
+      {
+       "type": "html",
+       "value": "<kbd>Ctrl</kbd>",
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
+      }
+     ]
+    },
+    {
+     "type": "block",
+     "meta": "{\"tags\": [\"draft\"]}",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
+     "children": [
+      {
+       "type": "paragraph",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -856,11 +1805,11 @@
   "edit": "split a paragraph",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -877,7 +1826,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -888,14 +1837,14 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "strong",
          "children": [
           {
            "type": "text",
-           "value": "In"
+           "value": "a "
           }
          ]
         }
@@ -903,14 +1852,30 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7418-a64a-1b4d70e81cbf",
+       "id": "node_01a17fed-a71f-747b-a5c1-b585c3f77f8a",
        "children": [
         {
          "type": "strong",
          "children": [
           {
            "type": "text",
-           "value": "d"
+           "value": "note"
+          }
+         ]
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
           }
          ]
         },
@@ -946,7 +1911,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -985,18 +1950,18 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
         {
          "type": "listItem",
          "spread": false,
-         "id": "node_01a17ea3-5b88-740c-8740-b521bac6d2c8",
+         "id": "node_01a17fed-a71e-77f5-8d08-061366111814",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
            "children": [
             {
              "type": "text",
@@ -1010,11 +1975,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -1028,11 +1993,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -1044,37 +2009,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -1091,11 +2056,11 @@
   "edit": "join it back",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -1112,7 +2077,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -1123,14 +2088,14 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "strong",
          "children": [
           {
            "type": "text",
-           "value": "In"
+           "value": "a "
           }
          ]
         }
@@ -1138,14 +2103,30 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7418-a64a-1b4d70e81cbf",
+       "id": "node_01a17fed-a71f-747b-a5c1-b585c3f77f8a",
        "children": [
         {
          "type": "strong",
          "children": [
           {
            "type": "text",
-           "value": "d"
+           "value": "note"
+          }
+         ]
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
           }
          ]
         },
@@ -1181,7 +2162,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -1219,7 +2200,7 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+       "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
        "children": [
         {
          "type": "text",
@@ -1230,7 +2211,7 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
@@ -1238,11 +2219,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -1256,11 +2237,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -1272,37 +2253,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -1319,11 +2300,11 @@
   "edit": "paragraph to heading",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -1340,7 +2321,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -1351,14 +2332,14 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "strong",
          "children": [
           {
            "type": "text",
-           "value": "In"
+           "value": "a "
           }
          ]
         }
@@ -1366,7 +2347,7 @@
       },
       {
        "type": "heading",
-       "id": "node_01a17ea3-5b89-7572-b9cd-61eef895d9c8",
+       "id": "node_01a17fed-a71f-747c-930a-9b1a951f44f8",
        "depth": 2,
        "children": [
         {
@@ -1374,7 +2355,23 @@
          "children": [
           {
            "type": "text",
-           "value": "d"
+           "value": "note"
+          }
+         ]
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
           }
          ]
         },
@@ -1410,7 +2407,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -1448,7 +2445,7 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+       "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
        "children": [
         {
          "type": "text",
@@ -1459,7 +2456,7 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
@@ -1467,11 +2464,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -1485,11 +2482,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -1501,37 +2498,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -1548,11 +2545,11 @@
   "edit": "wrap in a list",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -1569,7 +2566,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -1580,14 +2577,14 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "strong",
          "children": [
           {
            "type": "text",
-           "value": "In"
+           "value": "a "
           }
          ]
         }
@@ -1595,7 +2592,7 @@
       },
       {
        "type": "heading",
-       "id": "node_01a17ea3-5b89-7572-b9cd-61eef895d9c8",
+       "id": "node_01a17fed-a71f-747c-930a-9b1a951f44f8",
        "depth": 2,
        "children": [
         {
@@ -1603,7 +2600,23 @@
          "children": [
           {
            "type": "text",
-           "value": "d"
+           "value": "note"
+          }
+         ]
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
           }
          ]
         },
@@ -1639,7 +2652,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -1677,15 +2690,15 @@
       },
       {
        "type": "list",
-       "id": "node_01a17ea3-5b89-7573-a59e-b1ee275db70d",
+       "id": "node_01a17fed-a71f-747d-b883-5802a5b2ebab",
        "children": [
         {
          "type": "listItem",
-         "id": "node_01a17ea3-5b89-7574-9296-b35bda65a90b",
+         "id": "node_01a17fed-a71f-747e-b5f6-1ad673dc2898",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
            "children": [
             {
              "type": "text",
@@ -1700,7 +2713,7 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
@@ -1708,11 +2721,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -1726,11 +2739,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -1742,37 +2755,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -1789,11 +2802,11 @@
   "edit": "new paragraph at the end",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -1810,7 +2823,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -1821,14 +2834,14 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "strong",
          "children": [
           {
            "type": "text",
-           "value": "In"
+           "value": "a "
           }
          ]
         }
@@ -1836,7 +2849,7 @@
       },
       {
        "type": "heading",
-       "id": "node_01a17ea3-5b89-7572-b9cd-61eef895d9c8",
+       "id": "node_01a17fed-a71f-747c-930a-9b1a951f44f8",
        "depth": 2,
        "children": [
         {
@@ -1844,7 +2857,23 @@
          "children": [
           {
            "type": "text",
-           "value": "d"
+           "value": "note"
+          }
+         ]
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
           }
          ]
         },
@@ -1880,7 +2909,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -1918,15 +2947,15 @@
       },
       {
        "type": "list",
-       "id": "node_01a17ea3-5b89-7573-a59e-b1ee275db70d",
+       "id": "node_01a17fed-a71f-747d-b883-5802a5b2ebab",
        "children": [
         {
          "type": "listItem",
-         "id": "node_01a17ea3-5b89-7574-9296-b35bda65a90b",
+         "id": "node_01a17fed-a71f-747e-b5f6-1ad673dc2898",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
            "children": [
             {
              "type": "text",
@@ -1941,7 +2970,7 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
@@ -1949,11 +2978,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -1967,11 +2996,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -1983,37 +3012,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -2025,7 +3054,7 @@
     },
     {
      "type": "paragraph",
-     "id": "node_01a17ea3-5b89-7575-b9a4-2599ee1339d7",
+     "id": "node_01a17fed-a71f-747f-8f56-9747824b4968",
      "children": [
       {
        "type": "text",
@@ -2040,11 +3069,11 @@
   "edit": "move the last block first",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "paragraph",
-     "id": "node_01a17ea3-5b89-7575-b9a4-2599ee1339d7",
+     "id": "node_01a17fed-a71f-747f-8f56-9747824b4968",
      "children": [
       {
        "type": "text",
@@ -2054,7 +3083,7 @@
     },
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "heading",
@@ -2071,7 +3100,7 @@
          "column": 20
         }
        },
-       "id": "node_01a17ea3-5b88-7408-be15-89925e32f22e",
+       "id": "node_01a17fed-a71e-77f1-9867-64155e7c0087",
        "depth": 1,
        "children": [
         {
@@ -2082,14 +3111,14 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7409-87fd-201f582e86be",
+       "id": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
        "children": [
         {
          "type": "strong",
          "children": [
           {
            "type": "text",
-           "value": "In"
+           "value": "a "
           }
          ]
         }
@@ -2097,7 +3126,7 @@
       },
       {
        "type": "heading",
-       "id": "node_01a17ea3-5b89-7572-b9cd-61eef895d9c8",
+       "id": "node_01a17fed-a71f-747c-930a-9b1a951f44f8",
        "depth": 2,
        "children": [
         {
@@ -2105,7 +3134,23 @@
          "children": [
           {
            "type": "text",
-           "value": "d"
+           "value": "note"
+          }
+         ]
+        },
+        {
+         "type": "link",
+         "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+         "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+         "children": [
+          {
+           "type": "strong",
+           "children": [
+            {
+             "type": "text",
+             "value": "Ind"
+            }
+           ]
           }
          ]
         },
@@ -2141,7 +3186,7 @@
         },
         {
          "type": "link",
-         "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+         "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
          "url": "https://example.org/essay",
          "title": "An essay",
          "children": [
@@ -2179,15 +3224,15 @@
       },
       {
        "type": "list",
-       "id": "node_01a17ea3-5b89-7573-a59e-b1ee275db70d",
+       "id": "node_01a17fed-a71f-747d-b883-5802a5b2ebab",
        "children": [
         {
          "type": "listItem",
-         "id": "node_01a17ea3-5b89-7574-9296-b35bda65a90b",
+         "id": "node_01a17fed-a71f-747e-b5f6-1ad673dc2898",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
            "children": [
             {
              "type": "text",
@@ -2202,7 +3247,7 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
@@ -2210,11 +3255,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -2228,11 +3273,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -2244,37 +3289,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",
@@ -2291,15 +3336,31 @@
   "edit": "delete across blocks",
   "myst": {
    "type": "root",
-   "id": "node_01a17ea3-5b88-7406-9750-cc39befeef9e",
+   "id": "node_01a17fed-a71e-77ef-a0d8-c5649114268d",
    "children": [
     {
      "type": "paragraph",
-     "id": "node_01a17ea3-5b89-7575-b9a4-2599ee1339d7",
+     "id": "node_01a17fed-a71f-747f-8f56-9747824b4968",
      "children": [
       {
+       "type": "link",
+       "id": "node_01a17fed-a71e-7801-8485-c8cd7feea984",
+       "url": "node_01a17fed-a71e-77f2-8945-6e55cd5f5447",
+       "children": [
+        {
+         "type": "strong",
+         "children": [
+          {
+           "type": "text",
+           "value": "Ind"
+          }
+         ]
+        }
+       ]
+      },
+      {
        "type": "text",
-       "value": ", Close reading is "
+       "value": "eed, Close reading is "
       },
       {
        "type": "emphasis",
@@ -2329,7 +3390,7 @@
       },
       {
        "type": "link",
-       "id": "node_01a17ea3-5b88-740a-89f3-3e34e9b8d803",
+       "id": "node_01a17fed-a71e-77f3-bcaf-38990d630086",
        "url": "https://example.org/essay",
        "title": "An essay",
        "children": [
@@ -2367,19 +3428,19 @@
     },
     {
      "type": "block",
-     "id": "node_01a17ea3-5b88-7407-86fe-8ade8a79b35b",
+     "id": "node_01a17fed-a71e-77f0-9adc-ae67535673f7",
      "children": [
       {
        "type": "list",
-       "id": "node_01a17ea3-5b89-7573-a59e-b1ee275db70d",
+       "id": "node_01a17fed-a71f-747d-b883-5802a5b2ebab",
        "children": [
         {
          "type": "listItem",
-         "id": "node_01a17ea3-5b89-7574-9296-b35bda65a90b",
+         "id": "node_01a17fed-a71f-747e-b5f6-1ad673dc2898",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740d-837b-f5359a69029b",
+           "id": "node_01a17fed-a71e-77f6-b46b-13cbc5b0d916",
            "children": [
             {
              "type": "text",
@@ -2394,7 +3455,7 @@
       {
        "type": "list",
        "spread": false,
-       "id": "node_01a17ea3-5b88-740b-84c5-9a7abaa0b4c3",
+       "id": "node_01a17fed-a71e-77f4-8889-cb15b0919968",
        "ordered": true,
        "start": 3,
        "children": [
@@ -2402,11 +3463,11 @@
          "type": "listItem",
          "spread": false,
          "checked": true,
-         "id": "node_01a17ea3-5b88-740e-ba06-4628f58460cf",
+         "id": "node_01a17fed-a71e-77f7-b138-991dcbdc61fa",
          "children": [
           {
            "type": "paragraph",
-           "id": "node_01a17ea3-5b88-740f-ae04-98b57b2c4b12",
+           "id": "node_01a17fed-a71e-77f8-8df7-5b71cf549d2b",
            "children": [
             {
              "type": "text",
@@ -2420,11 +3481,11 @@
       },
       {
        "type": "blockquote",
-       "id": "node_01a17ea3-5b88-7410-ae5c-fd5cff805b57",
+       "id": "node_01a17fed-a71e-77f9-b2fa-8ba44e3c1131",
        "children": [
         {
          "type": "paragraph",
-         "id": "node_01a17ea3-5b88-7411-8279-c2d6d1d98e6e",
+         "id": "node_01a17fed-a71e-77fa-a3ba-061e5fd4a30a",
          "children": [
           {
            "type": "text",
@@ -2436,37 +3497,37 @@
       },
       {
        "type": "thematicBreak",
-       "id": "node_01a17ea3-5b88-7412-a08b-439c636e77f0"
+       "id": "node_01a17fed-a71e-77fb-b3cb-687dd378079f"
       },
       {
        "type": "code",
        "meta": "linenos",
-       "id": "node_01a17ea3-5b88-7413-a056-ee4ce8a79a5f",
+       "id": "node_01a17fed-a71e-77fc-9e5c-3ed563a3b2e0",
        "lang": "python",
        "value": "print('hi')\n"
       },
       {
        "type": "image",
        "width": "50%",
-       "id": "node_01a17ea3-5b88-7414-b0ad-bab43afbf3a2",
+       "id": "node_01a17fed-a71e-77fd-9a53-e0f8c54ee463",
        "url": "fig/marginalia.png",
        "alt": "Marginalia"
       },
       {
        "type": "html",
        "value": "<kbd>Ctrl</kbd>",
-       "id": "node_01a17ea3-5b88-7415-8c19-a9a91c98f03c"
+       "id": "node_01a17fed-a71e-77fe-b556-c3db13564d2e"
       }
      ]
     },
     {
      "type": "block",
      "meta": "{\"tags\": [\"draft\"]}",
-     "id": "node_01a17ea3-5b88-7416-ae6a-3c72285f419f",
+     "id": "node_01a17fed-a71e-77ff-bdfa-9772da7f5656",
      "children": [
       {
        "type": "paragraph",
-       "id": "node_01a17ea3-5b88-7417-b6e5-e6a8e7fcbf09",
+       "id": "node_01a17fed-a71e-7800-aade-a6eb41f42bdb",
        "children": [
         {
          "type": "text",

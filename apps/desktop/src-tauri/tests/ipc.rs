@@ -73,6 +73,26 @@ fn the_ui_round_trip() {
     let loaded = invoke(&window, "load_document", json!({ "doc": doc })).unwrap();
     assert_eq!(loaded["myst"], myst);
 
+    // Linking: find a block, link to it from another note, see the backlink.
+    let hits = invoke(&window, "search_blocks", json!({ "text": "hel" })).unwrap();
+    let block = hits[0]["node"].as_str().unwrap().to_owned();
+    assert_eq!((hits[0]["doc"].as_str(), hits[0]["text"].as_str()), (Some(doc.as_str()), Some("Hello")));
+    let located = invoke(&window, "locate", json!({ "target": block })).unwrap();
+    assert_eq!(located["doc"], doc);
+    assert_eq!(invoke(&window, "locate", json!({ "target": "https://example.org" })).unwrap(), Value::Null);
+    let other = invoke(&window, "create_document", json!({ "title": "Other" })).unwrap()["doc"].as_str().unwrap().to_owned();
+    let loaded = invoke(&window, "load_document", json!({ "doc": other })).unwrap();
+    let mut linking = loaded["myst"].clone();
+    linking["children"][0]["children"] = json!([{ "type": "link", "url": block, "children": [{ "type": "text", "value": "hi" }] }]);
+    let err = invoke(&window, "save_document", json!({ "doc": other, "base": loaded["version"], "myst": linking })).unwrap_err();
+    assert_eq!(err["code"], "INVALID_DOCUMENT", "links need IDs too");
+    linking["children"][0]["children"][0]["id"] = json!(lv_core::ids::NodeId::new());
+    invoke(&window, "save_document", json!({ "doc": other, "base": loaded["version"], "myst": linking })).unwrap();
+    let links = invoke(&window, "backlinks", json!({ "doc": doc })).unwrap();
+    assert_eq!((links[0]["source_doc"].as_str(), links[0]["target"].as_str()), (Some(other.as_str()), Some(block.as_str())));
+    invoke(&window, "delete_document", json!({ "doc": other })).unwrap();
+    assert_eq!(invoke(&window, "backlinks", json!({ "doc": doc })).unwrap(), json!([]));
+
     let info = invoke(&window, "delete_document", json!({ "doc": doc })).unwrap();
     assert_eq!(info["documents"], json!([]));
 }

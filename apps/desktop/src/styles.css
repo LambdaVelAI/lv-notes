@@ -178,6 +178,11 @@ button.icon { border: none; background: transparent; padding: 0 6px; font-size: 
 .myst-editor code { font: 0.85em var(--mono-font); background: var(--code-bg); padding: 1px 4px; border-radius: 4px; }
 .myst-editor pre code { background: none; padding: 0; font-size: inherit; }
 .myst-editor a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+/* Links to notes and blocks: a quieter underline, so they read as part of the text. */
+.myst-editor a.link-internal { text-decoration-style: dotted; }
+.myst-editor a.link-node::after { content: "¶"; font: 0.7em var(--ui-font); vertical-align: super; margin-left: 1px; opacity: 0.6; }
+.myst-editor .flash { animation: flash 1.6s ease-out; border-radius: 4px; }
+@keyframes flash { from { background: var(--accent-soft); box-shadow: 0 0 0 4px var(--accent-soft); } to { background: transparent; box-shadow: 0 0 0 4px transparent; } }
 .myst-editor hr { border: none; border-top: 1px solid var(--line); margin: 1.5em 0; }
 .myst-editor figure.image { margin: 0 0 0.75em; }
 .myst-editor figure.image img { max-width: 100%; border-radius: 4px; }
@@ -200,6 +205,52 @@ span.opaque-crossReference, span.opaque-cite, span.opaque-citeGroup { color: var
 .ProseMirror-selectednode.opaque { outline: 2px solid var(--accent); }
 
 .ProseMirror-gapcursor { display: none; }
+
+/* ---- Links ---- */
+.link-picker, .link-bubble {
+  position: fixed;
+  z-index: 10;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.14);
+}
+.link-picker { padding: 6px; }
+.link-picker input { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; background: var(--bg); outline: none; }
+.link-picker input:focus { border-color: var(--accent); }
+.link-picker ul { list-style: none; margin: 6px 0 0; padding: 0; max-height: 260px; overflow-y: auto; }
+.link-picker li { display: flex; align-items: baseline; gap: 8px; padding: 5px 8px; border-radius: 6px; }
+.link-picker li.active { background: var(--accent-soft); }
+.link-picker li.empty { color: var(--muted); }
+.link-picker .kind { flex: none; width: 18px; text-align: center; color: var(--muted); font-size: 11px; }
+.link-picker .label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-picker .option-block .label { font-family: var(--text-font); }
+.link-picker .detail { flex: none; max-width: 40%; color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.link-bubble { display: flex; align-items: center; gap: 4px; padding: 4px 4px 4px 10px; max-width: 360px; font-size: 12px; }
+.link-bubble .target { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); user-select: text; }
+.link-bubble.broken .target { color: var(--accent); }
+.link-bubble button { border: none; background: transparent; padding: 2px 8px; }
+
+/* ---- Backlinks ---- */
+.backlinks { margin-top: 48px; padding-top: 12px; border-top: 1px solid var(--line); }
+.backlinks h2 { font: 600 11px var(--ui-font); text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 8px; }
+.backlinks.empty h2 { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.backlinks ul { list-style: none; margin: 0; padding: 0; }
+.backlinks li { margin-bottom: 10px; }
+.backlinks .source { font-weight: 600; margin-bottom: 2px; }
+.backlinks .backlink {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  align-items: baseline;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+}
+.backlinks .context { flex: 1; min-width: 0; font: 14px/1.45 var(--text-font); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.backlinks .meta { flex: none; color: var(--muted); font-size: 11px; }
 
 @media (max-width: 760px) {
   .workspace { grid-template-columns: 1fr; }

@@ -8,10 +8,12 @@
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
-use lv_core::convert::{Flavor, ImportError, MaterializeError, import_document, materialize, update_document};
+use lv_core::convert::{
+    Flavor, ImportError, MaterializeError, enclosing_block, import_document, materialize, plain_text, update_document,
+};
 use lv_core::ids::{DocumentId, NodeId, OpId, PersonId, ProjectId, Version};
 use lv_core::myst::Node;
-use lv_core::op::{DocKind, Op, OpBody, Parent, Sequenced, Timestamp};
+use lv_core::op::{DocKind, Op, OpBody, Parent, Relation, Sequenced, Timestamp};
 use lv_core::principal::{Grant, GrantScope, Principal};
 use lv_core::refusal::{Refusal, RefusalCode};
 use lv_core::sequencer::{LoadError, Sequencer, SubmitError};
@@ -107,6 +109,48 @@ pub struct Saved {
     pub ops: usize,
     /// `(old, new)` node IDs the editor should rename.
     pub renamed: Vec<(NodeId, NodeId)>,
+}
+
+/// A link into an open document, for its backlinks panel.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct BacklinkInfo {
+    /// The link node, and the document and title it sits in.
+    pub source: NodeId,
+    pub source_doc: DocumentId,
+    pub source_title: String,
+    /// The block it points at, or `None` for a link to the whole document.
+    pub target: Option<NodeId>,
+    pub relation: Option<Relation>,
+    /// The text of the block the link sits in.
+    pub context: String,
+}
+
+/// A block, with where it lives and its text: a search hit or a link target.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct BlockInfo {
+    pub node: NodeId,
+    pub doc: DocumentId,
+    pub title: String,
+    /// The MyST type (`paragraph`, `heading`, ...).
+    pub kind: String,
+    pub text: String,
+}
+
+/// Where a link target (`doc_…` or `node_…`) is now.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct Located {
+    pub doc: DocumentId,
+    pub title: String,
+    /// Set when the target is a block.
+    pub block: Option<BlockInfo>,
+}
+
+/// Turns what someone typed into an FTS5 query: every word, as a prefix.
+fn fts_query(text: &str) -> String {
+    text.split_whitespace()
+        .map(|word| format!("\"{}\"*", word.replace('"', "\"\"")))
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// What a submit changed, for listeners (other editors, later the agent).
@@ -225,6 +269,75 @@ impl Session {
         let ops = update.ops.len();
         let change = if ops == 0 { None } else { Some(self.submit(update.ops)?) };
         Ok((Saved { version: self.seq.head(), ops, renamed: update.renamed }, change))
+    }
+
+    /// Links, references and citations pointing into `doc` (at it, or at
+    /// one of its blocks), from any live document including itself.
+    pub fn backlinks(&self, doc: DocumentId) -> Result<Vec<BacklinkInfo>> {
+        let state = self.state();
+        Ok(self
+            .store
+            .document_backlinks(doc)?
+            .into_iter()
+            .map(|b| BacklinkInfo {
+                source: b.source,
+                source_doc: b.source_doc,
+                source_title: state.document(b.source_doc).map(|d| d.title.clone()).unwrap_or_default(),
+                target: b.target,
+                relation: b.relation,
+                context: enclosing_block(state, b.source).map(|block| plain_text(state, block)).unwrap_or_default(),
+            })
+            .collect())
+    }
+
+    /// Blocks whose text matches every word of `text` (as prefixes), best
+    /// first, at most `limit`.
+    pub fn search_blocks(&self, text: &str, limit: usize) -> Result<Vec<BlockInfo>> {
+        let query = fts_query(text);
+        if query.is_empty() {
+            return Ok(vec![]);
+        }
+        let mut seen = HashSet::new();
+        let mut hits = vec![];
+        for hit in self.store.search(&query)? {
+            let Some(block) = enclosing_block(self.state(), hit) else { continue };
+            if seen.insert(block)
+                && let Some(info) = self.block_info(block)
+            {
+                hits.push(info);
+                if hits.len() == limit {
+                    break;
+                }
+            }
+        }
+        Ok(hits)
+    }
+
+    fn block_info(&self, node: NodeId) -> Option<BlockInfo> {
+        let state = self.state();
+        let n = state.node(node).filter(|n| !n.deleted)?;
+        let doc = state.document(n.document).filter(|d| !d.deleted)?;
+        if n.content.node_type == "root" {
+            return None;
+        }
+        Some(BlockInfo {
+            node,
+            doc: n.document,
+            title: doc.title.clone(),
+            kind: n.content.node_type.clone(),
+            text: plain_text(state, node),
+        })
+    }
+
+    /// Where the target of a link (`doc_…` or `node_…`) is now; `None` if it
+    /// is not an ID, or names something deleted or unknown.
+    pub fn locate(&self, target: &str) -> Option<Located> {
+        if let Ok(doc) = target.parse::<DocumentId>() {
+            let d = self.state().document(doc).filter(|d| !d.deleted)?;
+            return Some(Located { doc, title: d.title.clone(), block: None });
+        }
+        let block = self.block_info(target.parse::<NodeId>().ok()?)?;
+        Some(Located { doc: block.doc, title: block.title.clone(), block: Some(block) })
     }
 
     pub fn rename_document(&mut self, doc: DocumentId, title: &str) -> Result<Change> {
@@ -382,6 +495,47 @@ mod tests {
         let (doc, _) = s.create_document("A", DocKind::Note).unwrap();
         let err = s.save_document(doc, s.seq.head(), json!({ "children": [] })).unwrap_err();
         assert_eq!(err.code(), "INVALID_DOCUMENT");
+    }
+
+    #[test]
+    fn links_to_notes_and_blocks_show_as_backlinks() {
+        let (_dir, path, me) = project();
+        let mut s = Session::create(&path, "P", &me).unwrap();
+        let (target, _) = s.create_document("Target", DocKind::Note).unwrap();
+        let (source, _) = s.create_document("Source", DocKind::Note).unwrap();
+        let mut t = s.load_document(target).unwrap();
+        t.myst["children"][0]["children"] = json!([{ "type": "text", "value": "Marginalia are arguments." }]);
+        s.save_document(target, t.version, t.myst.clone()).unwrap();
+        let block: NodeId = t.myst["children"][0]["id"].as_str().unwrap().parse().unwrap();
+
+        // Find the block by searching, as the link picker does.
+        let hits = s.search_blocks("margin argu", 10).unwrap();
+        assert_eq!(hits.iter().map(|h| (h.node, h.doc, h.kind.as_str())).collect::<Vec<_>>(), [(block, target, "paragraph")]);
+        assert!(s.search_blocks("  ", 10).unwrap().is_empty());
+        assert!(s.search_blocks("\"unbalanced", 10).is_ok(), "quotes are escaped");
+
+        let mut src = s.load_document(source).unwrap();
+        src.myst["children"][0]["children"] = json!([
+            { "type": "text", "value": "See " },
+            { "type": "link", "id": NodeId::new().to_string(), "url": target.to_string(), "children": [{ "type": "text", "value": "the note" }] },
+            { "type": "text", "value": " and " },
+            { "type": "link", "id": NodeId::new().to_string(), "url": block.to_string(), "children": [{ "type": "text", "value": "this claim" }] },
+        ]);
+        s.save_document(source, src.version, src.myst.clone()).unwrap();
+        drop(s);
+
+        let s = Session::open(&path, &me).unwrap();
+        let links = s.backlinks(target).unwrap();
+        let mut got: Vec<_> = links.iter().map(|b| (b.target, b.source_title.as_str(), b.context.as_str())).collect();
+        got.sort();
+        assert_eq!(got, [(None, "Source", "See the note and this claim"), (Some(block), "Source", "See the note and this claim")]);
+        assert!(s.backlinks(source).unwrap().is_empty());
+
+        assert_eq!(s.locate(&target.to_string()).unwrap().title, "Target");
+        let located = s.locate(&block.to_string()).unwrap();
+        assert_eq!((located.doc, located.block.unwrap().text.as_str()), (target, "Marginalia are arguments."));
+        assert_eq!(s.locate("https://example.org"), None);
+        assert_eq!(s.locate(&NodeId::new().to_string()), None);
     }
 
     #[test]

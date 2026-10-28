@@ -17,7 +17,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tauri::{AppHandle, Emitter, Manager, Runtime, State};
 
-pub use session::{Change, DocumentSummary, Error, Identity, LoadedDocument, ProjectInfo, Saved, Session};
+pub use session::{
+    BacklinkInfo, BlockInfo, Change, DocumentSummary, Error, Identity, LoadedDocument, Located, ProjectInfo, Saved, Session,
+};
 
 /// Per-user settings, kept as JSON in the app's config directory.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -172,6 +174,24 @@ fn delete_document<R: Runtime>(app: AppHandle<R>, state: State<App>, doc: Docume
     })
 }
 
+/// Links pointing into `doc`, for its backlinks panel.
+#[tauri::command]
+fn backlinks(state: State<App>, doc: DocumentId) -> Reply<Vec<BacklinkInfo>> {
+    state.with(|s| s.backlinks(doc))
+}
+
+/// Blocks matching `text`, for the link picker.
+#[tauri::command]
+fn search_blocks(state: State<App>, text: String, limit: Option<usize>) -> Reply<Vec<BlockInfo>> {
+    state.with(|s| s.search_blocks(&text, limit.unwrap_or(20)))
+}
+
+/// Where a link target (`doc_…`, `node_…`) is now, or null.
+#[tauri::command]
+fn locate(state: State<App>, target: String) -> Reply<Option<Located>> {
+    state.with(|s| Ok(s.locate(&target)))
+}
+
 impl App {
     fn new(config_dir: &Path) -> App {
         let settings_path = config_dir.join("settings.json");
@@ -192,6 +212,9 @@ fn commands<R: Runtime>(builder: tauri::Builder<R>) -> tauri::Builder<R> {
         save_document,
         rename_document,
         delete_document,
+        backlinks,
+        search_blocks,
+        locate,
     ])
 }
 

@@ -4,11 +4,13 @@
 // native MyST with the version it was based on. The core works out the ops,
 // so this file never builds ops itself. One save is in flight at a time.
 
-import { type Backend, BackendError, type ProjectInfo, connect } from "./backend";
+import { type Backend, BackendError, type Backlink, type Located, type ProjectInfo, connect } from "./backend";
 import { MystEditor } from "./editor/editor";
+import { isInternalTarget } from "./editor/links";
 import type { Myst } from "./editor/myst";
 import { commands } from "./editor/plugins";
 import { schema } from "./editor/schema";
+import { LinkBubble, LinkPicker, renderBacklinks, shorten } from "./linking";
 import "./styles.css";
 
 const SAVE_DELAY_MS = 400;
@@ -26,6 +28,8 @@ const ui = {
   toolbar: $("#toolbar"),
   empty: $("#no-document"),
   editorPane: $("#editor-pane"),
+  backlinks: $("#backlinks"),
+  linkButton: $<HTMLButtonElement>("#link-button"),
 };
 
 interface Open {
@@ -41,7 +45,12 @@ let backend: Backend;
 let project: ProjectInfo | null = null;
 let open: Open | null = null;
 
-const editor = new MystEditor($("#editor"), { onEdit: edited, onUpdate: refreshToolbar });
+const editor = new MystEditor($("#editor"), {
+  onEdit: edited,
+  onUpdate: refreshToolbar,
+  onLinkRequest: () => openPicker(),
+  onFollowLink: (url) => void follow(url),
+});
 // For poking at the editor from devtools during development.
 if (import.meta.env.DEV) Object.assign(window, { lvEditor: editor });
 
@@ -82,17 +91,22 @@ function renderDocuments() {
   );
 }
 
-async function openDocument(doc: string) {
-  await flush();
-  const loaded = await backend.loadDocument(doc);
-  open = { doc, version: loaded.version, dirty: false, saving: null, timer: undefined };
-  ui.empty.hidden = true;
-  ui.editorPane.hidden = false;
-  ui.title.value = loaded.title;
-  editor.load(loaded.myst);
-  renderDocuments();
-  setStatus("Saved");
+/** Opens `doc`, or stays on it if open; then shows the node `reveal`, if given. */
+async function openDocument(doc: string, reveal?: string) {
+  if (open?.doc !== doc) {
+    await flush();
+    const loaded = await backend.loadDocument(doc);
+    open = { doc, version: loaded.version, dirty: false, saving: null, timer: undefined };
+    ui.empty.hidden = true;
+    ui.editorPane.hidden = false;
+    ui.title.value = loaded.title;
+    editor.load(loaded.myst);
+    renderDocuments();
+    setStatus("Saved");
+    void refreshBacklinks();
+  }
   editor.focus();
+  if (reveal) editor.reveal(reveal);
 }
 
 async function newDocument() {
@@ -111,6 +125,7 @@ async function deleteDocument(doc: string, title: string) {
     ui.empty.hidden = false;
   }
   showProject(await backend.deleteDocument(doc));
+  void refreshBacklinks();
 }
 
 // ---- Saving ------------------------------------------------------------------
@@ -181,6 +196,95 @@ async function renameOpen() {
   if (current && current.title !== title) showProject(await backend.renameDocument(open.doc, title));
 }
 
+// ---- Links and backlinks ------------------------------------------------------
+
+const picker = new LinkPicker({
+  documents: () => project?.documents ?? [],
+  searchBlocks: (text) => backend.searchBlocks(text),
+});
+
+/** Opens the link picker for the selection, or for the link at the cursor. */
+function openPicker() {
+  if (!open || picker.isOpen) return;
+  const { view } = editor;
+  const coords = view.coordsAtPos(view.state.selection.from);
+  const link = editor.link();
+  const query = editor.selectedText() || (link ? view.state.doc.textBetween(link.from, link.to) : "");
+  bubble.hide();
+  picker.open(
+    coords,
+    query.length <= 80 ? query : "",
+    (choice) => {
+      editor.setLink(choice.url, choice.text);
+      locations.delete(choice.url);
+    },
+    () => editor.focus(),
+  );
+}
+
+/** Where internal link targets are, cached until the project changes. */
+const locations = new Map<string, Promise<Located | null>>();
+const locate = (url: string) => {
+  if (!locations.has(url)) locations.set(url, backend.locate(url).catch(() => null));
+  return locations.get(url)!;
+};
+
+const bubble = new LinkBubble({
+  open: (url) => void follow(url),
+  edit: () => openPicker(),
+  remove: () => {
+    editor.removeLink();
+    editor.focus();
+  },
+});
+
+function refreshBubble() {
+  const link = editor.view.hasFocus() && !picker.isOpen ? editor.link() : null;
+  if (!link) return bubble.hide();
+  const url: string = link.mark.attrs.url;
+  const at = editor.view.coordsAtPos(link.from);
+  const internal = isInternalTarget(url);
+  bubble.show(url, at, internal);
+  if (internal) {
+    void locate(url).then((located) => {
+      const now = editor.link();
+      if (now?.mark.attrs.url === url) bubble.show(url, editor.view.coordsAtPos(now.from), true, located);
+    });
+  }
+}
+
+/** Opens what a link points at: a note, or a block in its note. */
+async function follow(url: string) {
+  if (!isInternalTarget(url)) {
+    setStatus(`Web links don't open from here yet: ${shorten(url, 60)}`);
+    return;
+  }
+  const located = await locate(url);
+  if (!located) {
+    setStatus("That link's target was deleted", "error");
+    return;
+  }
+  bubble.hide();
+  await openDocument(located.doc, located.block?.node);
+}
+
+let backlinksRequest = 0;
+async function refreshBacklinks() {
+  const o = open;
+  const request = ++backlinksRequest;
+  if (!o) return;
+  const links = await backend.backlinks(o.doc).catch((e) => (console.error(e), [] as Backlink[]));
+  if (request !== backlinksRequest || open !== o) return;
+  renderBacklinks(ui.backlinks, links, (link) => void openDocument(link.source_doc, link.source));
+}
+
+ui.linkButton.addEventListener("mousedown", (e) => {
+  e.preventDefault();
+  openPicker();
+});
+editor.view.dom.addEventListener("blur", () => setTimeout(refreshBubble, 0));
+ui.editorPane.addEventListener("scroll", () => bubble.hide());
+
 // ---- Toolbar -------------------------------------------------------------------
 
 function refreshToolbar() {
@@ -192,6 +296,8 @@ function refreshToolbar() {
     const command = (commands as any)[button.dataset.command!];
     button.disabled = !command(editor.view.state);
   }
+  ui.linkButton.disabled = !open || !!parent.type.spec.code || !parent.inlineContent;
+  refreshBubble();
 }
 
 function run(command: (state: any, dispatch?: any) => boolean) {
@@ -225,7 +331,12 @@ async function start() {
     );
     return docs;
   });
+  let backlinksTimer: number | undefined;
   backend.onChange((change) => {
+    // Any change can add or remove links to the open note, or move targets.
+    locations.clear();
+    clearTimeout(backlinksTimer);
+    backlinksTimer = window.setTimeout(() => void refreshBacklinks(), 150);
     // Someone else (another window, later the agent) changed the open document.
     const o = open;
     if (!o || !change.documents.includes(o.doc) || change.version <= o.version || o.dirty || o.saving) return;

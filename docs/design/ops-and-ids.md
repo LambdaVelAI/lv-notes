@@ -293,8 +293,11 @@ How projections stay correct:
 - **`node.num`** is a file-local row number keying the FTS index. It is
   never shared or exported, so invariant 4 holds.
 
-Queries so far: `Store::children`, `Store::search` (FTS5 syntax) and
-`Store::backlinks` (by ID or label, with relation).
+Queries so far: `Store::children`, `Store::search` (FTS5 syntax),
+`Store::backlinks` (to one node, by ID or label, with relation) and
+`Store::document_backlinks` (into a document: at it, or at any of its live
+nodes). `convert::enclosing_block` and `convert::plain_text` turn a hit or
+a link into the block it sits in and that block's text.
 
 ## 6. MyST import and export (implemented)
 

@@ -7,8 +7,9 @@ Status: implemented (Tauri 2 + ProseMirror), not yet released.
 ```
 apps/desktop/
   src/                 web UI (TypeScript, no framework)
-    editor/            ProseMirror: MyST schema, conversion, IDs, keys
+    editor/            ProseMirror: MyST schema, conversion, IDs, keys, links
     backend.ts         Tauri commands, or an in-memory stand-in for previews
+    linking.ts         link picker, link bubble, backlinks panel
     main.ts            sidebar, title, toolbar, save loop
   src-tauri/           the `lv-desktop` crate
     src/session.rs     an open project: Store + Sequencer + the local grant
@@ -30,6 +31,9 @@ The UI never builds ops. It sends whole documents:
 | `load_document(doc)` | Returns `{version, title, myst}`, with `myst` as native MyST (IDs included) |
 | `save_document(doc, base, myst)` | Reconciles the tree into ops (`lv_core::convert::update_document`) and submits one batch |
 | `rename_document`, `delete_document` | One op each |
+| `backlinks(doc)` | Links pointing into `doc`, with the source note's title and the text of the block each link sits in |
+| `search_blocks(text, limit?)` | Blocks whose text matches every word (as a prefix), best first |
+| `locate(target)` | Where a `doc_…` / `node_…` link target is now, or null if it is gone |
 
 After every accepted batch the app emits `project-changed {version,
 documents}`. An editor with no unsaved edits reloads its document if
@@ -90,6 +94,40 @@ typed.
   list item) shows as a paragraph flagged `implicit`, and is unwrapped on
   save.
 
+## Links and backlinks
+
+A link to a note or a block is an ordinary MyST `link` whose `url` is the
+target's ID: `doc_…` for a note, `node_…` for a block. It never holds a
+title or a path, so renaming a note or moving a block (even into another
+note) doesn't break it. Plain MyST export keeps the ID as the url. Web
+links are links with any other url.
+
+- **Graph.** The core's `edge` projection already reads the ID off the url
+  into `target_doc` / `target_node`. `Store::document_backlinks(doc)` returns
+  every live link, reference or citation that points at the document, at
+  one of its live nodes by ID, or at one of its labels. A link to a block
+  follows the block when it moves. Links start untyped; a `relation`
+  shows in the panel when present, but there is no UI to set one yet.
+- **Adding a link.** ⌘K, the toolbar's Link button, or typing `[[` opens
+  the picker. It lists notes by title (from the project info, filtered
+  locally) and blocks by text (`search_blocks`, FTS5 prefix match), and
+  offers a web address when the query looks like one. With text selected,
+  the selection becomes the link. With a bare cursor, the note's title or
+  the block's text (shortened) is inserted as the link text. On an existing
+  link, picking retargets it and keeps its node ID.
+- **Following and editing.** With the cursor in a link, a bubble shows
+  where it goes (the note title, or "note › block text", resolved with
+  `locate` and cached until the next change), with Open, Edit and Remove.
+  ⌘-click also opens it. Opening a block link opens its note, selects the
+  block and briefly highlights it (a decoration, so ProseMirror doesn't undo
+  it).
+- **Backlinks panel.** Under the note, "Linked from …" groups links by
+  source note and shows the text around each one. Clicking one opens the
+  source note at the link. The panel refreshes on open and after every
+  `project-changed`.
+- The in-memory preview backend answers the same three queries by walking
+  its stored trees.
+
 ## Tests
 
 - `cargo test -p lv-desktop`:
@@ -102,7 +140,10 @@ typed.
     exactly. Regenerate the traces after changing the schema or conversion
     with `WRITE_TRACES=1 npm test`.
 - `npm test`: conversion round trips on the core's fixtures, mark nesting,
-  implicit paragraphs, ID assignment and renames.
+  implicit paragraphs, ID assignment and renames; link commands (add,
+  insert, retarget, remove, find by ID) and the preview backend's link
+  queries. The editor traces include adding, retargeting and removing
+  links.
 
 ## Still open
 
@@ -116,9 +157,18 @@ typed.
 - **Edited blocks drop text-run details.** Source positions on their text,
   unmodelled fields on text runs and empty text nodes are lost. Mark
   nesting is normalized to schema order (link > strong > emphasis > …).
-- **Not editable yet:** links (they show and save, but there's no UI to
-  add or edit one), cross-references, citations, directives, tables and
-  figures.
+- **Not editable yet:** cross-references, citations, directives, tables
+  and figures. Link relations (`supports`, ...) can't be set from the UI.
+- **Web links don't open.** ⌘-click or Open on a web link only shows its
+  address; opening it in the browser needs Tauri's opener plugin.
+- **Broken links look like working ones** until the cursor is in them
+  (the bubble then says the target was deleted). Marking them in the text
+  would need the editor to resolve every link target on load.
+- **Changing a block's type breaks links to it** (see above): the block
+  gets a new ID and `node_…` links to the old one dangle.
+- **Search covers text runs only.** A block whose words are split across
+  formatting (`**slo**w`) matches by fragment, and code and math blocks
+  match by their source.
 - **Images:** relative URLs don't resolve to project assets.
 - **Cost per save** is O(document): the whole tree is serialized and
   reconciled. That is fine for notes; long drafts may want per-block saves.

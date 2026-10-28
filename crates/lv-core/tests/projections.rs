@@ -216,6 +216,39 @@ fn queries_agree_with_state() {
 }
 
 #[test]
+fn document_backlinks_cover_the_document_and_its_blocks() {
+    let mut w = World::in_memory();
+    let ids = history(&mut w, |_| {});
+    // A link to the whole note, from inside the note's own heading.
+    let doc_link = NodeId::new();
+    w.person(insert(doc_link, Parent::Node(ids.heading), None, content("link", json!({ "url": ids.note.to_string() }))));
+
+    let links = w.store.document_backlinks(ids.note).unwrap();
+    let mut got: Vec<_> = links.iter().map(|b| (b.source, b.source_doc, b.target, b.relation.clone())).collect();
+    got.sort_by_key(|(source, ..)| *source);
+    let mut expected = vec![
+        (ids.id_link, ids.draft, Some(ids.heading), Some(Relation::new("supports"))),
+        (ids.label_ref, ids.draft, Some(ids.heading), None),
+        (ids.proposed_link, ids.draft, Some(ids.heading), Some(Relation::new("contradicts"))),
+        (doc_link, ids.note, None, None),
+    ];
+    expected.sort_by_key(|(source, ..)| *source);
+    assert_eq!(got, expected);
+    // Nothing points into the draft.
+    assert!(w.store.document_backlinks(ids.draft).unwrap().is_empty());
+
+    // Moving the heading to the draft moves its backlinks with it.
+    w.person(OpBody::MoveNode { node: ids.heading, parent: Parent::DocumentRoot(ids.draft), after: None });
+    assert_eq!(w.store.document_backlinks(ids.draft).unwrap().len(), 3);
+    // The link to the note moved with the heading, so it now comes from the draft.
+    let to_note = w.store.document_backlinks(ids.note).unwrap();
+    assert_eq!(to_note.iter().map(|b| (b.source, b.source_doc)).collect::<Vec<_>>(), [(doc_link, ids.draft)]);
+    // Deleting the target drops them.
+    w.person(OpBody::DeleteNode { node: ids.heading });
+    assert!(w.store.document_backlinks(ids.draft).unwrap().is_empty());
+}
+
+#[test]
 fn moved_subtree_changes_document_in_projection() {
     let mut w = World::in_memory();
     let ids = history(&mut w, |_| {});

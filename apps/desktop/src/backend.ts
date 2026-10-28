@@ -35,6 +35,34 @@ export interface Change {
   documents: string[];
 }
 
+/** A link into an open document (`target` null: to the document itself). */
+export interface Backlink {
+  source: string;
+  source_doc: string;
+  source_title: string;
+  target: string | null;
+  relation: string | null;
+  /** The text of the block the link sits in. */
+  context: string;
+}
+
+/** A block, where it lives, and its text. */
+export interface BlockInfo {
+  node: string;
+  doc: string;
+  title: string;
+  /** MyST type: `paragraph`, `heading`, ... */
+  kind: string;
+  text: string;
+}
+
+/** Where a link target is now; `block` is set for a block target. */
+export interface Located {
+  doc: string;
+  title: string;
+  block: BlockInfo | null;
+}
+
 /** A failed command: a stable code (refusal codes, `STALE_BASE`, ...) and a message. */
 export class BackendError extends Error {
   constructor(readonly code: string, message: string) {
@@ -53,6 +81,12 @@ export interface Backend {
   saveDocument(doc: string, base: number, myst: Myst): Promise<Saved>;
   renameDocument(doc: string, title: string): Promise<ProjectInfo>;
   deleteDocument(doc: string): Promise<ProjectInfo>;
+  /** Links pointing into `doc`. */
+  backlinks(doc: string): Promise<Backlink[]>;
+  /** Blocks matching every word of `text`, as prefixes. */
+  searchBlocks(text: string): Promise<BlockInfo[]>;
+  /** Where a `doc_…` / `node_…` link target is; null if missing. */
+  locate(target: string): Promise<Located | null>;
   onChange(listener: (change: Change) => void): void;
   /** Runs `task` (e.g. a final save) before the window closes. */
   beforeClose?(task: () => Promise<void>): void;
@@ -89,6 +123,9 @@ async function tauriBackend(): Promise<Backend> {
     saveDocument: (doc, base, myst) => call("save_document", { doc, base, myst }),
     renameDocument: (doc, title) => call("rename_document", { doc, title }),
     deleteDocument: (doc) => call("delete_document", { doc }),
+    backlinks: (doc) => call("backlinks", { doc }),
+    searchBlocks: (text) => call("search_blocks", { text }),
+    locate: (target) => call("locate", { target }),
     onChange(listener) {
       void listen<Change>("project-changed", (event) => listener(event.payload));
     },
@@ -97,6 +134,17 @@ async function tauriBackend(): Promise<Backend> {
       void getCurrentWindow().onCloseRequested(() => task().catch(console.error));
     },
   };
+}
+
+const PHRASING = new Set(["text", "emphasis", "strong", "underline", "delete", "subscript", "superscript", "inlineCode", "inlineMath", "break", "abbreviation", "link", "crossReference", "cite", "citeGroup", "footnoteReference", "mystRole"]);
+const textOf = (n: Myst): string =>
+  typeof n.value === "string" ? n.value : Array.isArray(n.children) ? n.children.map(textOf).join("") : "";
+
+/** Every node in `myst` with its nearest enclosing block (itself for blocks). */
+function* walk(myst: Myst, block: Myst | null = null): Generator<[Myst, Myst | null]> {
+  const own = PHRASING.has(myst.type) || myst.type === "root" ? block : myst;
+  yield [myst, own];
+  for (const child of myst.children ?? []) yield* walk(child, own);
 }
 
 /** Keeps documents as MyST in memory. No ops, no reconcile: UI preview only. */
@@ -153,6 +201,43 @@ export function memoryBackend(seed: { title: string; myst: Myst }[] = []): Backe
       version++;
       changed([doc]);
       return info();
+    },
+    // The same answers as the core's queries, worked out from the trees.
+    async backlinks(doc) {
+      const target = get(doc);
+      const inTarget = new Set([...walk(target.myst)].map(([n]) => n.id).filter(Boolean));
+      const links: Backlink[] = [];
+      for (const [source, d] of docs) {
+        for (const [n, block] of walk(d.myst)) {
+          if (n.type !== "link" || !(n.url === doc || inTarget.has(n.url))) continue;
+          links.push({ source: n.id, source_doc: source, source_title: d.title, target: n.url === doc ? null : n.url, relation: n.relation ?? null, context: block ? textOf(block) : "" });
+        }
+      }
+      return links;
+    },
+    async searchBlocks(text) {
+      const words = text.toLowerCase().split(/\s+/).filter(Boolean);
+      if (!words.length) return [];
+      const hits: BlockInfo[] = [];
+      for (const [doc, d] of docs) {
+        for (const [n, block] of walk(d.myst)) {
+          if (n !== block || !n.id || n.children?.some((c: Myst) => !PHRASING.has(c.type))) continue;
+          const t = textOf(n);
+          const tokens = t.toLowerCase().split(/\W+/);
+          if (words.every((w) => tokens.some((tok) => tok.startsWith(w)))) hits.push({ node: n.id, doc, title: d.title, kind: n.type, text: t });
+        }
+      }
+      return hits.slice(0, 20);
+    },
+    async locate(target) {
+      const d = docs.get(target);
+      if (d) return { doc: target, title: d.title, block: null };
+      for (const [doc, d] of docs) {
+        for (const [n] of walk(d.myst)) {
+          if (n.id === target && n.type !== "root") return { doc, title: d.title, block: { node: target, doc, title: d.title, kind: n.type, text: textOf(n) } };
+        }
+      }
+      return null;
     },
     onChange: (l) => void listeners.push(l),
   };

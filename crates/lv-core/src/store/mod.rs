@@ -23,6 +23,17 @@ use crate::op::{Op, OpBody, Parent, Relation, Sequenced, Timestamp};
 use crate::principal::{Grant, GrantScope, Principal};
 use crate::state::{Effects, ProjectState};
 
+/// A link, reference or citation pointing into a document.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Backlink {
+    /// The link node.
+    pub source: NodeId,
+    pub source_doc: DocumentId,
+    /// The node it points at, or `None` for a link to the whole document.
+    pub target: Option<NodeId>,
+    pub relation: Option<Relation>,
+}
+
 /// `PRAGMA application_id` of lv-notes project files ("LVNP").
 pub const APPLICATION_ID: i32 = 0x4C56_4E50;
 /// Schema version this code writes, stored in `PRAGMA user_version`.
@@ -315,6 +326,33 @@ impl Store {
         )?;
         let rows = stmt.query_map([target], |r| {
             Ok((r.get(0)?, r.get::<_, Option<String>>(1)?.map(Relation)))
+        })?;
+        Ok(rows.collect::<rusqlite::Result<_>>()?)
+    }
+
+    /// Live links, references and citations pointing into document `doc`:
+    /// at the document itself (by its ID), or at one of its live nodes (by
+    /// ID or by label). A link to a block follows the block if it moves to
+    /// another document.
+    pub fn document_backlinks(&self, doc: DocumentId) -> Result<Vec<Backlink>> {
+        let mut stmt = self.conn.prepare_cached(
+            "SELECT DISTINCT edge.source_node, edge.source_doc, target.id, edge.relation FROM edge
+             JOIN document ON document.id = edge.source_doc AND document.deleted = 0
+             LEFT JOIN node AS target ON target.deleted = 0
+                  AND (target.id = edge.target_node
+                       OR (edge.target_node IS NULL AND edge.target_doc IS NULL AND target.identifier = edge.target
+                           -- A reference's own `identifier` names what it points at, not itself.
+                           AND target.type NOT IN ('link', 'crossReference', 'cite')))
+             WHERE edge.target_doc = ?1 OR target.document_id = ?1
+             ORDER BY edge.source_doc, edge.source_node",
+        )?;
+        let rows = stmt.query_map([doc], |r| {
+            Ok(Backlink {
+                source: r.get(0)?,
+                source_doc: r.get(1)?,
+                target: r.get(2)?,
+                relation: r.get::<_, Option<String>>(3)?.map(Relation),
+            })
         })?;
         Ok(rows.collect::<rusqlite::Result<_>>()?)
     }

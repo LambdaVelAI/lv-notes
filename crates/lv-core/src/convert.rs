@@ -360,6 +360,44 @@ fn longest_increasing(positions: &[Option<usize>]) -> HashSet<usize> {
     stay
 }
 
+/// MyST types that are inline content (phrasing): text runs plus inline
+/// anchors and references.
+const PHRASING_TYPES: [&str; 6] = ["link", "crossReference", "cite", "citeGroup", "footnoteReference", "mystRole"];
+
+/// The block `node` sits in: itself, or its nearest ancestor that is not
+/// phrasing. A search hit in a text run, or a link, resolves to its
+/// paragraph, heading, ... which has a stable, exported ID.
+pub fn enclosing_block(state: &ProjectState, node: NodeId) -> Option<NodeId> {
+    let mut id = node;
+    loop {
+        let n = state.node(id)?;
+        let t = n.content.node_type.as_str();
+        if !TEXT_RUN_TYPES.contains(&t) && !PHRASING_TYPES.contains(&t) {
+            return Some(id);
+        }
+        match n.parent {
+            Parent::Node(parent) => id = parent,
+            Parent::DocumentRoot(_) => return None,
+        }
+    }
+}
+
+/// The text of `node` and its live descendants, concatenated.
+pub fn plain_text(state: &ProjectState, node: NodeId) -> String {
+    fn walk(state: &ProjectState, id: NodeId, out: &mut String) {
+        let Some(n) = state.node(id) else { return };
+        if let Some(text) = n.text() {
+            out.push_str(text);
+        }
+        for child in state.children(Parent::Node(id)) {
+            walk(state, child, out);
+        }
+    }
+    let mut out = String::new();
+    walk(state, node, &mut out);
+    out
+}
+
 fn to_json(node: &Node) -> Value {
     serde_json::to_value(node).expect("MyST nodes serialize")
 }

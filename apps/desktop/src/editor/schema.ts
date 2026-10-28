@@ -9,6 +9,8 @@
 
 import { type DOMOutputSpec, type Mark, type Node as PMNode, Schema } from "prosemirror-model";
 
+const TARGET_ID = /^(doc|node)_[0-9a-f-]{36}$/;
+
 const ided = { id: { default: null }, extra: { default: null } };
 
 /** A short label for MyST the editor shows but does not edit. */
@@ -217,7 +219,16 @@ export const schema = new Schema({
     link: {
       attrs: { id: { default: null }, url: { default: "" }, title: { default: null }, extra: { default: null } },
       inclusive: false,
-      toDOM: (m: Mark) => ["a", { href: m.attrs.url, ...(m.attrs.title ? { title: m.attrs.title } : {}) }, 0],
+      // Links to notes and blocks (`doc_…`, `node_…`) are styled apart from web links.
+      toDOM: (m: Mark) => [
+        "a",
+        {
+          href: m.attrs.url,
+          class: TARGET_ID.test(m.attrs.url) ? `link-internal link-${m.attrs.url.slice(0, m.attrs.url.indexOf("_"))}` : "link-external",
+          ...(m.attrs.title ? { title: m.attrs.title } : {}),
+        },
+        0,
+      ],
       parseDOM: [{ tag: "a[href]", getAttrs: (dom) => ({ url: (dom as HTMLElement).getAttribute("href"), title: (dom as HTMLElement).getAttribute("title") }) }],
     },
     strong: { attrs: markExtra, toDOM: () => ["strong", 0], parseDOM: [{ tag: "strong" }, { tag: "b" }] },

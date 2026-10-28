@@ -8,6 +8,7 @@ import { type Node as PMNode } from "prosemirror-model";
 import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-list";
 import { type Command, type EditorState, Plugin, Selection, TextSelection, type Transaction } from "prosemirror-state";
 import { newNodeId } from "./ids";
+import { LINK_REQUEST, flashPlugin, requestLink } from "./links";
 import { claimMystIds, mapMystIds, mystIds } from "./myst";
 import { schema } from "./schema";
 
@@ -179,6 +180,8 @@ function rules() {
         (match) => ({ ordered: true, start: Number(match[1]) === 1 ? null : Number(match[1]) }),
         (match, node) => node.childCount + (node.attrs.start ?? 1) === Number(match[1]),
       ),
+      // `[[` opens the link picker.
+      new InputRule(/\[\[$/, (state, _match, start, end) => state.tr.delete(start, end).setMeta(LINK_REQUEST, true)),
       new InputRule(/^---$/, (state, _match, start, end) => {
         const $start = state.doc.resolve(start);
         if ($start.parent.type !== n.paragraph) return null;
@@ -198,6 +201,7 @@ export function plugins(): Plugin[] {
       "Mod-b": commands.strong,
       "Mod-i": commands.emphasis,
       "Mod-e": commands.inlineCode,
+      "Mod-k": requestLink,
       "Mod-Alt-0": commands.paragraph,
       "Mod-Alt-1": commands.heading(1),
       "Mod-Alt-2": commands.heading(2),
@@ -213,5 +217,6 @@ export function plugins(): Plugin[] {
     keymap(baseKeymap),
     history(),
     idPlugin,
+    flashPlugin,
   ];
 }
