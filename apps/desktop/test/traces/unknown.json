@@ -11,12 +11,12 @@
      }
     ]
    },
-   "id": "node_01a17fed-a722-7514-aecb-14993e3a57e1",
+   "id": "node_01a17ffe-8624-70ce-bd8a-36cdd0ba0036",
    "children": [
     {
      "type": "block",
      "key": "k8Xq2",
-     "id": "node_01a17fed-a722-7515-aeb9-8cdc5ba061cb",
+     "id": "node_01a17ffe-8624-70cf-b5f8-700870a81b9c",
      "children": [
       {
        "type": "heading",
@@ -29,7 +29,7 @@
          null
         ]
        },
-       "id": "node_01a17fed-a722-7516-b713-2db5dcf34487",
+       "id": "node_01a17ffe-8624-70d0-a585-22192d31d6fb",
        "depth": 2,
        "children": [
         {
@@ -51,7 +51,7 @@
            "value": "Fermat"
           }
          ],
-         "id": "node_01a17fed-a722-7518-9574-829e49cd9f05"
+         "id": "node_01a17ffe-8624-70d2-9250-d6013dc9dc69"
         },
         {
          "type": "paragraph",
@@ -61,14 +61,14 @@
            "value": "No three positive integers..."
           }
          ],
-         "id": "node_01a17fed-a722-7519-8e39-64e71a630fb2"
+         "id": "node_01a17ffe-8624-70d3-a0c6-84bc4a7c6081"
         }
        ],
-       "id": "node_01a17fed-a722-7517-91c9-cb100e7504d3"
+       "id": "node_01a17ffe-8624-70d1-b189-bdff7fafe55a"
       },
       {
        "type": "paragraph",
-       "id": "node_01a17fed-a722-751a-b326-85d5e043aeb7",
+       "id": "node_01a17ffe-8624-70d4-934e-fb35576ed754",
        "children": [
         {
          "type": "abbreviation",
@@ -84,14 +84,14 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17fed-a722-751b-a589-fad4be8a4948",
+       "id": "node_01a17ffe-8624-70d5-971c-59af63757cc1",
        "children": []
       },
       {
        "type": "list",
        "ordered": false,
        "children": [],
-       "id": "node_01a17fed-a722-751c-9b75-3ba15f44c487"
+       "id": "node_01a17ffe-8624-70d6-970f-a6c9c2260fac"
       }
      ]
     }
@@ -110,12 +110,12 @@
      }
     ]
    },
-   "id": "node_01a17fed-a722-7514-aecb-14993e3a57e1",
+   "id": "node_01a17ffe-8624-70ce-bd8a-36cdd0ba0036",
    "children": [
     {
      "type": "block",
      "key": "k8Xq2",
-     "id": "node_01a17fed-a722-7515-aeb9-8cdc5ba061cb",
+     "id": "node_01a17ffe-8624-70cf-b5f8-700870a81b9c",
      "children": [
       {
        "type": "heading",
@@ -128,7 +128,7 @@
          null
         ]
        },
-       "id": "node_01a17fed-a722-7516-b713-2db5dcf34487",
+       "id": "node_01a17ffe-8624-70d0-a585-22192d31d6fb",
        "depth": 2,
        "children": [
         {
@@ -150,7 +150,7 @@
            "value": "Fermat"
           }
          ],
-         "id": "node_01a17fed-a722-7518-9574-829e49cd9f05"
+         "id": "node_01a17ffe-8624-70d2-9250-d6013dc9dc69"
         },
         {
          "type": "paragraph",
@@ -160,14 +160,14 @@
            "value": "No three positive integers..."
           }
          ],
-         "id": "node_01a17fed-a722-7519-8e39-64e71a630fb2"
+         "id": "node_01a17ffe-8624-70d3-a0c6-84bc4a7c6081"
         }
        ],
-       "id": "node_01a17fed-a722-7517-91c9-cb100e7504d3"
+       "id": "node_01a17ffe-8624-70d1-b189-bdff7fafe55a"
       },
       {
        "type": "paragraph",
-       "id": "node_01a17fed-a722-751a-b326-85d5e043aeb7",
+       "id": "node_01a17ffe-8624-70d4-934e-fb35576ed754",
        "children": [
         {
          "type": "abbreviation",
@@ -183,14 +183,205 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17fed-a722-751b-a589-fad4be8a4948",
+       "id": "node_01a17ffe-8624-70d5-971c-59af63757cc1",
        "children": []
       },
       {
        "type": "list",
        "ordered": false,
        "children": [],
-       "id": "node_01a17fed-a722-751c-9b75-3ba15f44c487"
+       "id": "node_01a17ffe-8624-70d6-970f-a6c9c2260fac"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "heading back to paragraph",
+  "myst": {
+   "type": "root",
+   "frontmatter": {
+    "title": "Edge cases",
+    "authors": [
+     {
+      "name": "A. Scholar"
+     }
+    ]
+   },
+   "id": "node_01a17ffe-8624-70ce-bd8a-36cdd0ba0036",
+   "children": [
+    {
+     "type": "block",
+     "key": "k8Xq2",
+     "id": "node_01a17ffe-8624-70cf-b5f8-700870a81b9c",
+     "children": [
+      {
+       "type": "paragraph",
+       "enumerated": false,
+       "data": {
+        "custom": [
+         1,
+         2.5,
+         true,
+         null
+        ]
+       },
+       "id": "node_01a17ffe-8624-70d0-a585-22192d31d6fb",
+       "children": [
+        {
+         "type": "text",
+         "value": "§ Unmodelled fields"
+        }
+       ]
+      },
+      {
+       "type": "proof",
+       "kind": "theorem",
+       "enumerated": true,
+       "children": [
+        {
+         "type": "admonitionTitle",
+         "children": [
+          {
+           "type": "text",
+           "value": "Fermat"
+          }
+         ],
+         "id": "node_01a17ffe-8624-70d2-9250-d6013dc9dc69"
+        },
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "No three positive integers..."
+          }
+         ],
+         "id": "node_01a17ffe-8624-70d3-a0c6-84bc4a7c6081"
+        }
+       ],
+       "id": "node_01a17ffe-8624-70d1-b189-bdff7fafe55a"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ffe-8624-70d4-934e-fb35576ed754",
+       "children": [
+        {
+         "type": "abbreviation",
+         "title": "HyperText Markup Language",
+         "children": [
+          {
+           "type": "text",
+           "value": "HTML"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ffe-8624-70d5-971c-59af63757cc1",
+       "children": []
+      },
+      {
+       "type": "list",
+       "ordered": false,
+       "children": [],
+       "id": "node_01a17ffe-8624-70d6-970f-a6c9c2260fac"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "edit": "paragraph to code",
+  "myst": {
+   "type": "root",
+   "frontmatter": {
+    "title": "Edge cases",
+    "authors": [
+     {
+      "name": "A. Scholar"
+     }
+    ]
+   },
+   "id": "node_01a17ffe-8624-70ce-bd8a-36cdd0ba0036",
+   "children": [
+    {
+     "type": "block",
+     "key": "k8Xq2",
+     "id": "node_01a17ffe-8624-70cf-b5f8-700870a81b9c",
+     "children": [
+      {
+       "type": "code",
+       "enumerated": false,
+       "data": {
+        "custom": [
+         1,
+         2.5,
+         true,
+         null
+        ]
+       },
+       "id": "node_01a17ffe-8624-70d0-a585-22192d31d6fb",
+       "value": "§ Unmodelled fields"
+      },
+      {
+       "type": "proof",
+       "kind": "theorem",
+       "enumerated": true,
+       "children": [
+        {
+         "type": "admonitionTitle",
+         "children": [
+          {
+           "type": "text",
+           "value": "Fermat"
+          }
+         ],
+         "id": "node_01a17ffe-8624-70d2-9250-d6013dc9dc69"
+        },
+        {
+         "type": "paragraph",
+         "children": [
+          {
+           "type": "text",
+           "value": "No three positive integers..."
+          }
+         ],
+         "id": "node_01a17ffe-8624-70d3-a0c6-84bc4a7c6081"
+        }
+       ],
+       "id": "node_01a17ffe-8624-70d1-b189-bdff7fafe55a"
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ffe-8624-70d4-934e-fb35576ed754",
+       "children": [
+        {
+         "type": "abbreviation",
+         "title": "HyperText Markup Language",
+         "children": [
+          {
+           "type": "text",
+           "value": "HTML"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "paragraph",
+       "id": "node_01a17ffe-8624-70d5-971c-59af63757cc1",
+       "children": []
+      },
+      {
+       "type": "list",
+       "ordered": false,
+       "children": [],
+       "id": "node_01a17ffe-8624-70d6-970f-a6c9c2260fac"
       }
      ]
     }
@@ -209,15 +400,15 @@
      }
     ]
    },
-   "id": "node_01a17fed-a722-7514-aecb-14993e3a57e1",
+   "id": "node_01a17ffe-8624-70ce-bd8a-36cdd0ba0036",
    "children": [
     {
      "type": "block",
      "key": "k8Xq2",
-     "id": "node_01a17fed-a722-7515-aeb9-8cdc5ba061cb",
+     "id": "node_01a17ffe-8624-70cf-b5f8-700870a81b9c",
      "children": [
       {
-       "type": "heading",
+       "type": "code",
        "enumerated": false,
        "data": {
         "custom": [
@@ -227,14 +418,8 @@
          null
         ]
        },
-       "id": "node_01a17fed-a722-7516-b713-2db5dcf34487",
-       "depth": 2,
-       "children": [
-        {
-         "type": "text",
-         "value": "§ Unmodelled fields"
-        }
-       ]
+       "id": "node_01a17ffe-8624-70d0-a585-22192d31d6fb",
+       "value": "§ Unmodelled fields"
       },
       {
        "type": "proof",
@@ -249,7 +434,7 @@
            "value": "Fermat"
           }
          ],
-         "id": "node_01a17fed-a722-7518-9574-829e49cd9f05"
+         "id": "node_01a17ffe-8624-70d2-9250-d6013dc9dc69"
         },
         {
          "type": "paragraph",
@@ -259,14 +444,14 @@
            "value": "No three positive integers..."
           }
          ],
-         "id": "node_01a17fed-a722-7519-8e39-64e71a630fb2"
+         "id": "node_01a17ffe-8624-70d3-a0c6-84bc4a7c6081"
         }
        ],
-       "id": "node_01a17fed-a722-7517-91c9-cb100e7504d3"
+       "id": "node_01a17ffe-8624-70d1-b189-bdff7fafe55a"
       },
       {
        "type": "paragraph",
-       "id": "node_01a17fed-a722-751a-b326-85d5e043aeb7",
+       "id": "node_01a17ffe-8624-70d4-934e-fb35576ed754",
        "children": [
         {
          "type": "abbreviation",
@@ -282,20 +467,20 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17fed-a722-751b-a589-fad4be8a4948",
+       "id": "node_01a17ffe-8624-70d5-971c-59af63757cc1",
        "children": []
       },
       {
        "type": "list",
        "ordered": false,
        "children": [],
-       "id": "node_01a17fed-a722-751c-9b75-3ba15f44c487"
+       "id": "node_01a17ffe-8624-70d6-970f-a6c9c2260fac"
       }
      ]
     },
     {
      "type": "paragraph",
-     "id": "node_01a17fed-a722-751d-add1-c09e6be9adb3",
+     "id": "node_01a17ffe-8624-70d7-9922-246433b4e259",
      "children": [
       {
        "type": "text",
@@ -318,11 +503,11 @@
      }
     ]
    },
-   "id": "node_01a17fed-a722-7514-aecb-14993e3a57e1",
+   "id": "node_01a17ffe-8624-70ce-bd8a-36cdd0ba0036",
    "children": [
     {
      "type": "paragraph",
-     "id": "node_01a17fed-a722-751d-add1-c09e6be9adb3",
+     "id": "node_01a17ffe-8624-70d7-9922-246433b4e259",
      "children": [
       {
        "type": "text",
@@ -333,10 +518,10 @@
     {
      "type": "block",
      "key": "k8Xq2",
-     "id": "node_01a17fed-a722-7515-aeb9-8cdc5ba061cb",
+     "id": "node_01a17ffe-8624-70cf-b5f8-700870a81b9c",
      "children": [
       {
-       "type": "heading",
+       "type": "code",
        "enumerated": false,
        "data": {
         "custom": [
@@ -346,14 +531,8 @@
          null
         ]
        },
-       "id": "node_01a17fed-a722-7516-b713-2db5dcf34487",
-       "depth": 2,
-       "children": [
-        {
-         "type": "text",
-         "value": "§ Unmodelled fields"
-        }
-       ]
+       "id": "node_01a17ffe-8624-70d0-a585-22192d31d6fb",
+       "value": "§ Unmodelled fields"
       },
       {
        "type": "proof",
@@ -368,7 +547,7 @@
            "value": "Fermat"
           }
          ],
-         "id": "node_01a17fed-a722-7518-9574-829e49cd9f05"
+         "id": "node_01a17ffe-8624-70d2-9250-d6013dc9dc69"
         },
         {
          "type": "paragraph",
@@ -378,14 +557,14 @@
            "value": "No three positive integers..."
           }
          ],
-         "id": "node_01a17fed-a722-7519-8e39-64e71a630fb2"
+         "id": "node_01a17ffe-8624-70d3-a0c6-84bc4a7c6081"
         }
        ],
-       "id": "node_01a17fed-a722-7517-91c9-cb100e7504d3"
+       "id": "node_01a17ffe-8624-70d1-b189-bdff7fafe55a"
       },
       {
        "type": "paragraph",
-       "id": "node_01a17fed-a722-751a-b326-85d5e043aeb7",
+       "id": "node_01a17ffe-8624-70d4-934e-fb35576ed754",
        "children": [
         {
          "type": "abbreviation",
@@ -401,14 +580,14 @@
       },
       {
        "type": "paragraph",
-       "id": "node_01a17fed-a722-751b-a589-fad4be8a4948",
+       "id": "node_01a17ffe-8624-70d5-971c-59af63757cc1",
        "children": []
       },
       {
        "type": "list",
        "ordered": false,
        "children": [],
-       "id": "node_01a17fed-a722-751c-9b75-3ba15f44c487"
+       "id": "node_01a17ffe-8624-70d6-970f-a6c9c2260fac"
       }
      ]
     }
@@ -427,23 +606,23 @@
      }
     ]
    },
-   "id": "node_01a17fed-a722-7514-aecb-14993e3a57e1",
+   "id": "node_01a17ffe-8624-70ce-bd8a-36cdd0ba0036",
    "children": [
     {
      "type": "paragraph",
-     "id": "node_01a17fed-a722-751d-add1-c09e6be9adb3",
+     "id": "node_01a17ffe-8624-70d7-9922-246433b4e259",
      "children": []
     },
     {
      "type": "block",
      "key": "k8Xq2",
-     "id": "node_01a17fed-a722-7515-aeb9-8cdc5ba061cb",
+     "id": "node_01a17ffe-8624-70cf-b5f8-700870a81b9c",
      "children": [
       {
        "type": "list",
        "ordered": false,
        "children": [],
-       "id": "node_01a17fed-a722-751c-9b75-3ba15f44c487"
+       "id": "node_01a17ffe-8624-70d6-970f-a6c9c2260fac"
       }
      ]
     }

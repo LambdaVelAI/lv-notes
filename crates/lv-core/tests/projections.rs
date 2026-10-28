@@ -143,6 +143,9 @@ fn history(w: &mut World, mut check: impl FnMut(&World)) -> Ids {
         Box::new(move |w| { w.person(OpBody::SetRelation { node: id_link, relation: Some(Relation::new(Relation::SUPPORTS)) }); }),
         Box::new(move |w| { w.person(OpBody::EditText { node: para_text, edit: TextEdit::Replace { value: "Marginalia record a reader arguing".into() } }); }),
         Box::new(move |w| { w.person(OpBody::SetAttrs { node: heading, set: json!({ "depth": 2 }).as_object().unwrap().clone(), unset: vec![] }); }),
+        // Retype the heading and back: the same node throughout, so links to it hold.
+        Box::new(move |w| { w.person(OpBody::SetType { node: heading, node_type: "paragraph".into(), set: Default::default(), unset: vec!["depth".into()] }); }),
+        Box::new(move |w| { w.person(OpBody::SetType { node: heading, node_type: "heading".into(), set: json!({ "depth": 2 }).as_object().unwrap().clone(), unset: vec![] }); }),
         Box::new(move |w| { w.person(insert(scrap, root(note), None, content("paragraph", json!({})))); }),
         Box::new(move |w| { w.person(OpBody::DeleteNode { node: scrap }); }),
         Box::new(move |w| { w.person(OpBody::SetDocumentTitle { doc: note, title: "On reading".into() }); }),

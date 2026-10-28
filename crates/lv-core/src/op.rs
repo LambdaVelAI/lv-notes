@@ -161,6 +161,18 @@ pub enum OpBody {
         unset: Vec<String>,
     },
     EditText { node: NodeId, edit: TextEdit },
+    /// Changes the node's MyST type in place (paragraph → heading, ...),
+    /// keeping its ID and so everything that points at it. `set` and
+    /// `unset` adjust its fields in the same step, since the new type may
+    /// need different ones; they may include `value` (paragraph → code).
+    SetType {
+        node: NodeId,
+        node_type: String,
+        #[serde(default, skip_serializing_if = "Map::is_empty")]
+        set: Map<String, Value>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        unset: Vec<String>,
+    },
 
     /// Types (or untypes) the link, citation or reference node `node`.
     SetRelation { node: NodeId, relation: Option<Relation> },
@@ -186,6 +198,7 @@ impl OpBody {
             OpBody::DeleteNode { .. } => "delete_node",
             OpBody::SetAttrs { .. } => "set_attrs",
             OpBody::EditText { .. } => "edit_text",
+            OpBody::SetType { .. } => "set_type",
             OpBody::SetRelation { .. } => "set_relation",
             OpBody::OpenChangeSet { .. } => "open_change_set",
             OpBody::AcceptChangeSet { .. } => "accept_change_set",
@@ -203,6 +216,7 @@ mod tests {
     fn kind_matches_serde_tag() {
         let bodies = [
             OpBody::DeleteNode { node: NodeId::new() },
+            OpBody::SetType { node: NodeId::new(), node_type: "heading".into(), set: Map::new(), unset: vec![] },
             OpBody::SetAttrs { node: NodeId::new(), set: Map::new(), unset: vec!["lang".into()] },
             OpBody::RejectChangeSet { change_set: ChangeSetId::new(), reason: None },
         ];

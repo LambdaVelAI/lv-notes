@@ -165,8 +165,9 @@ impl Parts {
 pub struct Update {
     pub ops: Vec<OpBody>,
     /// `(old, new)`: IDs in the edited tree that could not be reused, because
-    /// the node was deleted or its type changed. The node was inserted under
-    /// the new ID instead; the editor should rename it.
+    /// the node was deleted (or its type changed to or from a text run). The
+    /// node was inserted under the new ID instead; the editor should rename
+    /// it.
     pub renamed: Vec<(NodeId, NodeId)>,
 }
 
@@ -177,15 +178,16 @@ pub struct Update {
 /// unknown `id` is a new node. Text runs match the parent's old text runs of
 /// the same type in order. Matched nodes that kept their relative order stay
 /// put (the longest such run), the rest move; changed fields become
-/// `set_attrs`, `edit_text` and `set_relation`; nodes missing from `root`
-/// are deleted. Applying the ops to `state` and materializing gives `root`
+/// `set_attrs`, `edit_text` and `set_relation`, and a changed type becomes
+/// `set_type`, so the node keeps its ID; nodes missing from `root` are
+/// deleted. Applying the ops to `state` and materializing gives `root`
 /// back.
 pub fn update_document(state: &ProjectState, doc: DocumentId, root: &Node) -> Result<Update, ImportError> {
     state.document(doc).ok_or(ImportError::UnknownDocument(doc))?;
     let root = to_json(root);
     let mut claimed = HashSet::new();
     claim_ids(&root, &mut claimed)?;
-    let mut r = Reconciler { state, claimed, matched: HashSet::new(), update: Update::default() };
+    let mut r = Reconciler { state, claimed, matched: HashSet::new(), deleted: HashSet::new(), update: Update::default() };
     r.children(Parent::DocumentRoot(doc), vec![root], "document")?;
 
     // Delete what is no longer there, outermost first; a deleted node takes
@@ -194,7 +196,7 @@ pub fn update_document(state: &ProjectState, doc: DocumentId, root: &Node) -> Re
     while let Some(id) = stack.pop() {
         if !r.matched.contains(&id) {
             let parent_goes = matches!(state.node(id).expect("child").parent, Parent::Node(p) if !r.matched.contains(&p));
-            if !parent_goes {
+            if !parent_goes && !r.deleted.contains(&id) {
                 r.update.ops.push(OpBody::DeleteNode { node: id });
             }
         }
@@ -232,6 +234,8 @@ struct Reconciler<'a> {
     claimed: HashSet<NodeId>,
     /// Old nodes that are still in the tree.
     matched: HashSet<NodeId>,
+    /// Old nodes already deleted (the children of a node that became a leaf).
+    deleted: HashSet<NodeId>,
     update: Update,
 }
 
@@ -255,7 +259,11 @@ impl Reconciler<'_> {
             let target = match parts.id {
                 Some(id) => match state.node(id) {
                     None => Target::New(id),
-                    Some(n) if n.deleted || n.content.node_type != node_type || state.document(n.document).is_none_or(|d| d.deleted) => {
+                    Some(n)
+                        if n.deleted
+                            || (n.content.node_type != node_type && !retypable(&n.content.node_type, node_type))
+                            || state.document(n.document).is_none_or(|d| d.deleted) =>
+                    {
                         let fresh = NodeId::new();
                         self.update.renamed.push((id, fresh));
                         Target::New(fresh)
@@ -308,10 +316,14 @@ impl Reconciler<'_> {
         Ok(())
     }
 
-    /// The ops that give existing node `id` the fields of `parts`.
+    /// The ops that give existing node `id` the type and fields of `parts`.
     fn content(&mut self, id: NodeId, parts: &Parts) -> Result<(), ImportError> {
         let n = self.state.node(id).expect("matched nodes exist");
         let (old, new) = (&n.content.fields, &parts.content.fields);
+        let new_type = &parts.content.node_type;
+        if *new_type != n.content.node_type {
+            return Ok(self.retype(id, parts));
+        }
         let set: Map<String, Value> = new
             .iter()
             .filter(|&(k, v)| k != "value" && old.get(k) != Some(v))
@@ -333,6 +345,39 @@ impl Reconciler<'_> {
         }
         Ok(())
     }
+
+    /// `set_type` for a node whose type changed, with what it needs around
+    /// it: a relation the new type can't carry is cleared first, and the
+    /// children of a node becoming a leaf (paragraph → code) are deleted
+    /// first.
+    fn retype(&mut self, id: NodeId, parts: &Parts) {
+        let n = self.state.node(id).expect("matched nodes exist");
+        let (old, new) = (&n.content.fields, &parts.content.fields);
+        let new_type = &parts.content.node_type;
+        let new_is_edge = EDGE_TYPES.contains(&new_type.as_str());
+        if n.relation.is_some() && !new_is_edge {
+            self.update.ops.push(OpBody::SetRelation { node: id, relation: None });
+        }
+        if children_policy(new_type) == ChildrenPolicy::Never {
+            for child in self.state.children(Parent::Node(id)) {
+                self.update.ops.push(OpBody::DeleteNode { node: child });
+                self.deleted.insert(child);
+            }
+        }
+        let set = new.iter().filter(|&(k, v)| old.get(k) != Some(v)).map(|(k, v)| (k.clone(), v.clone())).collect();
+        let unset = old.keys().filter(|k| !new.contains_key(*k)).cloned().collect();
+        self.update.ops.push(OpBody::SetType { node: id, node_type: new_type.clone(), set, unset });
+        let relation = if n.relation.is_some() && new_is_edge { n.relation.clone() } else { None };
+        if new_is_edge && relation != parts.relation {
+            self.update.ops.push(OpBody::SetRelation { node: id, relation: parts.relation.clone() });
+        }
+    }
+}
+
+/// Whether a node can change from `old` to `new` type in place: anything
+/// but a text run, which has no identity to keep.
+fn retypable(old: &str, new: &str) -> bool {
+    !TEXT_RUN_TYPES.contains(&old) && !TEXT_RUN_TYPES.contains(&new)
 }
 
 /// Indices of a longest strictly increasing subsequence of the `Some`

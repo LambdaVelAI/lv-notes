@@ -7,13 +7,13 @@
 // the schema or conversion changes.
 
 import { writeFileSync, mkdirSync } from "node:fs";
-import { setBlockType, toggleMark, joinBackward } from "prosemirror-commands";
+import { toggleMark, joinBackward } from "prosemirror-commands";
 import { wrapInList } from "prosemirror-schema-list";
 import { type Command, EditorState, TextSelection } from "prosemirror-state";
 import { describe, expect, it } from "vitest";
 import { removeLink, setLink } from "../src/editor/links";
 import { type Myst, mystToPm, pmToMyst } from "../src/editor/myst";
-import { assignIds, plugins } from "../src/editor/plugins";
+import { assignIds, plugins, setBlockType } from "../src/editor/plugins";
 import { schema } from "../src/editor/schema";
 
 const fixtures = import.meta.glob<{ default: Myst }>("../../../crates/lv-core/tests/fixtures/myst/*.json", { eager: true });
@@ -49,6 +49,8 @@ const EDITS: Edit[] = [
   ["split a paragraph", (s) => { const p = firstText(s); return p == null ? null : s.apply(s.tr.split(p + 2)); }],
   ["join it back", (s) => { const p = firstText(s); if (p == null) return null; const next = s.doc.resolve(p).after() + 1; return run(at(s, next + 1), joinBackward); }],
   ["paragraph to heading", (s) => { const p = firstText(s); return p == null ? null : run(at(s, p), setBlockType(schema.nodes.heading, { depth: 2 })); }],
+  ["heading back to paragraph", (s) => { const p = firstText(s, schema.nodes.heading); return p == null ? null : run(at(s, p), setBlockType(schema.nodes.paragraph)); }],
+  ["paragraph to code", (s) => { const p = firstText(s); return p == null ? null : run(at(s, p), setBlockType(schema.nodes.code)); }],
   ["wrap in a list", (s) => { const p = firstText(s); return p == null ? null : run(at(s, p), wrapInList(schema.nodes.list)); }],
   ["new paragraph at the end", (s) => s.apply(s.tr.insert(s.doc.content.size, schema.nodes.paragraph.create(null, schema.text("The end.")))) ],
   ["move the last block first", (s) => {

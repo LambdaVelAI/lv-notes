@@ -76,7 +76,11 @@ typed.
   too.
 - An ID the core can't reuse is reported back in `renamed`, and the editor
   applies it. This happens when the node was deleted (for example,
-  restored by undo) or its type changed.
+  restored by undo).
+- Changing a block's type (the block menu, `# `, ```` ``` ````) keeps its
+  ID: the editor's `setBlockType` and type input rules carry `id` and
+  `extra` over, and the core turns the change into one `set_type`. Links
+  to the block keep working.
 
 ## The schema
 
@@ -150,10 +154,6 @@ links are links with any other url.
 - **Concurrent edits are refused, not merged.** `STALE_BASE` is right while
   the editor is the only writer. Once the in-app agent edits the same
   document (layer 3), it needs real merging: the text-CRDT question.
-- **Changing a block's type loses its ID.** `set_attrs` cannot change
-  `type`, so paragraph → heading is delete plus insert, and anything
-  anchored to the old ID (comments, backlinks by ID) is lost. A
-  `set_type` op would fix this.
 - **Edited blocks drop text-run details.** Source positions on their text,
   unmodelled fields on text runs and empty text nodes are lost. Mark
   nesting is normalized to schema order (link > strong > emphasis > …).
@@ -164,8 +164,9 @@ links are links with any other url.
 - **Broken links look like working ones** until the cursor is in them
   (the bubble then says the target was deleted). Marking them in the text
   would need the editor to resolve every link target on load.
-- **Changing a block's type breaks links to it** (see above): the block
-  gets a new ID and `node_…` links to the old one dangle.
+- **Wrapping or unwrapping** (into a list or quote) keeps the block's ID,
+  but turning a list item into a paragraph replaces the item: links to the
+  `listItem` itself dangle (links to the paragraph inside it don't).
 - **Search covers text runs only.** A block whose words are split across
   formatting (`**slo**w`) matches by fragment, and code and math blocks
   match by their source.

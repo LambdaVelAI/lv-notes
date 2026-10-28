@@ -27,7 +27,7 @@ use std::collections::{BTreeSet, HashMap};
 use serde_json::Value;
 
 use crate::ids::{ChangeSetId, DocumentId, NodeId, Version};
-use crate::myst::{ChildrenPolicy, children_policy};
+use crate::myst::{ChildrenPolicy, TEXT_RUN_TYPES, children_policy};
 use crate::op::{DocKind, NodeContent, OpBody, Parent, Relation, Sequenced, TextEdit};
 use crate::principal::Principal;
 use crate::refusal::{Refusal, RefusalCode as Code};
@@ -330,16 +330,7 @@ impl ProjectState {
                 fx.nodes.insert(*node);
             }
             OpBody::EditText { node, edit } => {
-                let n = self.live_node(*node)?;
-                if let Some((seq, by)) = n.last_text_edit
-                    && seq > op.base
-                    && by != op.principal
-                {
-                    return Err(Refusal::new(
-                        Code::StaleText,
-                        format!("{node} text was replaced at {seq}, after base {}", op.base),
-                    ));
-                }
+                self.fresh_text(*node, op)?;
                 let n = self.nodes.get_mut(node).expect("live");
                 match edit {
                     TextEdit::Replace { value } => {
@@ -347,6 +338,50 @@ impl ProjectState {
                     }
                 }
                 n.last_text_edit = Some((s.seq, op.principal));
+                n.updated = s.seq;
+                fx.nodes.insert(*node);
+            }
+
+            OpBody::SetType { node, node_type, set, unset } => {
+                let n = self.live_node(*node)?;
+                let old_type = n.content.node_type.as_str();
+                if let Some(t) = [old_type, node_type.as_str()].into_iter().find(|t| TEXT_RUN_TYPES.contains(t)) {
+                    return Err(Refusal::new(
+                        Code::InvalidOp,
+                        format!("`{t}` is a text run, which has no identity to keep; replace the node instead"),
+                    ));
+                }
+                if let Some(key) = set.keys().chain(unset).find(|k| ["type", "id", "children"].contains(&k.as_str())) {
+                    return Err(Refusal::new(Code::InvalidOp, format!("`{key}` cannot be changed with set_type")));
+                }
+                if n.relation.is_some() && !EDGE_TYPES.contains(&node_type.as_str()) {
+                    return Err(Refusal::new(
+                        Code::InvalidOp,
+                        format!("{node} has a relation, which a `{node_type}` cannot carry; clear it first"),
+                    ));
+                }
+                if children_policy(node_type) == ChildrenPolicy::Never && !self.children(Parent::Node(*node)).is_empty() {
+                    return Err(Refusal::new(
+                        Code::InvalidOp,
+                        format!("a `{node_type}` has no children; delete {node}'s children first"),
+                    ));
+                }
+                let touches_text = set.contains_key("value") || unset.iter().any(|k| k == "value");
+                if touches_text {
+                    self.fresh_text(*node, op)?;
+                }
+                let mut content = self.nodes[node].content.clone();
+                content.node_type = node_type.clone();
+                for key in unset {
+                    content.fields.remove(key);
+                }
+                content.fields.extend(set.iter().map(|(k, v)| (k.clone(), v.clone())));
+                check_content(&content)?;
+                let n = self.nodes.get_mut(node).expect("live");
+                n.content = content;
+                if touches_text {
+                    n.last_text_edit = Some((s.seq, op.principal));
+                }
                 n.updated = s.seq;
                 fx.nodes.insert(*node);
             }
@@ -416,6 +451,18 @@ impl ProjectState {
             return Err(Refusal::new(Code::DocumentDeleted, format!("{id} is deleted")));
         }
         Ok(d)
+    }
+
+    /// Refuses replacing `node`'s text if someone else replaced it after
+    /// `op.base` (`STALE_TEXT`); the principal's own edits never conflict.
+    fn fresh_text(&self, node: NodeId, op: &crate::op::Op) -> Result<(), Refusal> {
+        if let Some((seq, by)) = self.live_node(node)?.last_text_edit
+            && seq > op.base
+            && by != op.principal
+        {
+            return Err(Refusal::new(Code::StaleText, format!("{node} text was replaced at {seq}, after base {}", op.base)));
+        }
+        Ok(())
     }
 
     fn live_node(&self, id: NodeId) -> Result<&NodeState, Refusal> {

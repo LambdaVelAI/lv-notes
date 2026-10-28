@@ -145,6 +145,9 @@ pub enum OpBody {
     // Content of one node
     SetAttrs { node: NodeId, set: Map<String, Value>, unset: Vec<String> },
     EditText { node: NodeId, edit: TextEdit },
+    // Change the MyST type in place (paragraph → heading), keeping the ID and
+    // so every link and anchor on it. `set`/`unset` may include `value`.
+    SetType { node: NodeId, node_type: String, set: Map<String, Value>, unset: Vec<String> },
 
     // Typed links: the edge is the link/cite node itself, so the graph
     // projection reads it from the tree. Typing it later is its own op.
@@ -207,7 +210,7 @@ replaying the log through it rebuilds the project. The full list of codes is
 | `STALE_TEXT` | a *different* principal replaced the node's text after `op.base` (goes away with the CRDT) |
 | `CHANGE_SET_CONFLICT` | an open change set no longer applies on top of the current project |
 | `CHANGE_SET_CLOSED` | adding to, accepting or rejecting a change set already accepted or rejected |
-| `INVALID_OP` | e.g. `set_attrs` on `type`/`id`/`children`/`value`, or a relation on a non-link node |
+| `INVALID_OP` | e.g. `set_attrs` on `type`/`id`/`children`/`value`, a relation on a non-link node, or a `set_type` to or from a text run, onto a leaf that still has children, or off an edge that still has a relation |
 
 Details decided while implementing:
 
@@ -331,9 +334,12 @@ a link into the block it sits in and that block's text.
   - Nodes match by `id`, and text runs by type and order.
   - The longest run of children already in order stays put; the rest move.
   - Changed fields become `set_attrs`, `edit_text` and `set_relation`.
+  - A changed type becomes `set_type`, carrying the field changes. A node
+    becoming a leaf (paragraph → code) has its children deleted first, and
+    a relation the new type can't carry is cleared first.
   - Missing nodes are deleted.
-  - An ID that can't be reused (the node was deleted, or its type changed)
-    gets a new ID, reported in `renamed`.
+  - An ID that can't be reused (the node was deleted, or it changes to or
+    from a text run) gets a new ID, reported in `renamed`.
 
   A seeded random-edit test checks that every save materializes back to
   the edited tree. See `desktop-shell.md`.

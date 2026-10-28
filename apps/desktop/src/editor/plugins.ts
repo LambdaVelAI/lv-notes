@@ -1,10 +1,10 @@
 // Editor behaviour: node IDs, keys and input rules.
 
-import { baseKeymap, chainCommands, setBlockType, toggleMark, wrapIn, exitCode } from "prosemirror-commands";
+import { baseKeymap, chainCommands, toggleMark, wrapIn, exitCode } from "prosemirror-commands";
 import { history, redo, undo } from "prosemirror-history";
-import { InputRule, inputRules, textblockTypeInputRule, wrappingInputRule } from "prosemirror-inputrules";
+import { InputRule, inputRules, wrappingInputRule } from "prosemirror-inputrules";
 import { keymap } from "prosemirror-keymap";
-import { type Node as PMNode } from "prosemirror-model";
+import { type Attrs, type Node as PMNode, type NodeType } from "prosemirror-model";
 import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-list";
 import { type Command, type EditorState, Plugin, Selection, TextSelection, type Transaction } from "prosemirror-state";
 import { newNodeId } from "./ids";
@@ -114,6 +114,42 @@ export function renameIds(state: EditorState, renamed: [string, string][]): Tran
 
 // ---- Commands ---------------------------------------------------------------
 
+/**
+ * Attributes for a block changing type: the new type's `attrs`, plus the old
+ * block's node ID and unmodelled MyST fields. Keeping the ID lets the core
+ * change the type in place (`set_type`), so links to the block still work.
+ */
+const keepIdentity = (attrs: Attrs | null) => (old: PMNode): Attrs => ({
+  ...attrs,
+  ...(old.attrs.implicit ? {} : { id: old.attrs.id ?? null, extra: old.attrs.extra ?? null }),
+});
+
+/** `setBlockType` that keeps each block's node ID. */
+export function setBlockType(type: NodeType, attrs: Attrs | null = null): Command {
+  return (state, dispatch) => {
+    const { from, to } = state.selection;
+    let applicable = false;
+    state.doc.nodesBetween(from, to, (node, pos) => {
+      if (applicable || !node.isTextblock || node.hasMarkup(type, type.create(keepIdentity(attrs)(node)).attrs)) return !applicable;
+      const $pos = state.doc.resolve(pos);
+      applicable = node.type === type || $pos.parent.canReplaceWith($pos.index(), $pos.index() + 1, type);
+      return false;
+    });
+    if (!applicable) return false;
+    dispatch?.(state.tr.setBlockType(from, to, type, keepIdentity(attrs)).scrollIntoView());
+    return true;
+  };
+}
+
+/** `textblockTypeInputRule` that keeps the block's node ID. */
+function textblockTypeRule(regexp: RegExp, type: NodeType, getAttrs?: (match: RegExpMatchArray) => Attrs): InputRule {
+  return new InputRule(regexp, (state, match, start, end) => {
+    const $start = state.doc.resolve(start);
+    if (!$start.node(-1).canReplaceWith($start.index(-1), $start.indexAfter(-1), type)) return null;
+    return state.tr.delete(start, end).setBlockType(start, start, type, keepIdentity(getAttrs?.(match) ?? null));
+  });
+}
+
 const n = schema.nodes;
 const m = schema.marks;
 
@@ -170,8 +206,8 @@ const insertBreak: Command = (state, dispatch) => {
 function rules() {
   return inputRules({
     rules: [
-      textblockTypeInputRule(/^(#{1,6})\s$/, n.heading, (match) => ({ depth: match[1].length })),
-      textblockTypeInputRule(/^```$/, n.code),
+      textblockTypeRule(/^(#{1,6})\s$/, n.heading, (match) => ({ depth: match[1].length })),
+      textblockTypeRule(/^```$/, n.code),
       wrappingInputRule(/^\s*>\s$/, n.blockquote),
       wrappingInputRule(/^\s*([-+*])\s$/, n.list, { ordered: null }),
       wrappingInputRule(

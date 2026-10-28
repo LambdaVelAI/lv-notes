@@ -423,27 +423,81 @@ fn wrapping_and_unwrapping_swap_ancestors() {
 }
 
 #[test]
-fn changing_a_type_or_reusing_a_deleted_id_renames() {
+fn changing_a_type_keeps_the_id() {
     let (mut w, doc, mut native) = edited_prose();
     let blocks = children(at(&mut native, &[0]));
     let paragraph = blocks.iter_mut().find(|b| b["type"] == "paragraph").unwrap();
-    let old: NodeId = paragraph["id"].as_str().unwrap().parse().unwrap();
+    let id: NodeId = paragraph["id"].as_str().unwrap().parse().unwrap();
+    let text = paragraph["children"].clone();
+
+    // Paragraph → heading: one op, same node.
     paragraph["type"] = json!("heading");
     paragraph["depth"] = json!(2);
     let update = w.save(doc, &native);
-    assert_eq!(update.renamed.len(), 1);
-    assert_eq!(update.renamed[0].0, old);
+    assert_eq!((kinds(&update), update.renamed.len()), (vec!["set_type"], 0));
+    assert_eq!(w.seq.state().node(id).unwrap().content.node_type, "heading");
+
+    // Heading → code: its text runs go, and it takes a value.
+    let block = children(at(&mut native, &[0])).iter_mut().find(|b| b["id"] == json!(id.to_string())).unwrap();
+    *block = json!({ "type": "code", "id": id, "value": "print('hi')" });
+    let update = w.save(doc, &native);
+    let k = kinds(&update);
+    assert_eq!(k.last(), Some(&"set_type"));
+    assert!(k[..k.len() - 1].iter().all(|k| *k == "delete_node"), "{k:?}");
+
+    // Code → paragraph: the value goes, and text runs come back.
+    let block = children(at(&mut native, &[0])).iter_mut().find(|b| b["id"] == json!(id.to_string())).unwrap();
+    *block = json!({ "type": "paragraph", "id": id, "children": text });
+    let update = w.save(doc, &native);
+    assert_eq!(kinds(&update)[0], "set_type");
+    // Only the deleted link inside it comes back under a new ID; the block keeps its own.
+    assert!(update.renamed.iter().all(|(old, _)| *old != id));
+}
+
+#[test]
+fn reusing_a_deleted_id_renames() {
+    let (mut w, doc, mut native) = edited_prose();
+    let blocks = children(at(&mut native, &[0]));
+    let i = blocks.iter().position(|b| b["type"] == "paragraph").unwrap();
+    let paragraph = blocks.remove(i);
+    let old: NodeId = paragraph["id"].as_str().unwrap().parse().unwrap();
+    w.save(doc, &native);
     assert!(w.seq.state().node(old).unwrap().deleted);
 
-    // Undo in the editor brings the old ID back: it is deleted, so renamed again.
-    let mut restored = native.clone();
-    rename(&mut restored, &[(old, old)]);
-    let paragraph = children(at(&mut restored, &[0])).iter_mut().find(|b| b["id"] == json!(old.to_string()));
-    let paragraph = paragraph.unwrap();
-    paragraph["type"] = json!("paragraph");
-    paragraph.as_object_mut().unwrap().remove("depth");
-    let update = w.save(doc, &restored);
-    assert_eq!(update.renamed.iter().map(|r| r.0).collect::<Vec<_>>(), [old]);
+    // Undo in the editor brings the old ID back: it is deleted, so renamed.
+    children(at(&mut native, &[0])).insert(i, paragraph);
+    let update = w.save(doc, &native);
+    assert_eq!(update.renamed.first().map(|r| r.0), Some(old), "and the link inside it");
+}
+
+#[test]
+fn set_type_refusals() {
+    let (mut w, _doc, native) = edited_prose();
+    let state = w.seq.state();
+    let find = |t: &str| state.nodes().find(|(_, n)| n.content.node_type == t && !n.deleted).map(|(id, _)| id).unwrap();
+    let (paragraph, text) = (find("paragraph"), find("text"));
+    let retype = |node, t: &str| OpBody::SetType { node, node_type: t.into(), set: Default::default(), unset: vec![] };
+
+    // Text runs have no identity to keep.
+    assert_eq!(w.submit(vec![retype(text, "emphasis")]), Err(RefusalCode::InvalidOp));
+    // A leaf can't keep children, and the result must be valid MyST.
+    assert_eq!(w.submit(vec![retype(paragraph, "thematicBreak")]), Err(RefusalCode::InvalidOp));
+    let bad_depth = OpBody::SetType {
+        node: paragraph,
+        node_type: "heading".into(),
+        set: json!({ "depth": "two" }).as_object().unwrap().clone(),
+        unset: vec![],
+    };
+    assert_eq!(w.submit(vec![bad_depth]), Err(RefusalCode::InvalidOp));
+    let reserved = OpBody::SetType {
+        node: paragraph,
+        node_type: "heading".into(),
+        set: json!({ "id": "x" }).as_object().unwrap().clone(),
+        unset: vec![],
+    };
+    assert_eq!(w.submit(vec![reserved]), Err(RefusalCode::InvalidOp));
+    assert_eq!(w.submit(vec![retype(paragraph, "heading")]), Ok(()));
+    drop(native);
 }
 
 #[test]
@@ -567,11 +621,17 @@ fn random_edits_always_save_exactly() {
                         at(&mut tree, path)["value"] = json!(format!("edit {step}"));
                     }
                 }
-                // Change an attribute.
+                // Change an attribute, or turn a paragraph into a heading and back.
                 3 if !nodes.is_empty() => {
                     let path = &nodes[rng.below(nodes.len())];
                     let node = at(&mut tree, path);
-                    if node["type"] != "text" {
+                    if node["type"] == "paragraph" {
+                        node["type"] = json!("heading");
+                        node["depth"] = json!(1 + step % 3);
+                    } else if node["type"] == "heading" {
+                        node["type"] = json!("paragraph");
+                        node.as_object_mut().unwrap().remove("depth");
+                    } else if node["type"] != "text" {
                         node["data-step"] = json!(step);
                     }
                 }

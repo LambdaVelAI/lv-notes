@@ -402,6 +402,7 @@ fn touched_documents(before: &ProjectState, after: &ProjectState, ops: &[Sequenc
             OpBody::DeleteNode { node }
             | OpBody::SetAttrs { node, .. }
             | OpBody::EditText { node, .. }
+            | OpBody::SetType { node, .. }
             | OpBody::SetRelation { node, .. } => docs.extend(node_docs(*node)),
             OpBody::AcceptChangeSet { change_set } => {
                 bodies.extend(before.change_set(*change_set).into_iter().flat_map(|cs| cs.ops.iter().map(|s| &s.op.body)));
@@ -536,6 +537,28 @@ mod tests {
         assert_eq!((located.doc, located.block.unwrap().text.as_str()), (target, "Marginalia are arguments."));
         assert_eq!(s.locate("https://example.org"), None);
         assert_eq!(s.locate(&NodeId::new().to_string()), None);
+    }
+
+    #[test]
+    fn links_to_a_block_survive_changing_its_type() {
+        let (_dir, path, me) = project();
+        let mut s = Session::create(&path, "P", &me).unwrap();
+        let (doc, _) = s.create_document("A", DocKind::Note).unwrap();
+        let mut a = s.load_document(doc).unwrap();
+        let block: NodeId = a.myst["children"][0]["id"].as_str().unwrap().parse().unwrap();
+        a.myst["children"].as_array_mut().unwrap().push(json!({
+            "type": "paragraph", "id": NodeId::new(),
+            "children": [{ "type": "link", "id": NodeId::new(), "url": block.to_string(), "children": [] }]
+        }));
+        let (saved, _) = s.save_document(doc, a.version, a.myst.clone()).unwrap();
+
+        // Paragraph → heading, as the editor's block menu sends it.
+        a.myst["children"][0]["type"] = json!("heading");
+        a.myst["children"][0]["depth"] = json!(1);
+        let (saved, _) = s.save_document(doc, saved.version, a.myst.clone()).unwrap();
+        assert_eq!((saved.ops, saved.renamed.len()), (1, 0));
+        assert_eq!(s.backlinks(doc).unwrap()[0].target, Some(block));
+        assert_eq!(s.locate(&block.to_string()).unwrap().block.unwrap().kind, "heading");
     }
 
     #[test]

@@ -3,7 +3,7 @@ import { EditorState, TextSelection } from "prosemirror-state";
 import { describe, expect, it } from "vitest";
 import { isNodeId, newNodeId } from "../src/editor/ids";
 import { type Myst, mystIds, mystToPm, pmToMyst } from "../src/editor/myst";
-import { assignIds, leaveCode, plugins, renameIds } from "../src/editor/plugins";
+import { assignIds, leaveCode, plugins, renameIds, setBlockType } from "../src/editor/plugins";
 import { schema } from "../src/editor/schema";
 
 const fixtures = import.meta.glob<{ default: Myst }>("../../../crates/lv-core/tests/fixtures/myst/*.json", { eager: true });
@@ -195,5 +195,20 @@ describe("leaving a code block", () => {
   it("does nothing outside code", () => {
     const s = state({ type: "root", children: [{ type: "paragraph", children: [{ type: "text", value: "p" }] }] });
     expect(run(s, leaveCode("anywhere")).handled).toBe(false);
+  });
+});
+
+describe("changing a block's type", () => {
+  it("keeps its node ID, so the core changes the type in place", () => {
+    const id = newNodeId();
+    let s = state({ type: "root", children: [{ type: "paragraph", id, children: [{ type: "text", value: "Title" }] }] });
+    s = s.apply(s.tr.setSelection(TextSelection.create(s.doc, 2)));
+    for (const [type, attrs] of [[schema.nodes.heading, { depth: 2 }], [schema.nodes.code, null], [schema.nodes.paragraph, null]] as const) {
+      let next = s;
+      expect(setBlockType(type, attrs)(s, (tr) => (next = s.apply(tr)))).toBe(true);
+      s = next;
+      expect([s.doc.child(0).type, s.doc.child(0).attrs.id]).toEqual([type, id]);
+    }
+    expect(setBlockType(schema.nodes.paragraph)(s)).toBe(false);
   });
 });
