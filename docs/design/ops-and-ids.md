@@ -268,7 +268,8 @@ surfaced for later review) is still to be designed.
 ## 5. Storage and projections (implemented)
 
 One SQLite file per project; the schema is in `store/schema.sql` (version 2;
-`store/migrate_v2.sql` upgrades version 1 files).
+`store/migrate_v2.sql` upgrades version 1 files, after `Store::open`
+copies the file aside as `<name> (before upgrade from v1).lv`).
 
 - **Source of truth:** `op_log`, which is append-only (enforced by
   triggers), plus the `person`, `agent` and `grants` registry. Op bodies are

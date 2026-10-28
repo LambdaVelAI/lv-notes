@@ -141,7 +141,8 @@ kind first, or pick a declared one).
   and the MCP server can list the vocabulary without replaying. This is
   schema version 2 (`store/schema.sql`); `store/migrate_v2.sql` upgrades
   version 1 files by emptying the projections, which the next load
-  rebuilds from the untouched op log. `PROJECTION_VERSION` is 2.
+  rebuilds from the untouched op log. `Store::open` first copies the file
+  aside (`Thesis (before upgrade from v1).lv`) with `VACUUM INTO`. `PROJECTION_VERSION` is 2.
 
 ## 7. Starting vocabulary
 

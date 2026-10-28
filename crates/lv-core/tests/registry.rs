@@ -328,8 +328,15 @@ fn version_1_files_migrate() {
         )
         .unwrap();
     }
+    let backup = lv_core::store::backup_path(&path, 1);
     let mut store = Store::open(&path).unwrap();
     let seq = Sequencer::load(&mut store).unwrap();
+    // The untouched version 1 file was kept next to it.
+    assert_eq!(backup.file_name().unwrap(), "old (before upgrade from v1).lv");
+    let kept = rusqlite::Connection::open(&backup).unwrap();
+    assert_eq!(kept.pragma_query_value(None, "user_version", |r| r.get::<_, i32>(0)).unwrap(), 1);
+    assert_eq!(kept.query_row("SELECT count(*) FROM op_log", [], |r| r.get::<_, i64>(0)).unwrap(), 1);
+    assert_eq!(lv_core::store::backup_path(&path, 1).file_name().unwrap(), "old (before upgrade from v1) 2.lv");
     assert!(seq.state().document(doc).is_some());
     assert!(store.projections_current().unwrap());
     let snapshot = store.projection_snapshot().unwrap();

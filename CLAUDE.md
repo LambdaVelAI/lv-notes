@@ -57,6 +57,8 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
 - Rust 1.90 or later (Tauri 2.12's minimum).
 - Design notes: `docs/design/` (`ops-and-ids.md`, `desktop-shell.md`,
   `registry.md`).
+- CI runs on every push to `main` (`.github/workflows/ci.yml`). Releases:
+  push a `v*` tag; see `docs/release.md`.
 
 ## Invariants (do not compromise; retrofitting means migrating the op log)
 

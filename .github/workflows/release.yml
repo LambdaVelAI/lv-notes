@@ -1,0 +1,81 @@
+# Builds the macOS app when a version tag (v0.1.0, ...) is pushed, and
+# attaches the .dmg to a draft GitHub release for review before publishing.
+#
+# The app is signed and notarized when the signing secrets are set (see
+# docs/release.md); without them it builds unsigned, with a warning.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Check the tag matches the app version
+        run: |
+          version=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME, but tauri.conf.json says $version"
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Install UI dependencies
+        run: npm ci --prefix apps/desktop
+      - name: Tests
+        run: |
+          npm test --prefix apps/desktop
+          npm run build --prefix apps/desktop
+          cargo test -p lv-core -p lv-desktop --locked
+
+      # Tauri signs with APPLE_CERTIFICATE / APPLE_SIGNING_IDENTITY and
+      # notarizes with the App Store Connect API key. They are exported only
+      # when set, so a build without secrets is plainly unsigned.
+      - name: Build the app (Apple Silicon and Intel)
+        env:
+          CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          if [ -n "$CERTIFICATE" ]; then
+            export APPLE_CERTIFICATE="$CERTIFICATE"
+            export APPLE_CERTIFICATE_PASSWORD="$CERTIFICATE_PASSWORD"
+            export APPLE_SIGNING_IDENTITY="$SIGNING_IDENTITY"
+            if [ -n "$API_KEY_P8" ]; then
+              key="$RUNNER_TEMP/AuthKey_$API_KEY_ID.p8"
+              printf '%s' "$API_KEY_P8" > "$key"
+              export APPLE_API_ISSUER="$API_ISSUER" APPLE_API_KEY="$API_KEY_ID" APPLE_API_KEY_PATH="$key"
+            else
+              echo "::warning::No App Store Connect API key: the app is signed but not notarized"
+            fi
+          else
+            echo "::warning::No signing certificate: building an unsigned app"
+          fi
+          npm --prefix apps/desktop run tauri -- build --target universal-apple-darwin --bundles dmg
+
+      - name: Attach to a draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          dmg=$(ls target/universal-apple-darwin/release/bundle/dmg/*.dmg)
+          gh release create "$GITHUB_REF_NAME" "$dmg" \
+            --draft --prerelease --generate-notes --title "lv-notes $VERSION"

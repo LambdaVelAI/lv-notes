@@ -95,8 +95,10 @@ impl Store {
         Self::init(Connection::open_in_memory()?, project, name)
     }
 
-    /// Opens an existing project file.
+    /// Opens an existing project file. A file from an older schema version
+    /// is first copied aside (see [`backup_path`]) and then upgraded.
     pub fn open(path: impl AsRef<Path>) -> Result<Store> {
+        let path = path.as_ref();
         let flags = OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_NO_MUTEX;
         let conn = Connection::open_with_flags(path, flags)?;
         Self::configure(&conn)?;
@@ -107,6 +109,11 @@ impl Store {
         let version: i32 = conn.pragma_query_value(None, "user_version", |r| r.get(0))?;
         if version > SCHEMA_VERSION {
             return Err(StoreError::SchemaTooNew { found: version });
+        }
+        if version < SCHEMA_VERSION {
+            // A consistent copy, WAL included, before anything changes.
+            let backup = backup_path(path, version);
+            conn.execute("VACUUM INTO ?1", [backup.to_string_lossy()])?;
         }
         if version < 2 {
             let tx = conn.unchecked_transaction()?;
@@ -378,6 +385,22 @@ impl Store {
             .map(|raw| raw.into_sequenced(self.project))
             .transpose()
     }
+}
+
+/// Where [`Store::open`] keeps a copy of a file at schema `version` before
+/// upgrading it: `Thesis.lv` → `Thesis (before upgrade from v1).lv`, then
+/// `... 2.lv` and so on, never overwriting an earlier copy.
+pub fn backup_path(path: &Path, version: i32) -> std::path::PathBuf {
+    let stem = path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_else(|| "project".into());
+    let ext = path.extension().map(|e| format!(".{}", e.to_string_lossy())).unwrap_or_default();
+    let base = format!("{stem} (before upgrade from v{version})");
+    let mut candidate = path.with_file_name(format!("{base}{ext}"));
+    let mut n = 2;
+    while candidate.exists() {
+        candidate = path.with_file_name(format!("{base} {n}{ext}"));
+        n += 1;
+    }
+    candidate
 }
 
 fn principal(person: PersonId, agent: Option<AgentId>) -> Principal {

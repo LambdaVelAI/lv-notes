@@ -1,2 +1,22 @@
 # lv-notes
 Academic note taking, knowledge management and authoring
+
+## Installing (alpha)
+
+lv-notes is in early alpha, for macOS (Apple Silicon and Intel).
+
+1. Download the `.dmg` from the latest release on the
+   [Releases page](https://github.com/LambdaVelAI/lv-notes/releases).
+2. Open it and drag **lv-notes** into Applications.
+3. Open lv-notes and create a project: one `.lv` file holds all of a
+   project's notes, links and history.
+
+Alpha builds can have bugs, so keep your project files somewhere that's
+backed up. "Export all…" in the sidebar writes every note as Markdown at
+any time. When a new version changes the file format, it keeps a copy of
+the old file next to it before upgrading.
+
+## Developing
+
+See `CLAUDE.md` for the layout and commands, `docs/design/` for the design
+notes, and `docs/release.md` for cutting a release.
