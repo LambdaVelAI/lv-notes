@@ -23,6 +23,9 @@
         <div class="project">
           <button id="switch-project" class="project-name" title="Open another project"><span id="project-name"></span></button>
         </div>
+        <div class="search-box">
+          <input id="search" type="search" placeholder="Search" title="Search all notes (⇧⌘F)" spellcheck="false" autocomplete="off" />
+        </div>
         <div class="section-head">
           <span>Notes</span>
           <button id="new-document" class="icon" title="New note (⌘N)">+</button>
@@ -60,6 +63,10 @@
         <div id="no-document" class="no-document">
           <p>No note open.</p>
           <button id="new-document-empty">New note</button>
+        </div>
+
+        <div id="search-pane" class="search-pane" hidden>
+          <div id="search-results" class="search-page"></div>
         </div>
 
         <div id="editor-pane" class="editor-pane" hidden>

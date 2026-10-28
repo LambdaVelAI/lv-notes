@@ -31,7 +31,7 @@ export function shorten(text: string, max = 60): string {
   return t.length <= max ? t : `${t.slice(0, max - 1).trimEnd()}…`;
 }
 
-const KIND_LABELS: Record<string, string> = { paragraph: "¶", heading: "H", listItem: "•", code: "</>", math: "∑", blockquote: "❝" };
+export const KIND_LABELS: Record<string, string> = { paragraph: "¶", heading: "H", listItem: "•", code: "</>", math: "∑", blockquote: "❝" };
 
 export interface PickerSource {
   documents(): DocumentSummary[];

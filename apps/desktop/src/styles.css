@@ -249,6 +249,34 @@ span.opaque-crossReference, span.opaque-cite, span.opaque-citeGroup { color: var
 .link-bubble button { border: none; background: transparent; padding: 2px 8px; }
 .link-bubble select.relation { flex: none; max-width: 130px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); padding: 1px 4px; font-size: 12px; }
 
+/* ---- Search ---- */
+.search-box { padding: 0 10px 8px; }
+.search-box input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: var(--bg);
+  outline: none;
+}
+.search-box input:focus { border-color: var(--accent); }
+.search-pane { flex: 1; overflow-y: auto; }
+.search-page { max-width: 720px; margin: 0 auto; padding: 28px 48px 30vh; }
+.search-summary { color: var(--muted); margin: 0 0 18px; }
+.search-group { margin-bottom: 22px; }
+.search-group h2 { font: 600 11px var(--ui-font); text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 6px; }
+.search-group ul { list-style: none; margin: 0; padding: 0; }
+.search-pane button { display: flex; width: 100%; gap: 10px; align-items: baseline; text-align: left; border: none; background: transparent; border-radius: 6px; }
+.search-pane button.active { background: var(--accent-soft); }
+.search-note { font-weight: 600; padding: 4px 8px; margin-bottom: 2px; }
+.search-note:hover { color: var(--accent); }
+.search-hit { padding: 5px 8px; }
+.search-hit .kind { flex: none; width: 18px; text-align: center; color: var(--muted); font-size: 11px; }
+.search-hit .text { flex: 1; min-width: 0; font: 15px/1.45 var(--text-font); }
+.search-title .text { font: inherit; }
+.search-pane mark { background: none; color: var(--accent); font-weight: 600; }
+.search-more { color: var(--muted); font-size: 12px; }
+
 /* ---- Backlinks ---- */
 .backlinks { margin-top: 48px; padding-top: 12px; border-top: 1px solid var(--line); }
 .backlinks h2 { font: 600 11px var(--ui-font); text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 8px; }
@@ -272,5 +300,5 @@ span.opaque-crossReference, span.opaque-cite, span.opaque-citeGroup { color: var
 @media (max-width: 760px) {
   .workspace { grid-template-columns: 1fr; }
   .sidebar { display: none; }
-  .page { padding: 24px 16px 30vh; }
+  .page, .search-page { padding: 24px 16px 30vh; }
 }

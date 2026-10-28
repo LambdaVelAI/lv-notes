@@ -2,6 +2,7 @@
 // in-process client protocol); in a plain browser it is an in-memory stand-in
 // so the UI can be previewed and developed without the shell.
 
+import { newNodeId } from "./editor/ids";
 import type { Myst } from "./editor/myst";
 
 export interface DocumentSummary {
@@ -54,6 +55,16 @@ export interface BlockInfo {
   /** MyST type: `paragraph`, `heading`, ... */
   kind: string;
   text: string;
+}
+
+/** The search screen's results. */
+export interface SearchResults {
+  /** Notes whose title matches. */
+  documents: DocumentSummary[];
+  /** Matching blocks, best first. */
+  blocks: BlockInfo[];
+  /** Whether more blocks matched than were returned. */
+  more: boolean;
 }
 
 /** Where a link target is now; `block` is set for a block target. */
@@ -118,6 +129,8 @@ export interface Backend {
   backlinks(doc: string): Promise<Backlink[]>;
   /** Blocks matching every word of `text`, as prefixes. */
   searchBlocks(text: string): Promise<BlockInfo[]>;
+  /** Notes by title and blocks by text, each matching every word of `text` as prefixes. */
+  search(text: string): Promise<SearchResults>;
   /** Where a `doc_…` / `node_…` link target is; null if missing. */
   locate(target: string): Promise<Located | null>;
   /**
@@ -172,6 +185,7 @@ async function tauriBackend(): Promise<Backend> {
     deleteDocument: (doc) => call("delete_document", { doc }),
     backlinks: (doc) => call("backlinks", { doc }),
     searchBlocks: (text) => call("search_blocks", { text }),
+    search: (text) => call("search", { text }),
     locate: (target) => call("locate", { target }),
     async exportProject(format) {
       const title = format === "book" ? "Export as a Jupyter Book into…" : "Export as an Obsidian vault into…";
@@ -204,6 +218,9 @@ const PHRASING = new Set(["text", "emphasis", "strong", "underline", "delete", "
 const textOf = (n: Myst): string =>
   typeof n.value === "string" ? n.value : Array.isArray(n.children) ? n.children.map(textOf).join("") : "";
 
+/** The lowercase words of `text`, split as the search index splits them. */
+export const wordsOf = (text: string): string[] => text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+
 /** Every node in `myst` with its nearest enclosing block (itself for blocks). */
 function* walk(myst: Myst, block: Myst | null = null): Generator<[Myst, Myst | null]> {
   const own = PHRASING.has(myst.type) || myst.type === "root" ? block : myst;
@@ -217,7 +234,12 @@ export function memoryBackend(seed: { title: string; myst: Myst }[] = []): Backe
   const docs = new Map<string, { title: string; myst: Myst }>();
   const listeners: ((c: Change) => void)[] = [];
   const id = () => `doc_${crypto.randomUUID()}`;
-  for (const d of seed) docs.set(id(), structuredClone(d));
+  for (const d of seed) {
+    const copy = structuredClone(d);
+    // As the editor would on first save: every node gets an ID.
+    for (const [n] of walk(copy.myst)) if (n.type !== "root") n.id ??= newNodeId();
+    docs.set(id(), copy);
+  }
   const info = (): ProjectInfo => ({
     path: "memory",
     name: "Preview project",
@@ -228,6 +250,20 @@ export function memoryBackend(seed: { title: string; myst: Myst }[] = []): Backe
     const d = docs.get(doc);
     if (!d) throw new BackendError("UNKNOWN_DOCUMENT", `${doc} does not exist`);
     return d;
+  };
+  const matchingBlocks = (text: string): BlockInfo[] => {
+    const words = wordsOf(text);
+    if (!words.length) return [];
+    const hits: BlockInfo[] = [];
+    for (const [doc, d] of docs) {
+      for (const [n, block] of walk(d.myst)) {
+        if (n !== block || !n.id || n.children?.some((c: Myst) => !PHRASING.has(c.type))) continue;
+        const t = textOf(n);
+        const tokens = wordsOf(t);
+        if (words.every((w) => tokens.some((tok) => tok.startsWith(w)))) hits.push({ node: n.id, doc, title: d.title, kind: n.type, text: t });
+      }
+    }
+    return hits;
   };
   // Events arrive asynchronously, as Tauri's do.
   const changed = (documents: string[]) => {
@@ -280,18 +316,18 @@ export function memoryBackend(seed: { title: string; myst: Myst }[] = []): Backe
       return links;
     },
     async searchBlocks(text) {
-      const words = text.toLowerCase().split(/\s+/).filter(Boolean);
-      if (!words.length) return [];
-      const hits: BlockInfo[] = [];
-      for (const [doc, d] of docs) {
-        for (const [n, block] of walk(d.myst)) {
-          if (n !== block || !n.id || n.children?.some((c: Myst) => !PHRASING.has(c.type))) continue;
-          const t = textOf(n);
-          const tokens = t.toLowerCase().split(/\W+/);
-          if (words.every((w) => tokens.some((tok) => tok.startsWith(w)))) hits.push({ node: n.id, doc, title: d.title, kind: n.type, text: t });
-        }
-      }
-      return hits.slice(0, 20);
+      return matchingBlocks(text).slice(0, 20);
+    },
+    async search(text) {
+      const words = wordsOf(text);
+      const documents = words.length
+        ? [...docs]
+            .filter(([, d]) => words.every((w) => wordsOf(d.title).some((t) => t.startsWith(w))))
+            .map(([id, d]): DocumentSummary => ({ id, kind: "note", title: d.title }))
+            .sort((a, b) => a.title.toLowerCase().localeCompare(b.title.toLowerCase()))
+        : [];
+      const blocks = matchingBlocks(text);
+      return { documents, blocks: blocks.slice(0, 200), more: blocks.length > 200 };
     },
     async locate(target) {
       const d = docs.get(target);

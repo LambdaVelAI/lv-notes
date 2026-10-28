@@ -33,6 +33,7 @@ The UI never builds ops. It sends whole documents:
 | `rename_document`, `delete_document` | One op each |
 | `backlinks(doc)` | Links pointing into `doc`, with the source note's title and the text of the block each link sits in |
 | `search_blocks(text, limit?)` | Blocks whose text matches every word (as a prefix), best first |
+| `search(text, limit?)` | The search screen: notes whose title matches, matching blocks (200 by default), and whether there were more |
 | `locate(target)` | Where a `doc_…` / `node_…` link target is now, or null if it is gone |
 | `registry()` | The project's vocabulary: document kinds, block kinds, relations (`registry.md`) |
 | `export_project(dir, format)` | Writes every note into a new folder in `dir`, as a Jupyter Book (`book`) or an Obsidian vault (`obsidian`) |
@@ -140,6 +141,26 @@ links are links with any other url.
 - The in-memory preview backend answers the same three queries by walking
   its stored trees.
 
+## Search
+
+The field at the top of the sidebar (⇧⌘F) searches the whole project as
+you type. The main pane then shows the notes whose titles match, followed by
+the matching blocks grouped by note, with the matching words marked and
+long blocks cut to the part around the first match. The arrow keys move
+through the blocks, Return or a click opens the note at that block (which
+flashes, as when following a link), and Escape clears the field and goes
+back to the open note. Clicking the field again with a query still in it
+shows the results again. The results refresh when the project changes.
+
+A word matches when a word in the text starts with it, so `measur`
+finds *measurable*. A block matches when it contains every word, even when
+the words fall in different text runs (`plain **bold**`).
+`Store::search_blocks` asks FTS5 for all the words together in one run, and
+those blocks rank first. It then asks for each word on its own and adds the
+blocks that have every word somewhere. The link picker uses the same query.
+Titles aren't in the FTS index; the session matches them directly against
+the state.
+
 ## Import and export
 
 The sidebar's **Export…** menu saves the open note as MyST Markdown, or
@@ -167,7 +188,8 @@ preview can't import or export.
   implicit paragraphs, ID assignment and renames; link commands (add,
   insert, retarget, remove, find by ID) and the preview backend's link
   queries. The editor traces include adding, retargeting and removing
-  links.
+  links. `test/search.test.ts`: highlighting, snippets, and the preview
+  backend's search.
 
 ## Still open
 
@@ -182,9 +204,10 @@ preview can't import or export.
 - **Wrapping or unwrapping** (into a list or quote) keeps the block's ID,
   but turning a list item into a paragraph replaces the item: links to the
   `listItem` itself dangle (links to the paragraph inside it don't).
-- **Search covers text runs only.** A block whose words are split across
-  formatting (`**slo**w`) matches by fragment, and code and math blocks
-  match by their source.
+- **Search splits on text runs.** A word that is split across formatting
+  (`**slo**w`) matches only by its fragments, and code and math blocks
+  match by their source. Search has no filters yet (by note, by block kind,
+  by relation).
 - **Images:** relative URLs don't resolve to project assets.
 - **Cost per save** is O(document): the whole tree is serialized and
   reconciled. That is fine for notes; long drafts may want per-block saves.

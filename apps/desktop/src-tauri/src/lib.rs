@@ -18,7 +18,7 @@ use serde_json::Value;
 use tauri::{AppHandle, Emitter, Manager, Runtime, State};
 
 pub use session::{
-    BacklinkInfo, BlockInfo, Change, DocumentSummary, Error, Exported, FolderFormat, Identity, Imported, LoadedDocument, Located, RegistryEntry, ProjectInfo, Saved, Session,
+    BacklinkInfo, BlockInfo, Change, DocumentSummary, Error, Exported, FolderFormat, Identity, Imported, LoadedDocument, Located, RegistryEntry, ProjectInfo, Saved, SearchResults, Session,
 };
 
 /// Per-user settings, kept as JSON in the app's config directory.
@@ -186,6 +186,12 @@ fn search_blocks(state: State<App>, text: String, limit: Option<usize>) -> Reply
     state.with(|s| s.search_blocks(&text, limit.unwrap_or(20)))
 }
 
+/// The search screen's results for `text`.
+#[tauri::command]
+fn search(state: State<App>, text: String, limit: Option<usize>) -> Reply<SearchResults> {
+    state.with(|s| s.search(&text, limit.unwrap_or(200)))
+}
+
 /// Where a link target (`doc_…`, `node_…`) is now, or null.
 #[tauri::command]
 fn locate(state: State<App>, target: String) -> Reply<Option<Located>> {
@@ -249,6 +255,7 @@ fn commands<R: Runtime>(builder: tauri::Builder<R>) -> tauri::Builder<R> {
         delete_document,
         backlinks,
         search_blocks,
+        search,
         locate,
         export_project,
         export_document,

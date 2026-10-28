@@ -18,6 +18,7 @@ use std::path::Path;
 
 use rusqlite::{Connection, OpenFlags, OptionalExtension, Transaction, params};
 
+use crate::convert::enclosing_block;
 use crate::ids::{AgentId, ChangeSetId, DocumentId, GrantId, NodeId, OpId, PersonId, ProjectId, Version};
 use crate::op::{Op, OpBody, Parent, Relation, Sequenced, Timestamp};
 use crate::principal::{Grant, GrantScope, Principal};
@@ -32,6 +33,11 @@ pub struct Backlink {
     /// The node it points at, or `None` for a link to the whole document.
     pub target: Option<NodeId>,
     pub relation: Option<Relation>,
+}
+
+/// An FTS5 query for words starting with `word`, quoted so any text is safe.
+fn prefix_query(word: &str) -> String {
+    format!("\"{}\"*", word.replace('"', "\"\""))
 }
 
 /// `PRAGMA application_id` of lv-notes project files ("LVNP").
@@ -325,6 +331,33 @@ impl Store {
         )?;
         let rows = stmt.query_map([query], |r| r.get(0))?;
         Ok(rows.collect::<rusqlite::Result<_>>()?)
+    }
+
+    /// Blocks (paragraphs, headings, ...) whose text has every word of
+    /// `text` as a prefix, best first. The index holds text runs, so a block
+    /// matches even when its words sit in different runs (`plain *bold*`);
+    /// those come after the blocks that match within one run.
+    pub fn search_blocks(&self, state: &ProjectState, text: &str) -> Result<Vec<NodeId>> {
+        let mut words: Vec<&str> = text.split_whitespace().filter(|w| w.chars().any(char::is_alphanumeric)).collect();
+        words.dedup();
+        if words.is_empty() {
+            return Ok(vec![]);
+        }
+        let blocks = |query: &str| -> Result<Vec<NodeId>> {
+            let mut seen = std::collections::HashSet::new();
+            Ok(self.search(query)?.into_iter().filter_map(|hit| enclosing_block(state, hit)).filter(|b| seen.insert(*b)).collect())
+        };
+        let mut found = blocks(&words.iter().map(|w| prefix_query(w)).collect::<Vec<_>>().join(" "))?;
+        if words.len() > 1 {
+            let mut each = words.iter().map(|w| blocks(&prefix_query(w))).collect::<Result<Vec<_>>>()?;
+            each.sort_by_key(Vec::len);
+            let rest: Vec<std::collections::HashSet<NodeId>> = each[1..].iter().map(|b| b.iter().copied().collect()).collect();
+            let have: std::collections::HashSet<NodeId> = found.iter().copied().collect();
+            let extra: Vec<NodeId> =
+                each[0].iter().copied().filter(|b| !have.contains(b) && rest.iter().all(|r| r.contains(b))).collect();
+            found.extend(extra);
+        }
+        Ok(found)
     }
 
     /// Live links, references and citations pointing at `target`, either by

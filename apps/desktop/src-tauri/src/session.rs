@@ -141,6 +141,17 @@ pub struct BlockInfo {
     pub text: String,
 }
 
+/// What the search screen shows for a query.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct SearchResults {
+    /// Notes whose title matches.
+    pub documents: Vec<DocumentSummary>,
+    /// Matching blocks, best first.
+    pub blocks: Vec<BlockInfo>,
+    /// Whether more blocks matched than were returned.
+    pub more: bool,
+}
+
 /// One entry of the project's registry, for UIs.
 #[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct RegistryEntry {
@@ -157,14 +168,6 @@ pub struct Located {
     pub title: String,
     /// Set when the target is a block.
     pub block: Option<BlockInfo>,
-}
-
-/// Turns what someone typed into an FTS5 query: every word, as a prefix.
-fn fts_query(text: &str) -> String {
-    text.split_whitespace()
-        .map(|word| format!("\"{}\"*", word.replace('"', "\"\"")))
-        .collect::<Vec<_>>()
-        .join(" ")
 }
 
 /// A folder format for import and export.
@@ -384,24 +387,35 @@ impl Session {
     /// Blocks whose text matches every word of `text` (as prefixes), best
     /// first, at most `limit`.
     pub fn search_blocks(&self, text: &str, limit: usize) -> Result<Vec<BlockInfo>> {
-        let query = fts_query(text);
-        if query.is_empty() {
-            return Ok(vec![]);
-        }
-        let mut seen = HashSet::new();
-        let mut hits = vec![];
-        for hit in self.store.search(&query)? {
-            let Some(block) = enclosing_block(self.state(), hit) else { continue };
-            if seen.insert(block)
-                && let Some(info) = self.block_info(block)
-            {
-                hits.push(info);
-                if hits.len() == limit {
-                    break;
-                }
-            }
-        }
-        Ok(hits)
+        let blocks = self.store.search_blocks(self.state(), text)?;
+        Ok(blocks.into_iter().filter_map(|b| self.block_info(b)).take(limit).collect())
+    }
+
+    /// The search screen: notes whose title has every word of `text` (as
+    /// prefixes), then matching blocks, at most `limit` of each.
+    pub fn search(&self, text: &str, limit: usize) -> Result<SearchResults> {
+        let words: Vec<String> = text
+            .split(|c: char| !c.is_alphanumeric())
+            .filter(|w| !w.is_empty())
+            .map(str::to_lowercase)
+            .collect();
+        let mut documents: Vec<DocumentSummary> = self
+            .state()
+            .documents()
+            .filter(|(_, d)| !d.deleted && !words.is_empty())
+            .filter(|(_, d)| {
+                let title = d.title.to_lowercase();
+                let tokens: Vec<&str> = title.split(|c: char| !c.is_alphanumeric()).collect();
+                words.iter().all(|w| tokens.iter().any(|t| t.starts_with(w.as_str())))
+            })
+            .map(|(id, d)| DocumentSummary { id, kind: d.kind.clone(), title: d.title.clone() })
+            .collect();
+        documents.sort_by_key(|d| d.title.to_lowercase());
+        documents.truncate(limit);
+        let all = self.store.search_blocks(self.state(), text)?;
+        let blocks: Vec<BlockInfo> = all.iter().filter_map(|&b| self.block_info(b)).take(limit).collect();
+        let more = all.len() > blocks.len();
+        Ok(SearchResults { documents, blocks, more })
     }
 
     fn block_info(&self, node: NodeId) -> Option<BlockInfo> {
@@ -654,6 +668,38 @@ mod tests {
         let (doc, _) = s.create_document("A", DocKind::note()).unwrap();
         let err = s.save_document(doc, s.seq.head(), json!({ "children": [] })).unwrap_err();
         assert_eq!(err.code(), "INVALID_DOCUMENT");
+    }
+
+    #[test]
+    fn search_finds_titles_and_blocks_across_runs() {
+        let (_dir, path, me) = project();
+        let mut s = Session::create(&path, "P", &me).unwrap();
+        let (doc, _) = s.create_document("Measure theory", DocKind::note()).unwrap();
+        s.create_document("Theory of mind", DocKind::note()).unwrap();
+        let mut d = s.load_document(doc).unwrap();
+        d.myst["children"] = json!([
+            { "type": "paragraph", "id": NodeId::new().to_string(), "children": [
+                { "type": "text", "id": NodeId::new().to_string(), "value": "Every measurable set " },
+                { "type": "strong", "id": NodeId::new().to_string(), "children": [{ "type": "text", "id": NodeId::new().to_string(), "value": "theorem" }] },
+            ] },
+            { "type": "paragraph", "id": NodeId::new().to_string(), "children": [{ "type": "text", "id": NodeId::new().to_string(), "value": "A measurable theorem in one run." }] },
+            { "type": "paragraph", "id": NodeId::new().to_string(), "children": [{ "type": "text", "id": NodeId::new().to_string(), "value": "Measurable only." }] },
+        ]);
+        s.save_document(doc, d.version, d.myst).unwrap();
+        let d = s.load_document(doc).unwrap();
+        let block = |i: usize| -> NodeId { d.myst["children"][i]["id"].as_str().unwrap().parse().unwrap() };
+
+        // Words in different runs of one block still match, after one-run matches.
+        let found = s.search("measur theor", 10).unwrap();
+        assert_eq!(found.blocks.iter().map(|b| b.node).collect::<Vec<_>>(), [block(1), block(0)]);
+        assert!(!found.more);
+        assert_eq!(found.documents.iter().map(|d| d.title.as_str()).collect::<Vec<_>>(), ["Measure theory"]);
+        assert_eq!(s.search("theory", 10).unwrap().documents.len(), 2);
+
+        let capped = s.search("measurable", 2).unwrap();
+        assert_eq!((capped.blocks.len(), capped.more), (2, true));
+        let nothing = s.search(" - ", 10).unwrap();
+        assert!(nothing.blocks.is_empty() && nothing.documents.is_empty());
     }
 
     #[test]

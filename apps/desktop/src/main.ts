@@ -11,6 +11,7 @@ import type { Myst } from "./editor/myst";
 import { commands } from "./editor/plugins";
 import { schema } from "./editor/schema";
 import { LinkBubble, LinkPicker, renderBacklinks, shorten } from "./linking";
+import { SearchScreen } from "./search";
 import "./styles.css";
 
 const SAVE_DELAY_MS = 400;
@@ -32,6 +33,8 @@ const ui = {
   linkButton: $<HTMLButtonElement>("#link-button"),
   importMenu: $<HTMLButtonElement>("#import-menu"),
   exportMenu: $<HTMLButtonElement>("#export-menu"),
+  search: $<HTMLInputElement>("#search"),
+  searchPane: $("#search-pane"),
 };
 
 interface Open {
@@ -59,6 +62,14 @@ if (import.meta.env.DEV) Object.assign(window, { lvEditor: editor });
 function setStatus(text: string, kind: "ok" | "busy" | "error" = "ok") {
   ui.status.textContent = text;
   ui.status.dataset.kind = kind;
+}
+
+/** Shows search results, the open note, or the empty state. */
+function showPane() {
+  ui.searchPane.hidden = !searching;
+  ui.editorPane.hidden = searching || !open;
+  ui.empty.hidden = searching || !!open;
+  ui.toolbar.hidden = searching;
 }
 
 // ---- Project and document list -------------------------------------------------
@@ -154,8 +165,6 @@ async function openDocument(doc: string, reveal?: string) {
     await flush();
     const loaded = await backend.loadDocument(doc);
     open = { doc, version: loaded.version, dirty: false, saving: null, timer: undefined };
-    ui.empty.hidden = true;
-    ui.editorPane.hidden = false;
     ui.title.value = loaded.title;
     editor.load(loaded.myst);
     renderDocuments();
@@ -163,6 +172,8 @@ async function openDocument(doc: string, reveal?: string) {
     void refreshBacklinks();
     void checkLinks();
   }
+  searching = false;
+  showPane();
   editor.focus();
   if (reveal) editor.reveal(reveal);
 }
@@ -179,10 +190,10 @@ async function deleteDocument(doc: string, title: string) {
   if (open?.doc === doc) {
     await flush();
     open = null;
-    ui.editorPane.hidden = true;
-    ui.empty.hidden = false;
+    showPane();
   }
   showProject(await backend.deleteDocument(doc));
+  if (searching) void runSearch();
   void refreshBacklinks();
 }
 
@@ -373,6 +384,73 @@ ui.linkButton.addEventListener("mousedown", (e) => {
 editor.view.dom.addEventListener("blur", () => setTimeout(refreshBubble, 0));
 ui.editorPane.addEventListener("scroll", () => bubble.hide());
 
+// ---- Search --------------------------------------------------------------------
+
+let searching = false;
+const results = new SearchScreen($("#search-results"), (doc, node) => void openDocument(doc, node));
+
+let searchRequest = 0;
+let searchTimer: number | undefined;
+/** Shows results for the search field, or the note again when it is empty. */
+async function runSearch() {
+  const query = ui.search.value.trim();
+  const request = ++searchRequest;
+  if (!query) {
+    searching = false;
+    showPane();
+    return;
+  }
+  await flush();
+  const found = await backend.search(query).catch((e) => {
+    setStatus(`Search failed: ${e instanceof Error ? e.message : String(e)}`, "error");
+    return null;
+  });
+  if (request !== searchRequest || !found) return;
+  searching = true;
+  bubble.hide();
+  showPane();
+  results.show(query, found);
+}
+
+ui.search.oninput = () => {
+  clearTimeout(searchTimer);
+  searchTimer = window.setTimeout(() => void runSearch(), 120);
+};
+ui.search.onfocus = () => {
+  if (ui.search.value.trim() && !searching) void runSearch();
+};
+ui.search.onkeydown = (e) => {
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    results.move(e.key === "ArrowDown" ? 1 : -1);
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    if (searching) results.activate();
+    else void runSearch();
+  } else if (e.key === "Escape") {
+    e.preventDefault();
+    ui.search.value = "";
+    searchRequest++;
+    searching = false;
+    showPane();
+    if (open) editor.focus();
+    else ui.search.blur();
+  }
+};
+
+document.addEventListener("keydown", (e) => {
+  if (!(e.metaKey || e.ctrlKey) || e.altKey || !project) return;
+  const key = e.key.toLowerCase();
+  if (key === "f" && e.shiftKey) {
+    e.preventDefault();
+    ui.search.focus();
+    ui.search.select();
+  } else if (key === "n" && !e.shiftKey) {
+    e.preventDefault();
+    void newDocument();
+  }
+});
+
 // ---- Toolbar -------------------------------------------------------------------
 
 function refreshToolbar() {
@@ -432,6 +510,7 @@ async function start() {
     backlinksTimer = window.setTimeout(() => {
       void refreshBacklinks();
       void checkLinks();
+      if (searching) void runSearch();
     }, 150);
     // Someone else (another window, later the agent) changed the open document.
     const o = open;
@@ -452,8 +531,9 @@ async function start() {
     const info = await backend.openProject();
     if (info) {
       open = null;
-      ui.editorPane.hidden = true;
-      ui.empty.hidden = false;
+      ui.search.value = "";
+      searching = false;
+      showPane();
       showProject(info);
     }
   };

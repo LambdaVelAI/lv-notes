@@ -77,6 +77,9 @@ fn the_ui_round_trip() {
     let hits = invoke(&window, "search_blocks", json!({ "text": "hel" })).unwrap();
     let block = hits[0]["node"].as_str().unwrap().to_owned();
     assert_eq!((hits[0]["doc"].as_str(), hits[0]["text"].as_str()), (Some(doc.as_str()), Some("Hello")));
+    let found = invoke(&window, "search", json!({ "text": "hel" })).unwrap();
+    assert_eq!((found["blocks"][0]["node"].as_str(), &found["more"]), (Some(block.as_str()), &json!(false)));
+    assert!(found["documents"].is_array());
     let located = invoke(&window, "locate", json!({ "target": block })).unwrap();
     assert_eq!(located["doc"], doc);
     assert_eq!(invoke(&window, "locate", json!({ "target": "https://example.org" })).unwrap(), Value::Null);
