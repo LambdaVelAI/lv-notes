@@ -62,7 +62,7 @@ impl World {
 
     fn import(&mut self, root: &Node) -> DocumentId {
         let doc = DocumentId::new();
-        self.submit(import_document(doc, DocKind::Note, "Imported", root).unwrap()).unwrap();
+        self.submit(import_document(doc, DocKind::note(), "Imported", root).unwrap()).unwrap();
         doc
     }
 
@@ -161,8 +161,8 @@ fn fixtures_roundtrip_through_the_project() {
 fn import_is_one_insert_per_node_in_document_order() {
     let root = parse(fixture("prose"));
     let doc = DocumentId::new();
-    let bodies = import_document(doc, DocKind::Draft, "Prose", &root).unwrap();
-    assert!(matches!(&bodies[0], OpBody::CreateDocument { doc: d, kind: DocKind::Draft, .. } if *d == doc));
+    let bodies = import_document(doc, DocKind::draft(), "Prose", &root).unwrap();
+    assert!(matches!(&bodies[0], OpBody::CreateDocument { doc: d, kind, .. } if *d == doc && *kind == DocKind::draft()));
     let types: Vec<&str> = bodies[1..]
         .iter()
         .map(|b| match b {
@@ -271,7 +271,7 @@ fn documents_built_without_a_root_get_one() {
     let para = NodeId::new();
     let content = NodeContent { node_type: "paragraph".into(), fields: Map::new() };
     w.submit(vec![
-        OpBody::CreateDocument { doc, kind: DocKind::Note, title: "Bare".into() },
+        OpBody::CreateDocument { doc, kind: DocKind::note(), title: "Bare".into() },
         OpBody::InsertNode { node: para, parent: Parent::DocumentRoot(doc), after: None, content },
     ])
     .unwrap();
@@ -285,20 +285,20 @@ fn documents_built_without_a_root_get_one() {
 fn import_refuses_what_it_cannot_represent() {
     let doc = DocumentId::new();
     let para = parse(json!({ "type": "paragraph", "children": [] }));
-    assert_eq!(import_document(doc, DocKind::Note, "x", &para), Err(ImportError::NotARoot("paragraph".into())));
+    assert_eq!(import_document(doc, DocKind::note(), "x", &para), Err(ImportError::NotARoot("paragraph".into())));
 
     let id = NodeId::new();
     let twice = parse(json!({
         "type": "root",
         "children": [{ "type": "paragraph", "id": id }, { "type": "paragraph", "id": id }]
     }));
-    assert_eq!(import_document(doc, DocKind::Note, "x", &twice), Err(ImportError::DuplicateId(id)));
+    assert_eq!(import_document(doc, DocKind::note(), "x", &twice), Err(ImportError::DuplicateId(id)));
 
     let foreign = parse(json!({ "type": "root", "children": [{ "type": "widget", "id": "w-17" }] }));
-    assert_eq!(import_document(doc, DocKind::Note, "x", &foreign), Err(ImportError::BadId("w-17".into())));
+    assert_eq!(import_document(doc, DocKind::note(), "x", &foreign), Err(ImportError::BadId("w-17".into())));
 
     let junk = parse(json!({ "type": "root", "children": [{ "type": "widget", "children": [3] }] }));
-    assert_eq!(import_document(doc, DocKind::Note, "x", &junk), Err(ImportError::BadChildren("widget".into())));
+    assert_eq!(import_document(doc, DocKind::note(), "x", &junk), Err(ImportError::BadChildren("widget".into())));
 }
 
 #[test]
@@ -337,7 +337,7 @@ fn materializes_the_same_after_reloading_the_file() {
 
     let mut seq = Sequencer::new(store.project());
     let doc = DocumentId::new();
-    let batch = import_document(doc, DocKind::Note, "Directives", &parse(fixture("directives")))
+    let batch = import_document(doc, DocKind::note(), "Directives", &parse(fixture("directives")))
         .unwrap()
         .into_iter()
         .map(|body| Op {

@@ -39,6 +39,14 @@ pub enum RefusalCode {
     ChangeSetClosed,
     /// The change set no longer applies on top of the current project.
     ChangeSetConflict,
+    /// A kind or relation the project's registry doesn't declare.
+    UndeclaredKind,
+    /// A new use of a kind or relation the registry has retired.
+    RetiredKind,
+    /// Declaring, or renaming onto, a name the registry already has.
+    KindExists,
+    /// Updating, renaming or merging a name the registry doesn't have.
+    UnknownKind,
 }
 
 impl RefusalCode {

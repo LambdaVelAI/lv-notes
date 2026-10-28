@@ -13,6 +13,7 @@ use serde_json::{Map, Value};
 use crate::ids::{ChangeSetId, DocumentId, GrantId, NodeId, OpId, ProjectId, Version};
 use crate::myst::Node;
 use crate::principal::Principal;
+use crate::schema::{KindEntry, Namespace};
 
 /// Milliseconds since the Unix epoch, from the submitting client's clock.
 /// Informational only: ordering comes from [`Version`].
@@ -52,11 +53,23 @@ pub struct Sequenced {
     pub op: Op,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum DocKind {
-    Note,
-    Draft,
+/// A document kind, declared in the project's registry (`note`, `draft`).
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct DocKind(pub String);
+
+impl DocKind {
+    pub fn new(name: impl Into<String>) -> DocKind {
+        DocKind(name.into())
+    }
+
+    pub fn note() -> DocKind {
+        DocKind::new("note")
+    }
+
+    pub fn draft() -> DocKind {
+        DocKind::new("draft")
+    }
 }
 
 /// Where a node sits in the tree.
@@ -177,6 +190,16 @@ pub enum OpBody {
     /// Types (or untypes) the link, citation or reference node `node`.
     SetRelation { node: NodeId, relation: Option<Relation> },
 
+    /// Adds `name` to the project's vocabulary (see `schema`).
+    DeclareKind { namespace: Namespace, name: String, entry: KindEntry },
+    /// Replaces an entry: its label, status (e.g. retiring it) or fields.
+    UpdateKind { namespace: Namespace, name: String, entry: KindEntry },
+    /// Renames `from` to `to`, rewriting every use in the project.
+    RenameKind { namespace: Namespace, from: String, to: String },
+    /// Folds `from` into `into`: every use of `from` becomes `into`, and
+    /// `from` leaves the registry.
+    MergeKind { namespace: Namespace, from: String, into: String },
+
     OpenChangeSet { change_set: ChangeSetId, rationale: String },
     AcceptChangeSet { change_set: ChangeSetId },
     RejectChangeSet {
@@ -200,6 +223,10 @@ impl OpBody {
             OpBody::EditText { .. } => "edit_text",
             OpBody::SetType { .. } => "set_type",
             OpBody::SetRelation { .. } => "set_relation",
+            OpBody::DeclareKind { .. } => "declare_kind",
+            OpBody::UpdateKind { .. } => "update_kind",
+            OpBody::RenameKind { .. } => "rename_kind",
+            OpBody::MergeKind { .. } => "merge_kind",
             OpBody::OpenChangeSet { .. } => "open_change_set",
             OpBody::AcceptChangeSet { .. } => "accept_change_set",
             OpBody::RejectChangeSet { .. } => "reject_change_set",
@@ -219,6 +246,7 @@ mod tests {
             OpBody::SetType { node: NodeId::new(), node_type: "heading".into(), set: Map::new(), unset: vec![] },
             OpBody::SetAttrs { node: NodeId::new(), set: Map::new(), unset: vec!["lang".into()] },
             OpBody::RejectChangeSet { change_set: ChangeSetId::new(), reason: None },
+            OpBody::MergeKind { namespace: Namespace::Relation, from: "backs".into(), into: "supports".into() },
         ];
         for body in bodies {
             let json = serde_json::to_value(&body).unwrap();

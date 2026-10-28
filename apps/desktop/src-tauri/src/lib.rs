@@ -18,7 +18,7 @@ use serde_json::Value;
 use tauri::{AppHandle, Emitter, Manager, Runtime, State};
 
 pub use session::{
-    BacklinkInfo, BlockInfo, Change, DocumentSummary, Error, Exported, Identity, LoadedDocument, Located, ProjectInfo, Saved, Session,
+    BacklinkInfo, BlockInfo, Change, DocumentSummary, Error, Exported, Identity, LoadedDocument, Located, RegistryEntry, ProjectInfo, Saved, Session,
 };
 
 /// Per-user settings, kept as JSON in the app's config directory.
@@ -136,7 +136,7 @@ struct Created {
 #[tauri::command]
 fn create_document<R: Runtime>(app: AppHandle<R>, state: State<App>, title: String) -> Reply<Created> {
     state.with(|s| {
-        let (doc, change) = s.create_document(&title, DocKind::Note)?;
+        let (doc, change) = s.create_document(&title, DocKind::note())?;
         changed(&app, &change);
         Ok(Created { doc, info: s.info()? })
     })
@@ -204,6 +204,12 @@ fn export_document(state: State<App>, doc: DocumentId, path: PathBuf) -> Reply<E
     state.with(|s| s.export_document(doc, &path))
 }
 
+/// The project's vocabulary: document kinds, block kinds, relations.
+#[tauri::command]
+fn registry(state: State<App>) -> Reply<Vec<RegistryEntry>> {
+    state.with(|s| Ok(s.registry()))
+}
+
 impl App {
     fn new(config_dir: &Path) -> App {
         let settings_path = config_dir.join("settings.json");
@@ -229,6 +235,7 @@ fn commands<R: Runtime>(builder: tauri::Builder<R>) -> tauri::Builder<R> {
         locate,
         export_project,
         export_document,
+        registry,
     ])
 }
 

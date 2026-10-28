@@ -55,7 +55,8 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
   - Browser preview with an in-memory backend: `npm run dev`.
   - Tests: `npm test`, and `cargo test -p lv-desktop`.
 - Rust 1.90 or later (Tauri 2.12's minimum).
-- Design notes: `docs/design/` (`ops-and-ids.md`, `desktop-shell.md`).
+- Design notes: `docs/design/` (`ops-and-ids.md`, `desktop-shell.md`,
+  `registry.md`).
 
 ## Invariants (do not compromise; retrofitting means migrating the op log)
 
@@ -125,8 +126,8 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
   Loro) or build our own sequence CRDT? Leaning CRDT over server-side rebasing.
 - Primitive structural ops (split, merge, move, re-nest) and how they carry
   anchors and ink.
-- Starting relation vocabulary for typed links, and the shape of a registry
-  entry (fields, counters, allowed children).
+- Registry entries beyond the first cut (`docs/design/registry.md`):
+  allowed children, relation source/target constraints, numbering.
 - Math editing: source with live preview first; whether a visual editor
   (MathLive) is worth its noisy LaTeX rewrites.
 - Layout inside a canvas frame: flow by default with layouts and absolute

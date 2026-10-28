@@ -31,6 +31,7 @@ use crate::myst::{ChildrenPolicy, TEXT_RUN_TYPES, children_policy};
 use crate::op::{DocKind, NodeContent, OpBody, Parent, Relation, Sequenced, TextEdit};
 use crate::principal::Principal;
 use crate::refusal::{Refusal, RefusalCode as Code};
+use crate::schema::{self, Namespace, Registry};
 
 /// Attribute keys `SetAttrs` may not touch: they have dedicated ops or are structural.
 const RESERVED_ATTRS: [&str; 4] = ["type", "id", "children", "value"];
@@ -114,11 +115,17 @@ pub struct Effects {
     /// Parents whose child order changed.
     pub parents: BTreeSet<Parent>,
     pub change_sets: BTreeSet<ChangeSetId>,
+    /// Whether the registry changed.
+    pub registry: bool,
 }
 
 impl Effects {
     pub fn is_empty(&self) -> bool {
-        self.documents.is_empty() && self.nodes.is_empty() && self.parents.is_empty() && self.change_sets.is_empty()
+        self.documents.is_empty()
+            && self.nodes.is_empty()
+            && self.parents.is_empty()
+            && self.change_sets.is_empty()
+            && !self.registry
     }
 
     pub fn merge(&mut self, other: Effects) {
@@ -126,6 +133,7 @@ impl Effects {
         self.nodes.extend(other.nodes);
         self.parents.extend(other.parents);
         self.change_sets.extend(other.change_sets);
+        self.registry |= other.registry;
     }
 }
 
@@ -134,6 +142,7 @@ pub struct ProjectState {
     documents: HashMap<DocumentId, DocumentState>,
     nodes: HashMap<NodeId, NodeState>,
     change_sets: HashMap<ChangeSetId, ChangeSetState>,
+    registry: Registry,
 }
 
 impl ProjectState {
@@ -147,6 +156,21 @@ impl ProjectState {
 
     pub fn node(&self, id: NodeId) -> Option<&NodeState> {
         self.nodes.get(&id)
+    }
+
+    /// The project's vocabulary.
+    pub fn registry(&self) -> &Registry {
+        &self.registry
+    }
+
+    /// Where `name` is used: documents of that kind, or nodes with that
+    /// block kind or relation, tombstones included.
+    pub fn kind_uses(&self, namespace: Namespace, name: &str) -> (Vec<DocumentId>, Vec<NodeId>) {
+        match namespace {
+            Namespace::Document => (self.documents().filter(|(_, d)| d.kind.0 == name).map(|(id, _)| id).collect(), vec![]),
+            Namespace::Block => (vec![], self.nodes().filter(|(_, n)| schema::block_kind(&n.content).as_deref() == Some(name)).map(|(id, _)| id).collect()),
+            Namespace::Relation => (vec![], self.nodes().filter(|(_, n)| n.relation.as_ref().is_some_and(|r| r.0 == name)).map(|(id, _)| id).collect()),
+        }
     }
 
     pub fn change_set(&self, id: ChangeSetId) -> Option<&ChangeSetState> {
@@ -222,10 +246,11 @@ impl ProjectState {
                 if self.documents.contains_key(doc) {
                     return Err(Refusal::new(Code::DocumentExists, format!("{doc} already exists")));
                 }
+                self.registry.check_use(Namespace::Document, &kind.0)?;
                 self.documents.insert(
                     *doc,
                     DocumentState {
-                        kind: *kind,
+                        kind: kind.clone(),
                         title: title.clone(),
                         deleted: false,
                         created: s.seq,
@@ -256,6 +281,7 @@ impl ProjectState {
                     return Err(Refusal::new(Code::NodeExists, format!("{node} already exists")));
                 }
                 check_content(content)?;
+                self.registry.check_content(None, content)?;
                 let document = self.live_parent(*parent)?;
                 self.known_anchor(*after)?;
                 self.nodes.insert(
@@ -324,6 +350,7 @@ impl ProjectState {
                 }
                 content.fields.extend(set.iter().map(|(k, v)| (k.clone(), v.clone())));
                 content.check().map_err(|e| Refusal::new(Code::InvalidOp, e))?;
+                self.registry.check_content(Some(&self.nodes[node].content), &content)?;
                 let n = self.nodes.get_mut(node).expect("live");
                 n.content = content;
                 n.updated = s.seq;
@@ -377,6 +404,7 @@ impl ProjectState {
                 }
                 content.fields.extend(set.iter().map(|(k, v)| (k.clone(), v.clone())));
                 check_content(&content)?;
+                self.registry.check_content(Some(&self.nodes[node].content), &content)?;
                 let n = self.nodes.get_mut(node).expect("live");
                 n.content = content;
                 if touches_text {
@@ -394,10 +422,50 @@ impl ProjectState {
                         format!("{node} is a `{}`; only links, citations and references take a relation", n.content.node_type),
                     ));
                 }
+                self.registry.check_relation(n.relation.as_ref(), relation.as_ref())?;
                 let n = self.nodes.get_mut(node).expect("live");
                 n.relation = relation.clone();
                 n.updated = s.seq;
                 fx.nodes.insert(*node);
+            }
+
+            OpBody::DeclareKind { namespace, name, entry } => {
+                schema::check_name(*namespace, name)?;
+                entry.check(*namespace)?;
+                if self.registry.get(*namespace, name).is_some() {
+                    return Err(Refusal::new(Code::KindExists, format!("`{name}` is already declared")));
+                }
+                self.registry.insert(*namespace, name, entry.clone());
+                fx.registry = true;
+            }
+            OpBody::UpdateKind { namespace, name, entry } => {
+                self.known_kind(*namespace, name)?;
+                entry.check(*namespace)?;
+                self.registry.insert(*namespace, name, entry.clone());
+                fx.registry = true;
+            }
+            OpBody::RenameKind { namespace, from, to } => {
+                self.known_kind(*namespace, from)?;
+                schema::check_name(*namespace, to)?;
+                same_block_type(*namespace, from, to)?;
+                if self.registry.get(*namespace, to).is_some() {
+                    return Err(Refusal::new(Code::KindExists, format!("`{to}` is already declared; merge into it instead")));
+                }
+                let entry = self.registry.remove(*namespace, from).expect("known");
+                self.registry.insert(*namespace, to, entry);
+                self.rewrite_uses(*namespace, from, to, s.seq, &mut fx);
+                fx.registry = true;
+            }
+            OpBody::MergeKind { namespace, from, into } => {
+                self.known_kind(*namespace, from)?;
+                self.known_kind(*namespace, into)?;
+                same_block_type(*namespace, from, into)?;
+                if from == into {
+                    return Err(Refusal::new(Code::InvalidOp, "a kind cannot merge into itself"));
+                }
+                self.registry.remove(*namespace, from);
+                self.rewrite_uses(*namespace, from, into, s.seq, &mut fx);
+                fx.registry = true;
             }
 
             OpBody::OpenChangeSet { change_set, rationale } => {
@@ -451,6 +519,37 @@ impl ProjectState {
             return Err(Refusal::new(Code::DocumentDeleted, format!("{id} is deleted")));
         }
         Ok(d)
+    }
+
+    fn known_kind(&self, namespace: Namespace, name: &str) -> Result<(), Refusal> {
+        match self.registry.get(namespace, name) {
+            Some(_) => Ok(()),
+            None => Err(Refusal::new(Code::UnknownKind, format!("`{name}` is not in the {} registry", namespace.as_str()))),
+        }
+    }
+
+    /// Points every use of `from` at `to`, tombstones included, so a
+    /// restored node comes back with the current name.
+    fn rewrite_uses(&mut self, namespace: Namespace, from: &str, to: &str, seq: Version, fx: &mut Effects) {
+        let (docs, nodes) = self.kind_uses(namespace, from);
+        for doc in docs {
+            let d = self.documents.get_mut(&doc).expect("used");
+            d.kind = DocKind::new(to);
+            d.updated = seq;
+            fx.documents.insert(doc);
+        }
+        let kind = to.split_once(':').map_or(to, |(_, k)| k);
+        for id in nodes {
+            let n = self.nodes.get_mut(&id).expect("used");
+            match namespace {
+                Namespace::Relation => n.relation = Some(Relation::new(to)),
+                _ => {
+                    n.content.fields.insert("kind".to_owned(), Value::String(kind.to_owned()));
+                }
+            }
+            n.updated = seq;
+            fx.nodes.insert(id);
+        }
     }
 
     /// Refuses replacing `node`'s text if someone else replaced it after
@@ -549,6 +648,14 @@ impl ProjectState {
         }
         out
     }
+}
+
+/// Block kinds can only be renamed or merged within their node type.
+fn same_block_type(namespace: Namespace, a: &str, b: &str) -> Result<(), Refusal> {
+    if namespace == Namespace::Block && schema::block_type(a) != schema::block_type(b) {
+        return Err(Refusal::new(Code::InvalidOp, format!("`{a}` and `{b}` are kinds of different node types")));
+    }
+    Ok(())
 }
 
 fn check_content(content: &NodeContent) -> Result<(), Refusal> {

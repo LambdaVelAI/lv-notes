@@ -40,7 +40,7 @@ impl World {
             world.log.add_grant(g.clone());
         }
         let doc = world.doc;
-        world.ok(world.by_person(OpBody::CreateDocument { doc, kind: DocKind::Note, title: "Note".into() }));
+        world.ok(world.by_person(OpBody::CreateDocument { doc, kind: DocKind::note(), title: "Note".into() }));
         world
     }
 
@@ -166,7 +166,7 @@ fn moves_refuse_cycles_and_carry_subtrees_across_documents() {
     assert_eq!(code, RefusalCode::Cycle);
 
     let other = DocumentId::new();
-    w.ok(w.by_person(OpBody::CreateDocument { doc: other, kind: DocKind::Draft, title: "Draft".into() }));
+    w.ok(w.by_person(OpBody::CreateDocument { doc: other, kind: DocKind::draft(), title: "Draft".into() }));
     w.ok(w.by_person(OpBody::MoveNode { node: list, parent: Parent::DocumentRoot(other), after: None }));
     assert!(w.root().is_empty());
     assert_eq!(w.seq.state().node(item).unwrap().document, other);
@@ -503,7 +503,7 @@ fn sequencer_writes_through_the_store_and_reloads() {
             body,
         };
         let node = NodeId::new();
-        seq.submit(&mut store, vec![op(Version(0), OpBody::CreateDocument { doc, kind: DocKind::Note, title: "N".into() })])
+        seq.submit(&mut store, vec![op(Version(0), OpBody::CreateDocument { doc, kind: DocKind::note(), title: "N".into() })])
             .unwrap();
         seq.submit(&mut store, vec![op(Version(1), insert(node, Parent::DocumentRoot(doc), None, "paragraph"))])
             .unwrap();

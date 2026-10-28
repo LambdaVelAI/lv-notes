@@ -1,4 +1,5 @@
--- lv-notes project file, schema version 1.
+-- lv-notes project file, schema version 2. Files at version 1 are
+-- migrated by migrate_v2.sql.
 --
 -- One file holds one project. IDs are 16-byte UUIDv7 BLOBs. The op log is
 -- the source of truth; tables marked "projection" are derived from it and
@@ -74,7 +75,7 @@ CREATE TABLE projection_meta (
 -- Projection: documents.
 CREATE TABLE document (
     id          BLOB    PRIMARY KEY CHECK (length(id) = 16),
-    kind        TEXT    NOT NULL CHECK (kind IN ('note', 'draft')),
+    kind        TEXT    NOT NULL,  -- a document kind from the registry
     title       TEXT    NOT NULL,
     created_seq INTEGER NOT NULL,
     updated_seq INTEGER NOT NULL,
@@ -132,6 +133,17 @@ CREATE INDEX edge_target ON edge (target) WHERE target IS NOT NULL;
 
 CREATE INDEX edge_target_node ON edge (target_node);
 CREATE INDEX edge_target_doc ON edge (target_doc);
+
+-- Projection: the project's vocabulary (document kinds, block kinds,
+-- relations), from declare/update/rename/merge_kind ops. `entry` is the
+-- KindEntry as JSON.
+CREATE TABLE registry (
+    namespace   TEXT    NOT NULL CHECK (namespace IN ('document', 'block', 'relation')),
+    name        TEXT    NOT NULL,
+    status      TEXT    NOT NULL CHECK (status IN ('declared', 'provisional', 'retired')),
+    entry       TEXT    NOT NULL CHECK (json_valid(entry)),
+    PRIMARY KEY (namespace, name)
+) STRICT;
 
 -- Projection: full-text search over live node text, keyed by node.num.
 CREATE VIRTUAL TABLE search USING fts5 (text);

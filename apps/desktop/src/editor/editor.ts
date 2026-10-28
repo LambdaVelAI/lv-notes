@@ -3,7 +3,7 @@
 import { EditorState, NodeSelection, Selection, TextSelection, type Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { type Myst, mystToPm, pmToMyst } from "./myst";
-import { BROKEN, FLASH, LINK_REQUEST, type LinkRange, findId, internalTargets, linkAt, removeLink, setLink } from "./links";
+import { BROKEN, FLASH, LINK_REQUEST, type LinkRange, findId, internalTargets, linkAt, removeLink, setLink, setLinkRelation } from "./links";
 import { SYSTEM, assignIds, plugins, renameIds } from "./plugins";
 
 export interface EditorOptions {
@@ -86,6 +86,11 @@ export class MystEditor {
   /** Links the selection (or the link at the cursor) to `url`; see `setLink`. */
   setLink(url: string, text?: string): boolean {
     return setLink(url, text)(this.view.state, this.view.dispatch);
+  }
+
+  /** Types the link at the cursor; see `setLinkRelation`. */
+  setLinkRelation(relation: string | null): boolean {
+    return setLinkRelation(relation)(this.view.state, this.view.dispatch);
   }
 
   removeLink(): boolean {

@@ -2,7 +2,7 @@ import { EditorState, TextSelection } from "prosemirror-state";
 import { describe, expect, it } from "vitest";
 import { memoryBackend } from "../src/backend";
 import { newNodeId } from "../src/editor/ids";
-import { BROKEN, LINK_REQUEST, brokenLinksPlugin, findId, internalTargets, isInternalTarget, linkAt, removeLink, requestLink, setLink } from "../src/editor/links";
+import { BROKEN, LINK_REQUEST, brokenLinksPlugin, setLinkRelation, findId, internalTargets, isInternalTarget, linkAt, removeLink, requestLink, setLink } from "../src/editor/links";
 import { type Myst, mystToPm, pmToMyst } from "../src/editor/myst";
 import { plugins } from "../src/editor/plugins";
 import { shorten } from "../src/linking";
@@ -60,6 +60,16 @@ describe("links", () => {
     // At the end of the link counts; before its first letter does not.
     expect(linkAt(state(myst, 7))).not.toBeNull();
     expect(linkAt(state(myst, 3))).toBeNull();
+  });
+
+  it("types and untypes the link at the cursor", () => {
+    const id = newNodeId();
+    const myst = paragraph({ type: "link", id, url: doc, children: [{ type: "text", value: "note" }] });
+    let s = run(state(myst, 2), setLinkRelation("supports"));
+    expect(saved(s)[0]).toMatchObject({ type: "link", id, url: doc, relation: "supports" });
+    s = run(s, setLinkRelation(null));
+    expect(saved(s)[0]).not.toHaveProperty("relation");
+    expect(setLinkRelation("supports")(state(paragraph({ type: "text", value: "x" }), 1))).toBe(false);
   });
 
   it("removes the link at the cursor", () => {

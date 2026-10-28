@@ -13,6 +13,7 @@ pub mod myst;
 pub mod op;
 pub mod principal;
 pub mod refusal;
+pub mod schema;
 pub mod sequencer;
 pub mod state;
 #[cfg(feature = "sqlite")]

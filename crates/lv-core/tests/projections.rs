@@ -130,9 +130,9 @@ fn history(w: &mut World, mut check: impl FnMut(&World)) -> Ids {
     let root = |d| Parent::DocumentRoot(d);
 
     let steps: Vec<Step> = vec![
-        Box::new(move |w| { w.person(OpBody::CreateDocument { doc: note, kind: DocKind::Note, title: "Reading".into() }); }),
-        Box::new(move |w| { w.person(OpBody::CreateDocument { doc: draft, kind: DocKind::Draft, title: "Essay".into() }); }),
-        Box::new(move |w| { w.person(OpBody::CreateDocument { doc: gone, kind: DocKind::Note, title: "Scratch".into() }); }),
+        Box::new(move |w| { w.person(OpBody::CreateDocument { doc: note, kind: DocKind::note(), title: "Reading".into() }); }),
+        Box::new(move |w| { w.person(OpBody::CreateDocument { doc: draft, kind: DocKind::draft(), title: "Essay".into() }); }),
+        Box::new(move |w| { w.person(OpBody::CreateDocument { doc: gone, kind: DocKind::note(), title: "Scratch".into() }); }),
         Box::new(move |w| { w.person(insert(heading, root(note), None, content("heading", json!({ "depth": 1, "identifier": "slow-reading", "label": "Slow reading" })))); }),
         Box::new(move |w| { w.person(text(heading_text, heading, "Slow reading")); }),
         Box::new(move |w| { w.person(insert(para, root(note), Some(heading), content("paragraph", json!({})))); }),
@@ -306,7 +306,7 @@ fn load_rebuilds_projections_that_are_behind_or_from_another_version() {
     };
     let behind = Sequenced {
         seq: seq.head().next(),
-        op: op(seq.head(), OpBody::CreateDocument { doc, kind: DocKind::Note, title: "Log only".into() }),
+        op: op(seq.head(), OpBody::CreateDocument { doc, kind: DocKind::note(), title: "Log only".into() }),
     };
     store.append(std::slice::from_ref(&behind)).unwrap();
     assert!(!store.projections_current().unwrap());

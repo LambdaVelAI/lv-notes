@@ -58,7 +58,7 @@ fn history(f: &Fixture) -> Vec<Sequenced> {
         op
     };
     vec![
-        at(1, f.op(&f.owner, 0, OpBody::CreateDocument { doc, kind: DocKind::Note, title: "Reading".into() })),
+        at(1, f.op(&f.owner, 0, OpBody::CreateDocument { doc, kind: DocKind::note(), title: "Reading".into() })),
         at(2, f.op(&f.owner, 1, OpBody::InsertNode {
             node: para,
             parent: Parent::DocumentRoot(doc),

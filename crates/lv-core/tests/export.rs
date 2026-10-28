@@ -52,7 +52,7 @@ impl World {
     fn import(&mut self, title: &str, root: Value) -> DocumentId {
         let doc = DocumentId::new();
         let root: Node = serde_json::from_value(root).unwrap();
-        self.submit(import_document(doc, DocKind::Note, title, &root).unwrap());
+        self.submit(import_document(doc, DocKind::note(), title, &root).unwrap());
         doc
     }
 }

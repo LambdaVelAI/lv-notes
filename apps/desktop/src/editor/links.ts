@@ -79,6 +79,25 @@ export function setLink(url: string, text?: string): Command {
   };
 }
 
+/**
+ * Types the link at the cursor with `relation` (`null` untypes it). The
+ * relation is the MyST link's lv-notes `relation` field, which the editor
+ * carries in the mark's `extra`; the core checks it against the registry.
+ */
+export function setLinkRelation(relation: string | null): Command {
+  return (state, dispatch) => {
+    const link = linkAt(state);
+    if (!link) return false;
+    const { relation: _old, ...rest } = link.mark.attrs.extra ?? {};
+    const extra = relation ? { ...rest, relation } : Object.keys(rest).length ? rest : null;
+    if (dispatch) {
+      const mark = schema.marks.link.create({ ...link.mark.attrs, extra });
+      dispatch(state.tr.removeMark(link.from, link.to, schema.marks.link).addMark(link.from, link.to, mark));
+    }
+    return true;
+  };
+}
+
 /** Removes the link at the cursor, or the links in the selection. */
 export const removeLink: Command = (state, dispatch) => {
   const range = linkAt(state) ?? (state.selection.empty ? null : state.selection);

@@ -2,7 +2,7 @@
 
 Status: **accepted** (2026-10-27, all five questions answered with the
 proposed defaults). Implemented in `crates/lv-core`: `ids`, `principal`, `op`,
-and `store` (schema in `store/schema_v1.sql`).
+and `store` (schema in `store/schema.sql`).
 
 This settles the types that the op log, the sequencer and the SQLite schema
 all depend on. Retrofitting any of them means migrating the op log, so they
@@ -153,6 +153,12 @@ pub enum OpBody {
     // projection reads it from the tree. Typing it later is its own op.
     SetRelation { node: NodeId, relation: Option<Relation> },
 
+    // The project's vocabulary (docs/design/registry.md)
+    DeclareKind { namespace: Namespace, name: String, entry: KindEntry },
+    UpdateKind  { namespace: Namespace, name: String, entry: KindEntry },
+    RenameKind  { namespace: Namespace, from: String, to: String },
+    MergeKind   { namespace: Namespace, from: String, into: String },
+
     // Change sets
     OpenChangeSet   { change_set: ChangeSetId, rationale: String },
     AcceptChangeSet { change_set: ChangeSetId },
@@ -210,6 +216,8 @@ replaying the log through it rebuilds the project. The full list of codes is
 | `STALE_TEXT` | a *different* principal replaced the node's text after `op.base` (goes away with the CRDT) |
 | `CHANGE_SET_CONFLICT` | an open change set no longer applies on top of the current project |
 | `CHANGE_SET_CLOSED` | adding to, accepting or rejecting a change set already accepted or rejected |
+| `UNDECLARED_KIND` / `RETIRED_KIND` | a new use of a kind or relation the registry doesn't declare, or has retired (`registry.md`) |
+| `KIND_EXISTS` / `UNKNOWN_KIND` | declaring an existing name, or updating, renaming or merging a missing one |
 | `INVALID_OP` | e.g. `set_attrs` on `type`/`id`/`children`/`value`, a relation on a non-link node, or a `set_type` to or from a text run, onto a leaf that still has children, or off an edge that still has a relation |
 
 Details decided while implementing:
@@ -259,7 +267,8 @@ surfaced for later review) is still to be designed.
 
 ## 5. Storage and projections (implemented)
 
-One SQLite file per project; the schema is in `store/schema_v1.sql`.
+One SQLite file per project; the schema is in `store/schema.sql` (version 2;
+`store/migrate_v2.sql` upgrades version 1 files).
 
 - **Source of truth:** `op_log`, which is append-only (enforced by
   triggers), plus the `person`, `agent` and `grants` registry. Op bodies are
@@ -270,6 +279,7 @@ One SQLite file per project; the schema is in `store/schema_v1.sql`.
   - `edge`: one row per live link, cross-reference or citation, with its
     raw target and relation.
   - `change_set`: author, rationale and review state.
+  - `registry`: the project's declared vocabulary.
   - `search`: FTS5 over live node text.
   - `projection_meta`: records which version built the projections and up
     to which op (invariant 7).

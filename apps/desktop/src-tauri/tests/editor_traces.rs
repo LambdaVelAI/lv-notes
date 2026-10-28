@@ -56,7 +56,7 @@ fn editor_traces_save_exactly() {
         let mut s = Session::create(&tmp.path().join("p.lv"), "Traces", &Identity::new("Ada")).unwrap();
 
         let root: Node = serde_json::from_value(steps[0].myst.clone()).unwrap();
-        let (doc, _) = s.import_document(&name, DocKind::Note, &root).unwrap();
+        let (doc, _) = s.import_document(&name, DocKind::note(), &root).unwrap();
         let mut loaded = s.load_document(doc).unwrap();
         let mut expected = steps[0].myst.clone();
         normalize(&mut expected);

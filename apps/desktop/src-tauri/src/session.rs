@@ -16,6 +16,7 @@ use lv_core::myst::Node;
 use lv_core::op::{DocKind, Op, OpBody, Parent, Relation, Sequenced, Timestamp};
 use lv_core::principal::{Grant, GrantScope, Principal};
 use lv_core::refusal::{Refusal, RefusalCode};
+use lv_core::schema::{self, KindEntry, Namespace};
 use lv_core::sequencer::{LoadError, Sequencer, SubmitError};
 use lv_core::state::ProjectState;
 use lv_core::store::{Store, StoreError};
@@ -140,6 +141,15 @@ pub struct BlockInfo {
     pub text: String,
 }
 
+/// One entry of the project's registry, for UIs.
+#[derive(Clone, Debug, PartialEq, Serialize)]
+pub struct RegistryEntry {
+    pub namespace: Namespace,
+    pub name: String,
+    #[serde(flatten)]
+    pub entry: KindEntry,
+}
+
 /// Where a link target (`doc_…` or `node_…`) is now.
 #[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct Located {
@@ -210,7 +220,14 @@ impl Session {
             }
         };
         let seq = Sequencer::load(&mut store)?;
-        Ok(Session { path: path.to_owned(), store, seq, grant, content_changed: HashMap::new() })
+        let mut session = Session { path: path.to_owned(), store, seq, grant, content_changed: HashMap::new() };
+        // New projects, and projects from before the registry, get the
+        // built-in vocabulary (and what their content already uses) once.
+        let vocabulary = schema::bootstrap(session.state());
+        if !vocabulary.is_empty() {
+            session.submit(vocabulary)?;
+        }
+        Ok(session)
     }
 
     pub fn path(&self) -> &Path {
@@ -226,7 +243,7 @@ impl Session {
             .state()
             .documents()
             .filter(|(_, d)| !d.deleted)
-            .map(|(id, d)| (d.created, DocumentSummary { id, kind: d.kind, title: d.title.clone() }))
+            .map(|(id, d)| (d.created, DocumentSummary { id, kind: d.kind.clone(), title: d.title.clone() }))
             .collect();
         documents.sort_by_key(|(created, _)| *created);
         Ok(ProjectInfo {
@@ -252,7 +269,12 @@ impl Session {
     /// Imports a MyST AST as a new document.
     pub fn import_document(&mut self, title: &str, kind: DocKind, root: &Node) -> Result<(DocumentId, Change)> {
         let doc = DocumentId::new();
-        let change = self.submit(import_document(doc, kind, title, root)?)?;
+        let ops = import_document(doc, kind, title, root)?;
+        // Import is lenient: kinds the project doesn't know yet are declared
+        // provisional, for review, rather than refused.
+        let mut batch = schema::declare_unknown(self.state(), &ops);
+        batch.extend(ops);
+        let change = self.submit(batch)?;
         Ok((doc, change))
     }
 
@@ -352,6 +374,15 @@ impl Session {
         Some(Located { doc: block.doc, title: block.title.clone(), block: Some(block) })
     }
 
+    /// The project's vocabulary, by namespace then name.
+    pub fn registry(&self) -> Vec<RegistryEntry> {
+        self.state()
+            .registry()
+            .entries()
+            .map(|(namespace, name, entry)| RegistryEntry { namespace, name: name.to_owned(), entry: entry.clone() })
+            .collect()
+    }
+
     /// Writes every live document as MyST Markdown into a new folder inside
     /// `dir`, named after the project (`-2`, `-3`, ... if taken), so an
     /// export never overwrites anything.
@@ -430,7 +461,16 @@ fn touched_documents(before: &ProjectState, after: &ProjectState, ops: &[Sequenc
             OpBody::CreateDocument { doc, .. } | OpBody::DeleteDocument { doc } => {
                 docs.insert(*doc);
             }
-            OpBody::SetDocumentTitle { .. } | OpBody::OpenChangeSet { .. } | OpBody::RejectChangeSet { .. } => {}
+            OpBody::SetDocumentTitle { .. }
+            | OpBody::OpenChangeSet { .. }
+            | OpBody::RejectChangeSet { .. }
+            | OpBody::DeclareKind { .. }
+            | OpBody::UpdateKind { .. } => {}
+            // Renames and merges rewrite `kind` / `relation` on every use.
+            OpBody::RenameKind { namespace, from, .. } | OpBody::MergeKind { namespace, from, .. } => {
+                let (_, nodes) = before.kind_uses(*namespace, from);
+                docs.extend(nodes.into_iter().flat_map(node_docs));
+            }
             OpBody::InsertNode { node, parent, .. } | OpBody::MoveNode { node, parent, .. } => {
                 match parent {
                     Parent::DocumentRoot(doc) => {
@@ -467,7 +507,7 @@ mod tests {
     fn create_edit_save_and_reopen() {
         let (_dir, path, me) = project();
         let mut s = Session::create(&path, "Thesis", &me).unwrap();
-        let (doc, change) = s.create_document("Reading notes", DocKind::Note).unwrap();
+        let (doc, change) = s.create_document("Reading notes", DocKind::note()).unwrap();
         assert_eq!(change.documents, [doc]);
 
         let mut loaded = s.load_document(doc).unwrap();
@@ -494,8 +534,8 @@ mod tests {
     fn saves_based_on_an_old_version_of_the_document_are_refused() {
         let (_dir, path, me) = project();
         let mut s = Session::create(&path, "P", &me).unwrap();
-        let (doc, _) = s.create_document("A", DocKind::Note).unwrap();
-        let (other, _) = s.create_document("B", DocKind::Note).unwrap();
+        let (doc, _) = s.create_document("A", DocKind::note()).unwrap();
+        let (other, _) = s.create_document("B", DocKind::note()).unwrap();
         let mut stale = s.load_document(doc).unwrap();
 
         // Other documents and titles do not make this one stale.
@@ -534,7 +574,7 @@ mod tests {
         let mut s = Session::create(&path, "P", &me).unwrap();
         let err = s.rename_document(DocumentId::new(), "x").unwrap_err();
         assert_eq!(err.code(), "UNKNOWN_DOCUMENT");
-        let (doc, _) = s.create_document("A", DocKind::Note).unwrap();
+        let (doc, _) = s.create_document("A", DocKind::note()).unwrap();
         let err = s.save_document(doc, s.seq.head(), json!({ "children": [] })).unwrap_err();
         assert_eq!(err.code(), "INVALID_DOCUMENT");
     }
@@ -543,8 +583,8 @@ mod tests {
     fn links_to_notes_and_blocks_show_as_backlinks() {
         let (_dir, path, me) = project();
         let mut s = Session::create(&path, "P", &me).unwrap();
-        let (target, _) = s.create_document("Target", DocKind::Note).unwrap();
-        let (source, _) = s.create_document("Source", DocKind::Note).unwrap();
+        let (target, _) = s.create_document("Target", DocKind::note()).unwrap();
+        let (source, _) = s.create_document("Source", DocKind::note()).unwrap();
         let mut t = s.load_document(target).unwrap();
         t.myst["children"][0]["children"] = json!([{ "type": "text", "value": "Marginalia are arguments." }]);
         s.save_document(target, t.version, t.myst.clone()).unwrap();
@@ -584,7 +624,7 @@ mod tests {
     fn links_to_a_block_survive_changing_its_type() {
         let (_dir, path, me) = project();
         let mut s = Session::create(&path, "P", &me).unwrap();
-        let (doc, _) = s.create_document("A", DocKind::Note).unwrap();
+        let (doc, _) = s.create_document("A", DocKind::note()).unwrap();
         let mut a = s.load_document(doc).unwrap();
         let block: NodeId = a.myst["children"][0]["id"].as_str().unwrap().parse().unwrap();
         a.myst["children"].as_array_mut().unwrap().push(json!({
@@ -606,8 +646,8 @@ mod tests {
     fn exports_never_overwrite_a_folder() {
         let (dir, path, me) = project();
         let mut s = Session::create(&path, "My Thesis", &me).unwrap();
-        let (doc, _) = s.create_document("Reading notes", DocKind::Note).unwrap();
-        s.create_document("Reading notes", DocKind::Note).unwrap();
+        let (doc, _) = s.create_document("Reading notes", DocKind::note()).unwrap();
+        s.create_document("Reading notes", DocKind::note()).unwrap();
 
         let first = s.export_project(dir.path()).unwrap();
         assert_eq!((first.path.file_name().unwrap().to_str(), first.files), (Some("my-thesis"), 2));
@@ -625,11 +665,47 @@ mod tests {
     }
 
     #[test]
+    fn projects_get_the_builtin_vocabulary_once() {
+        let (_dir, path, me) = project();
+        let s = Session::create(&path, "P", &me).unwrap();
+        let relations: Vec<_> = s.registry().into_iter().filter(|e| e.namespace == Namespace::Relation).map(|e| e.name).collect();
+        assert!(relations.contains(&"supports".to_owned()));
+        let head = s.seq.head();
+        drop(s);
+        let s = Session::open(&path, &me).unwrap();
+        assert_eq!(s.seq.head(), head, "nothing new on reopening");
+    }
+
+    #[test]
+    fn relations_must_be_declared() {
+        let (_dir, path, me) = project();
+        let mut s = Session::create(&path, "P", &me).unwrap();
+        let (doc, _) = s.create_document("A", DocKind::note()).unwrap();
+        let mut a = s.load_document(doc).unwrap();
+        a.myst["children"][0]["children"] = json!([
+            { "type": "link", "id": NodeId::new(), "url": "https://example.org", "relation": "supports", "children": [] }
+        ]);
+        let (saved, _) = s.save_document(doc, a.version, a.myst.clone()).unwrap();
+        a.myst["children"][0]["children"][0]["relation"] = json!("vibes-with");
+        let err = s.save_document(doc, saved.version, a.myst.clone()).unwrap_err();
+        assert_eq!(err.code(), "UNDECLARED_KIND");
+
+        // Imports declare what they bring, provisionally.
+        let root: Node = serde_json::from_value(json!({ "type": "root", "children": [{ "type": "paragraph", "children": [
+            { "type": "link", "url": "https://example.org", "relation": "vibes-with", "children": [] }
+        ]}]}))
+        .unwrap();
+        s.import_document("Imported", DocKind::note(), &root).unwrap();
+        let entry = s.registry().into_iter().find(|e| e.name == "vibes-with").unwrap();
+        assert_eq!(entry.entry.status, schema::KindStatus::Provisional);
+    }
+
+    #[test]
     fn moves_touch_both_documents() {
         let (_dir, path, me) = project();
         let mut s = Session::create(&path, "P", &me).unwrap();
-        let (a, _) = s.create_document("A", DocKind::Note).unwrap();
-        let (b, _) = s.create_document("B", DocKind::Note).unwrap();
+        let (a, _) = s.create_document("A", DocKind::note()).unwrap();
+        let (b, _) = s.create_document("B", DocKind::note()).unwrap();
         let mut from = s.load_document(a).unwrap();
         let mut to = s.load_document(b).unwrap();
         let paragraph = from.myst["children"].as_array_mut().unwrap().remove(0);

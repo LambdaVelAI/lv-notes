@@ -4,7 +4,7 @@
 // native MyST with the version it was based on. The core works out the ops,
 // so this file never builds ops itself. One save is in flight at a time.
 
-import { type Backend, BackendError, type Backlink, type Located, type ProjectInfo, connect } from "./backend";
+import { type Backend, BackendError, type Backlink, type Located, type ProjectInfo, type RegistryEntry, connect } from "./backend";
 import { MystEditor } from "./editor/editor";
 import { isInternalTarget } from "./editor/links";
 import type { Myst } from "./editor/myst";
@@ -70,6 +70,7 @@ function showProject(info: ProjectInfo | null) {
   ui.projectName.textContent = info.name;
   ui.projectName.title = info.path;
   renderDocuments();
+  void refreshVocabulary();
 }
 
 async function exportWith(task: () => Promise<{ path: string; files: number } | null>) {
@@ -249,19 +250,35 @@ const bubble = new LinkBubble({
     editor.removeLink();
     editor.focus();
   },
+  relate: (relation) => {
+    editor.setLinkRelation(relation);
+    editor.focus();
+  },
+  blur: () => setTimeout(refreshBubble, 0),
 });
 
+/** The project's vocabulary, for the relation menu and backlink labels. */
+let vocabulary: RegistryEntry[] = [];
+async function refreshVocabulary() {
+  vocabulary = await backend.registry().catch((e) => (console.error(e), [] as RegistryEntry[]));
+  bubble.setRelations(vocabulary);
+}
+const relationLabel = (name: string) =>
+  vocabulary.find((e) => e.namespace === "relation" && e.name === name)?.label.toLowerCase() ?? name;
+
 function refreshBubble() {
+  if (bubble.hasFocus()) return;
   const link = editor.view.hasFocus() && !picker.isOpen ? editor.link() : null;
   if (!link) return bubble.hide();
   const url: string = link.mark.attrs.url;
+  const relation: string | null = link.mark.attrs.extra?.relation ?? null;
   const at = editor.view.coordsAtPos(link.from);
   const internal = isInternalTarget(url);
-  bubble.show(url, at, internal);
+  bubble.show(url, at, internal, undefined, relation);
   if (internal) {
     void locate(url).then((located) => {
       const now = editor.link();
-      if (now?.mark.attrs.url === url) bubble.show(url, editor.view.coordsAtPos(now.from), true, located);
+      if (now?.mark.attrs.url === url) bubble.show(url, editor.view.coordsAtPos(now.from), true, located, relation);
     });
   }
 }
@@ -302,7 +319,7 @@ async function refreshBacklinks() {
   if (!o) return;
   const links = await backend.backlinks(o.doc).catch((e) => (console.error(e), [] as Backlink[]));
   if (request !== backlinksRequest || open !== o) return;
-  renderBacklinks(ui.backlinks, links, (link) => void openDocument(link.source_doc, link.source));
+  renderBacklinks(ui.backlinks, links, (link) => void openDocument(link.source_doc, link.source), relationLabel);
 }
 
 ui.linkButton.addEventListener("mousedown", (e) => {
@@ -366,6 +383,7 @@ async function start() {
   backend.onChange((change) => {
     // Any change can add or remove links to the open note, or move targets.
     locations.clear();
+    void refreshVocabulary();
     clearTimeout(backlinksTimer);
     backlinksTimer = window.setTimeout(() => {
       void refreshBacklinks();

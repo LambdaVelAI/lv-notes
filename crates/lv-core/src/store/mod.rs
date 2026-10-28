@@ -37,11 +37,12 @@ pub struct Backlink {
 /// `PRAGMA application_id` of lv-notes project files ("LVNP").
 pub const APPLICATION_ID: i32 = 0x4C56_4E50;
 /// Schema version this code writes, stored in `PRAGMA user_version`.
-pub const SCHEMA_VERSION: i32 = 1;
+pub const SCHEMA_VERSION: i32 = 2;
 /// Encoding of `op_log.body`: 1 = JSON of [`OpBody`].
 pub const BODY_FORMAT: i64 = 1;
 
-const SCHEMA_V1: &str = include_str!("schema_v1.sql");
+const SCHEMA: &str = include_str!("schema.sql");
+const MIGRATE_V2: &str = include_str!("migrate_v2.sql");
 
 #[derive(Debug, thiserror::Error)]
 pub enum StoreError {
@@ -107,7 +108,12 @@ impl Store {
         if version > SCHEMA_VERSION {
             return Err(StoreError::SchemaTooNew { found: version });
         }
-        // Migrations from older versions go here once there is a version 2.
+        if version < 2 {
+            let tx = conn.unchecked_transaction()?;
+            tx.execute_batch(MIGRATE_V2)?;
+            tx.pragma_update(None, "user_version", 2)?;
+            tx.commit()?;
+        }
         let project = conn.query_row("SELECT id FROM project", [], |r| r.get(0))?;
         Ok(Store { conn, project })
     }
@@ -120,7 +126,7 @@ impl Store {
     fn init(mut conn: Connection, project: ProjectId, name: &str) -> Result<Store> {
         Self::configure(&conn)?;
         let tx = conn.transaction()?;
-        tx.execute_batch(SCHEMA_V1)?;
+        tx.execute_batch(SCHEMA)?;
         tx.pragma_update(None, "application_id", APPLICATION_ID)?;
         tx.pragma_update(None, "user_version", SCHEMA_VERSION)?;
         tx.execute(
@@ -513,7 +519,7 @@ mod tests {
             names,
             [
                 "agent", "change_set", "document", "edge", "grants", "node", "op_log", "person",
-                "project", "projection_meta", "search",
+                "project", "projection_meta", "registry", "search",
             ]
         );
     }

@@ -1,19 +1,22 @@
-# Proposal: the project schema registry
+# The project schema registry
 
-Status: **proposal**, for review. Nothing here is built yet.
+Status: **accepted** (2026-10-27, all five decisions with the proposed
+defaults) and implemented: `crates/lv-core/src/schema.rs`, the registry
+ops in `op.rs` / `state.rs`, the `registry` projection, and the relation
+menu in the desktop app's link bubble.
 
 `CLAUDE.md` asks for a registry that is stored in the project, changed by
 ops, and checked in one place (invariant 8). It declares document kinds,
-block kinds and edge types as data. Today none of that exists:
+block kinds and edge types as data. Before this:
 
-- Document kinds are a Rust enum (`DocKind::Note | Draft`) and a SQL
-  `CHECK` on the `document` table.
-- Relations are free strings: `set_relation` accepts any name.
-- `kind` on `proof`, `admonition` and `container` nodes is not checked.
+- Document kinds were a Rust enum (`Note | Draft`) and a SQL `CHECK` on
+  the `document` table.
+- Relations were free strings: `set_relation` accepted any name.
+- `kind` on `proof`, `admonition` and `container` nodes was not checked.
 
-This settles the registry before agents arrive (layer 3), because agents
-are meant to propose vocabulary in change sets, and typed links need a
-vocabulary to pick from.
+The registry comes before agents (layer 3), because agents are meant to
+propose vocabulary in change sets, and typed links need a vocabulary to
+pick from.
 
 ## 1. What is registered
 
@@ -40,10 +43,12 @@ Kept small; only fields something uses now.
 
 ```rust
 pub struct KindEntry {
-    pub label: String,            // "Theorem", shown in UIs and the agent guide
-    pub status: KindStatus,       // Declared | Provisional | Retired
+    pub label: String,                  // "Theorem", shown in UIs and the agent guide
+    pub status: KindStatus,             // Declared | Provisional | Retired
     pub description: Option<String>,
-    pub detail: KindDetail,
+    pub layout: Option<Layout>,         // document kinds only: Flow | Canvas
+    pub counter: Option<String>,        // block kinds only: shared numbering counter, e.g. "theorem"
+    pub inverse_label: Option<String>,  // relations only: "Supported by", for backlinks
 }
 
 pub enum KindStatus {
@@ -54,13 +59,12 @@ pub enum KindStatus {
     /// Existing uses stay valid; new uses are refused.
     Retired,
 }
-
-pub enum KindDetail {
-    Document { layout: Layout },                   // Flow | Canvas
-    Block { counter: Option<String> },             // shared numbering counter, e.g. "theorem"
-    Relation { inverse_label: Option<String> },    // "supported by", for backlinks
-}
 ```
+
+The per-namespace fields are optional fields on the entry rather than an
+enum (a change from the proposal): the JSON in the log stays flat, and
+declaring or updating an entry with another namespace's field is refused
+with `INVALID_OP`.
 
 - **Numbering** stays a projection (`CLAUDE.md`). An entry only names its
   counter, so `lemma` and `theorem` can share one (Theorem 1, Lemma 2) or
@@ -90,12 +94,15 @@ MergeKind   { namespace: Namespace, from: String, into: String },
 
 ## 4. One check, in the core
 
-A new `schema` module with one function, called from `ProjectState::apply`
-for every op that creates or changes a kind, relation or document:
+`schema::Registry` checks every new use, called from `ProjectState::apply`
+for `create_document` (`check_use`), `insert_node`, `set_attrs` and
+`set_type` (`check_content`) and `set_relation` (`check_relation`). Only
+new uses are checked: content keeping the kind it had stays valid even if
+that kind was retired or predates the registry.
 
-```rust
-pub fn conforms(registry: &Registry, op: &OpBody, state: &ProjectState) -> Result<(), Refusal>;
-```
+A project with no declarations at all is not checked; its log predates the
+registry. Replaying a log therefore checks each op against the registry as
+it was at that op's position.
 
 Refusal codes:
 
@@ -115,23 +122,26 @@ kind first, or pick a declared one).
   that opens it. Built-ins are pre-filled entries, not hard-coded, as
   `CLAUDE.md` asks.
 - **Existing projects** (created before the registry) have no declarations.
-  On open, the app submits the built-in batch once, as the local person.
-  Ops already in the log were accepted without checks and stay valid:
-  replay checks an op against the registry as it was at that op's position.
-- **Import is lenient.** Importing MyST with an unknown `kind` adds a
-  `DeclareKind { status: Provisional }` to the import batch, so the content
-  is kept losslessly and the new kind is flagged for review rather than
+  On open, the app submits `schema::bootstrap` once, as the local person:
+  the built-ins, plus every kind or relation the content already uses,
+  declared `Provisional`. Ops already in the log were accepted without
+  checks and stay valid.
+- **Import is lenient.** `schema::declare_unknown` adds a
+  `DeclareKind { status: Provisional }` to an import batch for every kind
+  or relation it brings that the project doesn't know, so the content is
+  kept losslessly and the new kind is flagged for review rather than
   refused. Ops from editors and agents are strict.
 
-## 6. Migrations this needs
+## 6. Migrations
 
 - `DocKind` becomes a string newtype like `Relation`. It serializes the
   same way (`"note"`, `"draft"`), so the op log does not change.
-- The `document.kind` `CHECK` constraint goes. The table is a projection,
-  so this is a schema-version bump that drops and rebuilds projections; the
-  op log is untouched.
-- A `registry` projection table (namespace, name, entry JSON, status), so
-  UIs and the MCP server can list the vocabulary without replaying.
+- The `document.kind` `CHECK` constraint goes, and a `registry`
+  projection table (namespace, name, status, entry JSON) arrives, so UIs
+  and the MCP server can list the vocabulary without replaying. This is
+  schema version 2 (`store/schema.sql`); `store/migrate_v2.sql` upgrades
+  version 1 files by emptying the projections, which the next load
+  rebuilds from the untouched op log. `PROJECTION_VERSION` is 2.
 
 ## 7. Starting vocabulary
 
@@ -163,15 +173,32 @@ kind first, or pick a declared one).
   `CITES`, `SUPPORTS` and `CONTRADICTS` already exist as constants in
   `op.rs`.
 
-## Decisions needed
+## Decisions
 
-1. **Built-ins as ops in each project's log** (proposed), rather than an
-   implicit baseline the app supplies.
-2. **Scope for v1:** document kinds, `proof` / `admonition` / `container`
-   kinds and relations are checked; directive and role names are not
-   (proposed).
-3. **Rename and merge rewrite uses** (proposed), rather than keeping an
-   alias table.
-4. **Import declares unknown kinds as `Provisional`** (proposed), rather
-   than refusing or leaving them undeclared and flagged.
-5. **The starting relations** in section 7: keep, trim or extend.
+1. Built-ins are ops in each project's log.
+2. Checked in v1: document kinds, `proof` / `admonition` / `container`
+   kinds and relations. Directive and role names are not checked.
+3. Rename and merge rewrite every use, tombstones included.
+4. Import declares unknown kinds as `Provisional`.
+5. The starting relations are the eight in section 7.
+
+## In the desktop app
+
+- The link bubble has a relation menu with the project's relations
+  (provisional ones marked, retired ones hidden unless in use). Choosing
+  one sets the link's `relation`, which saves as `set_relation`.
+- The backlinks panel labels typed links with the relation's label.
+- `registry()` is a Tauri command; the preview backend returns the
+  built-in relations.
+
+## Still open
+
+- **No UI to declare, retire, rename or merge** kinds yet, and no review
+  view for provisional ones. The ops exist; agents (layer 3) and a
+  vocabulary panel will use them.
+- **Numbering** isn't projected yet; entries only name their counters.
+- **The MCP `guide`** chapters for the new refusal codes come with the MCP
+  server.
+- **Open change sets and renames.** A change set that uses a name renamed
+  or merged after it was opened fails to replay on accept
+  (`CHANGE_SET_CONFLICT`); the agent has to redo it.

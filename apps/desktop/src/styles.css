@@ -230,10 +230,11 @@ span.opaque-crossReference, span.opaque-cite, span.opaque-citeGroup { color: var
 .link-picker .option-block .label { font-family: var(--text-font); }
 .link-picker .detail { flex: none; max-width: 40%; color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.link-bubble { display: flex; align-items: center; gap: 4px; padding: 4px 4px 4px 10px; max-width: 360px; font-size: 12px; }
+.link-bubble { display: flex; align-items: center; gap: 4px; padding: 4px 4px 4px 10px; max-width: 480px; font-size: 12px; }
 .link-bubble .target { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); user-select: text; }
 .link-bubble.broken .target { color: var(--accent); }
 .link-bubble button { border: none; background: transparent; padding: 2px 8px; }
+.link-bubble select.relation { flex: none; max-width: 130px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); padding: 1px 4px; font-size: 12px; }
 
 /* ---- Backlinks ---- */
 .backlinks { margin-top: 48px; padding-top: 12px; border-top: 1px solid var(--line); }

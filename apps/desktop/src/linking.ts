@@ -1,7 +1,7 @@
 // Link UI: the picker (⌘K or `[[`), the bubble shown on a link, and the
 // backlinks panel. Plain DOM; the app wires them to the editor and backend.
 
-import type { Backlink, BlockInfo, DocumentSummary, Located } from "./backend";
+import type { Backlink, BlockInfo, DocumentSummary, Located, RegistryEntry } from "./backend";
 
 /** What a link points at, as the picker offers it. */
 export interface LinkChoice {
@@ -163,20 +163,32 @@ export interface BubbleActions {
   open(url: string): void;
   edit(): void;
   remove(): void;
+  /** Types the link (`null`: untyped). */
+  relate(relation: string | null): void;
+  /** Focus left the relation menu without a change. */
+  blur(): void;
 }
 
-/** A small bar under the link at the cursor: where it goes, Open, Edit, Remove. */
+/**
+ * A small bar under the link at the cursor: where it goes, its relation
+ * (from the project's registry), Open, Edit, Remove.
+ */
 export class LinkBubble {
   private root = el("div", "link-bubble");
   private target = el("span", "target");
+  private relation = el("select", "relation");
   private openButton = el("button", "", "Open");
   private url = "";
+  private relations: RegistryEntry[] = [];
 
   constructor(actions: BubbleActions) {
     this.root.hidden = true;
     const edit = el("button", "", "Edit");
     const remove = el("button", "", "Remove");
-    this.root.append(this.target, this.openButton, edit, remove);
+    this.relation.title = "Relation: what this link says about its target";
+    this.relation.onchange = () => actions.relate(this.relation.value || null);
+    this.relation.onblur = () => actions.blur();
+    this.root.append(this.target, this.relation, this.openButton, edit, remove);
     document.body.append(this.root);
     // mousedown, so the editor keeps its selection and focus.
     const on = (button: HTMLElement, f: () => void) =>
@@ -189,11 +201,41 @@ export class LinkBubble {
     on(remove, () => actions.remove());
   }
 
-  /** Shows the bubble for `url` at `at`; `located` is undefined while unknown. */
-  show(url: string, at: { left: number; bottom: number }, internal: boolean, located?: Located | null) {
+  /** Whether focus is in the bubble (its relation menu). */
+  hasFocus(): boolean {
+    return this.root.contains(document.activeElement);
+  }
+
+  /** The relations the menu offers: the registry's, minus retired ones. */
+  setRelations(entries: RegistryEntry[]) {
+    this.relations = entries.filter((e) => e.namespace === "relation");
+  }
+
+  /**
+   * Shows the bubble for `url` at `at`; `located` is undefined while
+   * unknown. `relation` is the link's current relation.
+   */
+  show(url: string, at: { left: number; bottom: number }, internal: boolean, located?: Located | null, relation: string | null = null) {
     this.url = url;
+    const options = [el("option", "", "No relation")];
+    options[0].value = "";
+    for (const r of this.relations) {
+      if (r.status === "retired" && r.name !== relation) continue;
+      const o = el("option", "", r.status === "provisional" ? `${r.label} (provisional)` : r.label);
+      o.value = r.name;
+      options.push(o);
+    }
+    if (relation && !this.relations.some((r) => r.name === relation)) {
+      const o = el("option", "", `${relation} (undeclared)`);
+      o.value = relation;
+      options.push(o);
+    }
+    if (!this.hasFocus()) {
+      this.relation.replaceChildren(...options);
+      this.relation.value = relation ?? "";
+    }
     this.root.hidden = false;
-    this.root.style.left = `${Math.max(8, Math.min(at.left, window.innerWidth - 360))}px`;
+    this.root.style.left = `${Math.max(8, Math.min(at.left, window.innerWidth - 480))}px`;
     this.root.style.top = `${at.bottom + 6}px`;
     this.openButton.hidden = !internal && !/^(https?|mailto):/i.test(url);
     this.root.classList.toggle("broken", internal && located === null);
@@ -211,7 +253,12 @@ export class LinkBubble {
 }
 
 /** Renders the backlinks of the open note into `mount`, grouped by source note. */
-export function renderBacklinks(mount: HTMLElement, links: Backlink[], openLink: (link: Backlink) => void) {
+export function renderBacklinks(
+  mount: HTMLElement,
+  links: Backlink[],
+  openLink: (link: Backlink) => void,
+  relationLabel: (name: string) => string = (name) => name,
+) {
   const head = el("h2", "", links.length ? `Linked from ${links.length} ${links.length === 1 ? "place" : "places"}` : "No links to this note yet");
   const groups = new Map<string, Backlink[]>();
   for (const l of links) groups.set(l.source_doc, [...(groups.get(l.source_doc) ?? []), l]);
@@ -222,7 +269,7 @@ export function renderBacklinks(mount: HTMLElement, links: Backlink[], openLink:
     for (const link of group) {
       const item = el("button", "backlink");
       item.append(el("span", "context", link.context.trim() || "(link)"));
-      const meta = [link.target ? "to a block" : "", link.relation ?? ""].filter(Boolean).join(" · ");
+      const meta = [link.target ? "to a block" : "", link.relation ? relationLabel(link.relation) : ""].filter(Boolean).join(" · ");
       if (meta) item.append(el("span", "meta", meta));
       item.onclick = () => openLink(link);
       li.append(item);

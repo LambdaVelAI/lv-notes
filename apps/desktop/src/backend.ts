@@ -69,6 +69,18 @@ export interface Exported {
   files: number;
 }
 
+/** An entry of the project's registry (its vocabulary). */
+export interface RegistryEntry {
+  namespace: "document" | "block" | "relation";
+  name: string;
+  label: string;
+  status: "declared" | "provisional" | "retired";
+  description?: string;
+  layout?: "flow" | "canvas";
+  counter?: string;
+  inverse_label?: string;
+}
+
 /** A failed command: a stable code (refusal codes, `STALE_BASE`, ...) and a message. */
 export class BackendError extends Error {
   constructor(readonly code: string, message: string) {
@@ -97,6 +109,8 @@ export interface Backend {
   exportProject(): Promise<Exported | null>;
   /** Asks where to save `doc` as Markdown; null if cancelled. */
   exportDocument(doc: string, title: string): Promise<Exported | null>;
+  /** The project's vocabulary: document kinds, block kinds, relations. */
+  registry(): Promise<RegistryEntry[]>;
   /** Opens a web address in the system browser. */
   openUrl(url: string): Promise<void>;
   onChange(listener: (change: Change) => void): void;
@@ -149,6 +163,7 @@ async function tauriBackend(): Promise<Backend> {
       return path ? call("export_document", { doc, path }) : null;
     },
     openUrl: (url) => opener.openUrl(url),
+    registry: () => call("registry"),
     onChange(listener) {
       void listen<Change>("project-changed", (event) => listener(event.payload));
     },
@@ -270,6 +285,20 @@ export function memoryBackend(seed: { title: string; myst: Myst }[] = []): Backe
     },
     async openUrl(url) {
       window.open(url, "_blank", "noopener");
+    },
+    // The built-in relations, as a new project declares them.
+    async registry() {
+      const relations: [string, string, string][] = [
+        ["supports", "Supports", "Supported by"],
+        ["contradicts", "Contradicts", "Contradicted by"],
+        ["extends", "Extends", "Extended by"],
+        ["uses", "Uses", "Used by"],
+        ["proves", "Proves", "Proved by"],
+        ["cites", "Cites", "Cited by"],
+        ["defines", "Defines", "Defined by"],
+        ["example-of", "Example of", "Has example"],
+      ];
+      return relations.map(([name, label, inverse_label]) => ({ namespace: "relation", name, label, status: "declared", inverse_label }));
     },
     onChange: (l) => void listeners.push(l),
   };

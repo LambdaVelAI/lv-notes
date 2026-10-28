@@ -26,7 +26,7 @@ The UI never builds ops. It sends whole documents:
 
 | Command | Does |
 | --- | --- |
-| `create_project(path, name)`, `open_project(path)`, `open_last_project()` | Opens a `.lv` file, registering the local person as owner if needed |
+| `create_project(path, name)`, `open_project(path)`, `open_last_project()` | Opens a `.lv` file, registering the local person as owner and declaring the built-in vocabulary if needed |
 | `create_document(title)` | Imports a root with one empty paragraph |
 | `load_document(doc)` | Returns `{version, title, myst}`, with `myst` as native MyST (IDs included) |
 | `save_document(doc, base, myst)` | Reconciles the tree into ops (`lv_core::convert::update_document`) and submits one batch |
@@ -34,6 +34,7 @@ The UI never builds ops. It sends whole documents:
 | `backlinks(doc)` | Links pointing into `doc`, with the source note's title and the text of the block each link sits in |
 | `search_blocks(text, limit?)` | Blocks whose text matches every word (as a prefix), best first |
 | `locate(target)` | Where a `doc_…` / `node_…` link target is now, or null if it is gone |
+| `registry()` | The project's vocabulary: document kinds, block kinds, relations (`registry.md`) |
 | `export_project(dir)` | Writes every note as MyST Markdown into a new folder in `dir` |
 | `export_document(doc, path)` | Writes one note as MyST Markdown to `path` |
 
@@ -112,8 +113,8 @@ links are links with any other url.
   into `target_doc` / `target_node`. `Store::document_backlinks(doc)` returns
   every live link, reference or citation that points at the document, at
   one of its live nodes by ID, or at one of its labels. A link to a block
-  follows the block when it moves. Links start untyped; a `relation`
-  shows in the panel when present, but there is no UI to set one yet.
+  follows the block when it moves. Links start untyped; the link bubble's
+  relation menu types them from the project's registry (`registry.md`).
 - **Adding a link.** ⌘K, the toolbar's Link button, or typing `[[` opens
   the picker. It lists notes by title (from the project info, filtered
   locally) and blocks by text (`search_blocks`, FTS5 prefix match), and
@@ -173,7 +174,7 @@ The browser preview can't export.
   unmodelled fields on text runs and empty text nodes are lost. Mark
   nesting is normalized to schema order (link > strong > emphasis > …).
 - **Not editable yet:** cross-references, citations, directives, tables
-  and figures. Link relations (`supports`, ...) can't be set from the UI.
+  and figures.
 - **Wrapping or unwrapping** (into a list or quote) keeps the block's ID,
   but turning a list item into a paragraph replaces the item: links to the
   `listItem` itself dangle (links to the paragraph inside it don't).

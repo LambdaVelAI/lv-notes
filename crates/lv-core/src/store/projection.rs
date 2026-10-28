@@ -9,17 +9,17 @@ use rusqlite::{Connection, params};
 use serde_json::Value;
 
 use crate::ids::{DocumentId, NodeId, Version};
-use crate::op::{DocKind, Parent};
+use crate::op::Parent;
 use crate::state::{Effects, ProjectState};
 
 use super::Result;
 
 /// Projection tables, as named in `projection_meta`.
-pub const PROJECTIONS: [&str; 5] = ["document", "node", "edge", "change_set", "search"];
+pub const PROJECTIONS: [&str; 6] = ["document", "node", "edge", "change_set", "search", "registry"];
 pub const PRODUCER: &str = "lv-core";
 /// Bump whenever projection rows would come out differently for the same
 /// log; files built by another version are rebuilt on load.
-pub const PROJECTION_VERSION: &str = "1";
+pub const PROJECTION_VERSION: &str = "2";
 
 /// Whether every projection was built by this version through `head`.
 pub(super) fn is_current(conn: &Connection, head: Version) -> Result<bool> {
@@ -62,6 +62,20 @@ pub(super) fn write_effects(conn: &Connection, state: &ProjectState, effects: &E
     for &cs in &effects.change_sets {
         write_change_set(conn, state, cs)?;
     }
+    if effects.registry {
+        write_registry(conn, state)?;
+    }
+    Ok(())
+}
+
+/// Rewrites the whole registry table: it is small, and renames move rows.
+fn write_registry(conn: &Connection, state: &ProjectState) -> Result<()> {
+    conn.execute("DELETE FROM registry", [])?;
+    let mut stmt = conn.prepare_cached("INSERT INTO registry (namespace, name, status, entry) VALUES (?1, ?2, ?3, ?4)")?;
+    for (namespace, name, entry) in state.registry().entries() {
+        let json = serde_json::to_string(entry).expect("serializes");
+        stmt.execute(params![namespace.as_str(), name, entry.status.as_str(), json])?;
+    }
     Ok(())
 }
 
@@ -69,23 +83,21 @@ pub(super) fn write_effects(conn: &Connection, state: &ProjectState, effects: &E
 pub(super) fn rebuild(conn: &Connection, state: &ProjectState) -> Result<()> {
     conn.execute_batch(
         "DELETE FROM search; DELETE FROM edge; DELETE FROM node;
-         DELETE FROM change_set; DELETE FROM document;",
+         DELETE FROM change_set; DELETE FROM document; DELETE FROM registry;",
     )?;
     let effects = Effects {
         documents: state.documents().map(|(id, _)| id).collect(),
         nodes: state.nodes().map(|(id, _)| id).collect(),
         parents: Default::default(),
         change_sets: state.change_sets().map(|(id, _)| id).collect(),
+        registry: true,
     };
     write_effects(conn, state, &effects)
 }
 
 fn write_document(conn: &Connection, state: &ProjectState, id: DocumentId) -> Result<()> {
     let d = state.document(id).expect("effects name existing documents");
-    let kind = match d.kind {
-        DocKind::Note => "note",
-        DocKind::Draft => "draft",
-    };
+    let kind = d.kind.0.as_str();
     conn.prepare_cached(
         "INSERT INTO document (id, kind, title, created_seq, updated_seq, deleted)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6)
@@ -222,7 +234,8 @@ fn write_change_set(conn: &Connection, state: &ProjectState, id: crate::ids::Cha
 /// Every projection row as sorted text, without file-local row numbers, so
 /// two files can be compared.
 pub(super) fn snapshot(conn: &Connection) -> Result<Vec<String>> {
-    const QUERIES: [&str; 5] = [
+    const QUERIES: [&str; 6] = [
+        "SELECT 'registry ' || namespace || ' ' || quote(name) || ' ' || status || ' ' || entry FROM registry",
         "SELECT 'document ' || quote(id) || ' ' || quote(kind) || ' ' || quote(title) || ' '
                 || created_seq || ' ' || updated_seq || ' ' || deleted FROM document",
         "SELECT 'node ' || quote(id) || ' ' || quote(document_id) || ' ' || quote(parent_id) || ' '

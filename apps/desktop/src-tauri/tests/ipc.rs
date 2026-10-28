@@ -90,6 +90,8 @@ fn the_ui_round_trip() {
     invoke(&window, "save_document", json!({ "doc": other, "base": loaded["version"], "myst": linking })).unwrap();
     let links = invoke(&window, "backlinks", json!({ "doc": doc })).unwrap();
     assert_eq!((links[0]["source_doc"].as_str(), links[0]["target"].as_str()), (Some(other.as_str()), Some(block.as_str())));
+    let registry = invoke(&window, "registry", json!({})).unwrap();
+    assert!(registry.as_array().unwrap().iter().any(|e| e["namespace"] == "relation" && e["name"] == "supports" && e["label"] == "Supports"));
     let exported = invoke(&window, "export_project", json!({ "dir": files.path() })).unwrap();
     assert_eq!(exported["files"], 2);
     let one = files.path().join("hello.md");
