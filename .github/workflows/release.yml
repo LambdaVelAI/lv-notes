@@ -72,6 +72,15 @@ jobs:
           fi
           npm --prefix apps/desktop run tauri -- build --target universal-apple-darwin --bundles dmg
 
+          # Tauri notarizes the app inside; notarize the disk image too, and
+          # staple the ticket so it checks out offline.
+          if [ -n "$CERTIFICATE" ] && [ -n "$API_KEY_P8" ]; then
+            dmg=$(ls target/universal-apple-darwin/release/bundle/dmg/*.dmg)
+            xcrun notarytool submit "$dmg" --key "$key" --key-id "$API_KEY_ID" --issuer "$API_ISSUER" --wait
+            xcrun stapler staple "$dmg"
+            xcrun stapler validate "$dmg"
+          fi
+
       - name: Attach to a draft release
         env:
           GH_TOKEN: ${{ github.token }}

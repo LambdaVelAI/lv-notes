@@ -1,6 +1,6 @@
 [package]
 name = "lv-desktop"
-version = "0.1.0"
+version = "0.1.1"
 description = "lv-notes desktop app"
 edition.workspace = true
 license.workspace = true

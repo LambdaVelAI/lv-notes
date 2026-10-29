@@ -14,11 +14,11 @@ public until you publish the draft.
 2. Commit, then tag and push:
 
    ```bash
-   git tag v0.1.0
+   git tag v0.1.1
    ```
 
    ```bash
-   git push origin v0.1.0
+   git push origin v0.1.1
    ```
 
 3. When the workflow finishes, open the draft on the repository's Releases
@@ -34,8 +34,9 @@ macOS refuses to open it until the tester allows it in System Settings ›
 Privacy & Security › Open Anyway (since macOS 15, right-click › Open no
 longer does it), or reports it as "damaged" until they run
 `xattr -dr com.apple.quarantine /Applications/lv-notes.app`. With them,
-Tauri signs the app with your Developer ID and has Apple notarize it, so it
-opens normally.
+Tauri signs the app with your Developer ID and has Apple notarize it, and
+the workflow then notarizes the `.dmg` too and staples Apple's tickets to
+both, so they open normally, even offline.
 
 The secrets are set on `LambdaVelAI/lv-notes`. The workflow's warnings say
 when a build went out unsigned or not notarized.
