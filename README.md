@@ -11,6 +11,10 @@ lv-notes is in early alpha, for macOS (Apple Silicon and Intel).
 3. Open lv-notes and create a project: one `.lv` file holds all of a
    project's notes, links and history.
 
+Releases are signed and notarized by Apple, so lv-notes opens like any
+other app. If macOS says it can't check the app, the build wasn't
+notarized: please report it.
+
 Alpha builds can have bugs, so keep your project files somewhere that's
 backed up. **Export…** in the sidebar writes every note out at any time, as
 a Jupyter Book or an Obsidian vault, and **Import…** brings either kind of

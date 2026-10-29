@@ -30,10 +30,15 @@ CI (`.github/workflows/ci.yml`) runs the same tests on every push to
 ## Signing and notarization (one-time setup)
 
 Without these secrets the workflow still builds, but the app is unsigned:
-macOS will refuse to open it until the tester right-clicks it and chooses
-Open (or, on recent macOS, allows it in System Settings › Privacy &
-Security). With them, Tauri signs the app with your Developer ID and has
-Apple notarize it, so it opens normally.
+macOS refuses to open it until the tester allows it in System Settings ›
+Privacy & Security › Open Anyway (since macOS 15, right-click › Open no
+longer does it), or reports it as "damaged" until they run
+`xattr -dr com.apple.quarantine /Applications/lv-notes.app`. With them,
+Tauri signs the app with your Developer ID and has Apple notarize it, so it
+opens normally.
+
+The secrets are set on `LambdaVelAI/lv-notes`. The workflow's warnings say
+when a build went out unsigned or not notarized.
 
 ### 1. A Developer ID Application certificate
 
