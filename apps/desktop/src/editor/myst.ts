@@ -128,6 +128,8 @@ function inline(children: Myst[], marks: readonly Mark[] = []): PMNode[] {
         return text(json.value, m.inlineCode.create({ extra: extra(json, ["value"]) }).addToSet(marks));
       case "break":
         return [schema.nodes.break.create({ extra: extra(json) }, null, marks)];
+      case "inlineMath":
+        return [schema.nodes.inlineMath.create({ value: json.value ?? "", extra: extra(json, ["value"]) }, null, marks)];
       case "link": {
         const link = m.link.create({ id: json.id ?? null, url: json.url ?? "", title: json.title ?? null, extra: extra(json, ["url", "title"]) });
         return inline(json.children ?? [], link.addToSet(marks));
@@ -237,6 +239,8 @@ function inlineOut(node: PMNode): Myst[] {
       into().push(code ? { type: "inlineCode", ...(code.attrs.extra ?? {}), value: child.text } : { type: "text", value: child.text });
     } else if (child.type === schema.nodes.break) {
       into().push({ type: "break", ...(child.attrs.extra ?? {}) });
+    } else if (child.type === schema.nodes.inlineMath) {
+      into().push({ type: "inlineMath", ...(child.attrs.extra ?? {}), value: child.attrs.value });
     } else {
       into().push(child.attrs.json);
     }

@@ -4,6 +4,7 @@ import { EditorState, NodeSelection, Selection, TextSelection, type Transaction 
 import { EditorView } from "prosemirror-view";
 import { type Myst, mystToPm, pmToMyst } from "./myst";
 import { BROKEN, FLASH, LINK_REQUEST, type LinkRange, findId, internalTargets, linkAt, removeLink, setLink, setLinkRelation } from "./links";
+import { mathViews } from "./math";
 import { SYSTEM, assignIds, plugins, renameIds } from "./plugins";
 
 export interface EditorOptions {
@@ -26,6 +27,7 @@ export class MystEditor {
       state: this.stateFor({ type: "root", children: [] }),
       dispatchTransaction: (tr) => this.dispatch(tr),
       attributes: { class: "myst-editor", spellcheck: "true" },
+      nodeViews: mathViews,
       handleClick: (view, pos, event) => {
         if (!(event.metaKey || event.ctrlKey) || !this.options.onFollowLink) return false;
         const link = view.state.doc.resolve(pos).marks().find((m) => m.type === view.state.schema.marks.link);

@@ -130,8 +130,9 @@ Full plan (living doc): https://claude.ai/artifact/Sub9Ec6n5k4QiSf1FdkGYD
   anchors and ink.
 - Registry entries beyond the first cut (`docs/design/registry.md`):
   allowed children, relation source/target constraints, numbering.
-- Math editing: source with live preview first; whether a visual editor
-  (MathLive) is worth its noisy LaTeX rewrites.
+- Math editing: source with a live KaTeX preview is built
+  (`desktop-shell.md`). Open: project-wide macros, and whether a visual
+  editor (MathLive) is worth its noisy LaTeX rewrites.
 - Layout inside a canvas frame: flow by default with layouts and absolute
   positioning as an escape hatch (Quarto), or free placement throughout
   (Keynote)? Leaning flow-first: it reflows across aspect ratios and agents

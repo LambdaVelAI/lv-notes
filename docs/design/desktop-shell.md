@@ -94,9 +94,10 @@ typed.
     `listItem`, `code`, `math`, `thematicBreak`, `image`, `admonition`;
   - inline marks: strong, emphasis, underline, delete, subscript,
     superscript, inline code, link;
-  - hard breaks.
+  - inline math (`inlineMath`, an atom whose `value` is the LaTeX) and hard
+    breaks.
 - **Opaque:** everything else (directives, figures, tables, footnotes,
-  citations, cross-references, roles, inline math, unknown types) is held
+  citations, cross-references, roles, unknown types) is held
   verbatim in `opaque` or `opaqueInline` atoms, shown as labelled chips. It
   can be moved and deleted, and it saves back unchanged.
 - **Implicit paragraphs:** phrasing directly inside a container (a tight
@@ -173,6 +174,35 @@ formats, and how links and IDs survive a round trip, are in
 `interchange.md`; the shell only reads and writes files. The browser
 preview can't import or export.
 
+## Math
+
+MyST's `inlineMath` and `math` nodes, rendered with KaTeX
+(`editor/math.ts`). The LaTeX source is what the document stores and what
+ops carry; the rendering is only presentation.
+
+- **Inline math** is an atom showing the rendering. Clicking it or arrowing
+  onto it selects it and opens a small source box under it, which updates
+  the rendering as you type. Return, Escape, Tab, or arrowing past either
+  end goes back to the text, and math left empty is removed. Typing `$x^2$`
+  in text makes inline math: the closing `$` triggers it, and the source
+  can't start or end with a space, so `$5 or $6` stays text. ⇧⌘E or the ∑
+  button turns the selection into math, or inserts empty math to type into.
+- **Display equations** are code-like blocks whose text is the source.
+  Away from the cursor only the rendering shows; with the cursor inside, the
+  source shows under it, with the LaTeX error (if any) and a label field.
+  Clicking the rendering, or arrowing into it, puts the cursor in the
+  source, which is hidden otherwise. `$$` and a space at the start of a
+  paragraph, or Equation in the block menu, makes one, keeping the block's
+  ID.
+- **Labels** set MyST's `label` and `identifier` (normalized like the
+  core's), so `{eq}` references and `(label)=`-style links resolve, and
+  the link picker finds equations by their source like any block.
+- **Numbers** are a CSS counter over the note's equations, skipping any
+  with `enumerated: false`. They match mystmd's numbering for one note; a
+  numbering projection across a document's parts can come later.
+- **Errors:** LaTeX KaTeX can't parse shows as source in red, with the
+  message, and saves unchanged.
+
 ## Tests
 
 - `cargo test -p lv-desktop`:
@@ -189,7 +219,8 @@ preview can't import or export.
   insert, retarget, remove, find by ID) and the preview backend's link
   queries. The editor traces include adding, retargeting and removing
   links. `test/search.test.ts`: highlighting, snippets, and the preview
-  backend's search.
+  backend's search. `test/math.test.ts`: math conversion, labels, the
+  `$…$` rule, and the math commands.
 
 ## Still open
 
@@ -208,6 +239,9 @@ preview can't import or export.
   (`**slo**w`) matches only by its fragments, and code and math blocks
   match by their source. Search has no filters yet (by note, by block kind,
   by relation).
+- **Math macros:** `\newcommand` works inside one equation, but there are
+  no project-wide macros yet (CLAUDE.md: macros are project state). Nor is
+  there a visual math editor; source with a live preview is the first cut.
 - **Images:** relative URLs don't resolve to project assets.
 - **Cost per save** is O(document): the whole tree is serialized and
   reconciled. That is fine for notes; long drafts may want per-block saves.

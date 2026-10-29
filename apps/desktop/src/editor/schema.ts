@@ -159,6 +159,7 @@ export const schema = new Schema({
       code: true,
       defining: true,
       attrs: ided,
+      // The editor shows it with a node view (math.ts); this is for copying.
       toDOM: (n) => ["pre", { class: "math", ...idAttr(n) }, 0],
       parseDOM: [{ tag: "pre.math", preserveWhitespace: "full", priority: 60 }],
     },
@@ -200,6 +201,18 @@ export const schema = new Schema({
       attrs: { json: { default: null } },
       toDOM: (n) => opaqueDOM(n, "span"),
       parseDOM: [{ tag: "span.opaque[data-myst]", getAttrs: (d) => parseMyst(d as HTMLElement) }],
+    },
+
+    /** MyST `inlineMath`: its LaTeX source is `value`; shown rendered (math.ts). */
+    inlineMath: {
+      group: "inline",
+      inline: true,
+      atom: true,
+      selectable: true,
+      draggable: true,
+      attrs: { value: { default: "" }, extra: { default: null } },
+      toDOM: (n) => ["span", { class: "math-inline", "data-latex": n.attrs.value }, n.attrs.value],
+      parseDOM: [{ tag: "span.math-inline[data-latex]", getAttrs: (d) => ({ value: (d as HTMLElement).getAttribute("data-latex") ?? "" }) }],
     },
 
     break: {

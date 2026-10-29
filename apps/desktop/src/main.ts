@@ -461,7 +461,9 @@ function refreshToolbar() {
   ui.blockType.disabled = inTitle;
   ui.blockType.value = inTitle
     ? ""
-    : parent.type === schema.nodes.heading ? `h${parent.attrs.depth}` : parent.type === schema.nodes.code ? "code" : "p";
+    : parent.type === schema.nodes.heading
+      ? `h${parent.attrs.depth}`
+      : parent.type === schema.nodes.code ? "code" : parent.type === schema.nodes.math ? "math" : "p";
   for (const button of ui.toolbar.querySelectorAll<HTMLButtonElement>("button[data-command]")) {
     const command = (commands as any)[button.dataset.command!];
     button.disabled = inTitle || !command(editor.view.state);
@@ -477,7 +479,12 @@ function run(command: (state: any, dispatch?: any) => boolean) {
 
 ui.blockType.onchange = () => {
   const value = ui.blockType.value;
-  run(value === "p" ? commands.paragraph : value === "code" ? commands.code : commands.heading(Number(value.slice(1))));
+  run(
+    value === "p" ? commands.paragraph
+    : value === "code" ? commands.code
+    : value === "math" ? commands.math
+    : commands.heading(Number(value.slice(1))),
+  );
 };
 ui.toolbar.addEventListener("mousedown", (e) => {
   const button = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-command]");

@@ -9,6 +9,7 @@ import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-li
 import { type Command, type EditorState, Plugin, Selection, TextSelection, type Transaction } from "prosemirror-state";
 import { newNodeId } from "./ids";
 import { LINK_REQUEST, brokenLinksPlugin, flashPlugin, requestLink } from "./links";
+import { INLINE_MATH_RULE, enterMath, insertInlineMath, mathPlugin } from "./math";
 import { claimMystIds, mapMystIds, mystIds } from "./myst";
 import { schema } from "./schema";
 
@@ -157,6 +158,8 @@ export const commands = {
   paragraph: setBlockType(n.paragraph),
   heading: (depth: number) => setBlockType(n.heading, { depth }),
   code: setBlockType(n.code),
+  math: setBlockType(n.math),
+  inlineMath: insertInlineMath,
   quote: wrapIn(n.blockquote),
   bullets: wrapIn(n.list, { ordered: null }),
   numbers: wrapIn(n.list, { ordered: true }),
@@ -208,6 +211,14 @@ function rules() {
     rules: [
       textblockTypeRule(/^(#{1,6})\s$/, n.heading, (match) => ({ depth: match[1].length })),
       textblockTypeRule(/^```$/, n.code),
+      // `$$ ` starts a display equation, `$x$` makes inline math.
+      textblockTypeRule(/^\$\$\s$/, n.math),
+      new InputRule(INLINE_MATH_RULE, (state, match, start, end) => {
+        const from = start + match[1].length;
+        const $from = state.doc.resolve(from);
+        if (!$from.parent.canReplaceWith($from.index(), $from.index(), n.inlineMath)) return null;
+        return state.tr.replaceRangeWith(from, end, n.inlineMath.create({ value: match[2] }, null, $from.marks()));
+      }),
       wrappingInputRule(/^\s*>\s$/, n.blockquote),
       wrappingInputRule(/^\s*([-+*])\s$/, n.list, { ordered: null }),
       wrappingInputRule(
@@ -237,6 +248,7 @@ export function plugins(): Plugin[] {
       "Mod-b": commands.strong,
       "Mod-i": commands.emphasis,
       "Mod-e": commands.inlineCode,
+      "Shift-Mod-e": commands.inlineMath,
       "Mod-k": requestLink,
       "Mod-Alt-0": commands.paragraph,
       "Mod-Alt-1": commands.heading(1),
@@ -245,8 +257,10 @@ export function plugins(): Plugin[] {
       "Shift-Enter": chainCommands(exitCode, insertBreak),
       "Mod-Enter": leaveCode("anywhere"),
       Enter: chainCommands(leaveCode("emptyLine"), splitListItem(n.listItem)),
-      ArrowDown: leaveCode("lastLine"),
-      ArrowRight: leaveCode("atEnd"),
+      ArrowDown: chainCommands(enterMath("down"), leaveCode("lastLine")),
+      ArrowRight: chainCommands(enterMath("right"), leaveCode("atEnd")),
+      ArrowUp: enterMath("up"),
+      ArrowLeft: enterMath("left"),
       Tab: sinkListItem(n.listItem),
       "Shift-Tab": liftListItem(n.listItem),
     }),
@@ -255,5 +269,6 @@ export function plugins(): Plugin[] {
     idPlugin,
     flashPlugin,
     brokenLinksPlugin,
+    mathPlugin,
   ];
 }
