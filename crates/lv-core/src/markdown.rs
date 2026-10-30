@@ -21,6 +21,10 @@
 //! wikilink becomes a `link` with a `_wikilink` field, and a block ID a
 //! `_block_id` field, for the folder importer (`import.rs`) to resolve; it
 //! removes them. Anything unrecognized stays as text: nothing is dropped.
+//!
+//! Notion's Markdown export writes callouts as `<aside>` HTML around
+//! Markdown, which become `note` admonitions, and may write inline equations
+//! as `` $`x`$ ``, which become inline math like `$x$`.
 
 use serde_json::{Map, Value, json};
 
@@ -33,6 +37,8 @@ pub enum Dialect {
     Myst,
     /// Obsidian: CommonMark plus wikilinks, block IDs and `%%` comments.
     Obsidian,
+    /// A Notion export: CommonMark plus `<aside>` callouts.
+    Notion,
 }
 
 /// Admonition kinds MyST knows as directives.
@@ -42,6 +48,7 @@ const ADMONITIONS: [&str; 11] =
 /// Parses `text` into a MyST `root` (as JSON), without node IDs.
 pub fn parse(text: &str, dialect: Dialect) -> Value {
     let source = colon_fences(text);
+    let source = if dialect == Dialect::Notion { one_line_math(&source) } else { source };
     let mut options = markdown::ParseOptions::gfm();
     options.constructs.math_flow = true;
     options.constructs.math_text = true;
@@ -104,6 +111,29 @@ fn colon_fences(text: &str) -> String {
             out.push_str(&format!("{}\n", "`".repeat(colons + 3)));
         } else {
             out.push_str(line);
+        }
+    }
+    out
+}
+
+/// Splits `$$x$$` alone on a line (outside code) into a `$$` fence, which
+/// CommonMark reads as display math; otherwise it would be inline math.
+fn one_line_math(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut fence: Option<String> = None;
+    for line in text.split_inclusive('\n') {
+        let trimmed = line.trim();
+        let ticks: String = trimmed.chars().take_while(|&c| c == '`' || c == '~').collect();
+        if ticks.len() >= 3 {
+            match &fence {
+                Some(open) if trimmed == open.as_str() => fence = None,
+                None => fence = Some(ticks),
+                _ => {}
+            }
+        }
+        match trimmed.strip_prefix("$$").and_then(|t| t.strip_suffix("$$")).filter(|m| fence.is_none() && !m.trim().is_empty() && !m.contains('$')) {
+            Some(math) => out.push_str(&format!("$$\n{}\n$$\n", math.trim())),
+            None => out.push_str(line),
         }
     }
     out
@@ -218,7 +248,18 @@ impl Reader {
     /// into targets, comments and block breaks.
     fn flow(&mut self, nodes: Vec<Value>, top: bool) -> Vec<Value> {
         let mut out: Vec<Value> = Vec::new();
-        for node in nodes {
+        let mut nodes = nodes.into_iter();
+        while let Some(node) = nodes.next() {
+            if self.dialect == Dialect::Notion
+                && let Some(open) = aside_open(&node)
+            {
+                let (callout, rest) = self.aside(open, nodes.as_slice());
+                if let Some(callout) = callout {
+                    out.push(callout);
+                    nodes = rest.into_iter();
+                    continue;
+                }
+            }
             match ty(&node) {
                 "definition" => {}
                 "paragraph" => self.paragraph(node, top, &mut out),
@@ -291,6 +332,7 @@ impl Reader {
         let line = match self.dialect {
             Dialect::Myst => line,
             Dialect::Obsidian => line.strip_prefix("%%")?.strip_suffix("%%")?.trim(),
+            Dialect::Notion => return None,
         };
         line.strip_prefix('(').and_then(|l| l.strip_suffix(")=")).map(str::to_owned)
     }
@@ -331,6 +373,7 @@ impl Reader {
                     json!({ "type": "mystComment", "value": inner })
                 }
             }
+            Dialect::Notion => return None,
         };
         let mut pieces = vec![Special::Node(node)];
         if !rest.trim().is_empty() {
@@ -441,6 +484,49 @@ impl Reader {
         Some(out)
     }
 
+    /// A Notion callout: `<aside>`, Markdown, `</aside>`. CommonMark ends an
+    /// HTML block at a blank line, so the Markdown between arrives parsed
+    /// and the tags arrive as HTML holding the lines next to them. `open` is
+    /// what follows `<aside>`; `after` the nodes after it. Returns the
+    /// callout and the nodes after `</aside>`, or no callout if it never
+    /// closes.
+    fn aside(&mut self, open: &str, after: &[Value]) -> (Option<Value>, Vec<Value>) {
+        let parsed = |text: &str| -> Vec<Value> {
+            let inner = parse(text, Dialect::Notion);
+            inner.get("children").and_then(Value::as_array).cloned().unwrap_or_default()
+        };
+        let close = |text: &str| text.rfind("</aside>");
+        let callout = |children: Vec<Value>| json!({ "type": "admonition", "kind": "note", "children": children });
+        let depth = |text: &str| text.matches("<aside").count() as i64 - text.matches("</aside>").count() as i64;
+        let mut level = 1 + depth(open);
+        if level <= 0 {
+            // Opened and closed in one HTML block.
+            let end = close(open).unwrap_or(open.len());
+            return (Some(callout(parsed(&open[..end]))), after.to_vec());
+        }
+        for (i, node) in after.iter().enumerate() {
+            if ty(node) != "html" {
+                continue;
+            }
+            let value = s(node, "value").unwrap_or("");
+            level += depth(value);
+            if level <= 0 {
+                let end = close(value).unwrap_or(value.len());
+                let mut children = parsed(open);
+                children.extend(self.flow(after[..i].to_vec(), false));
+                children.extend(parsed(&value[..end]));
+                let mut rest = Vec::new();
+                let tail = value[end..].trim_start_matches("</aside>");
+                if !tail.trim().is_empty() {
+                    rest.push(json!({ "type": "html", "value": tail.trim() }));
+                }
+                rest.extend(after[i + 1..].iter().cloned());
+                return (Some(callout(children)), rest);
+            }
+        }
+        (None, after.to_vec())
+    }
+
     /// A MyST directive from its fence: known ones become their MyST nodes,
     /// the rest a `mystDirective` holding its source.
     fn directive(&mut self, name: &str, args: &str, body: &str) -> Value {
@@ -531,6 +617,7 @@ impl Reader {
     // ---- Inline -------------------------------------------------------------
 
     fn inline(&mut self, nodes: Vec<Value>) -> Vec<Value> {
+        let nodes = if self.dialect == Dialect::Notion { dollar_code_math(nodes) } else { nodes };
         let mut out: Vec<Value> = Vec::new();
         let mut iter = nodes.into_iter().peekable();
         while let Some(mut node) = iter.next() {
@@ -643,6 +730,56 @@ impl Reader {
         }
         merge_text(out)
     }
+}
+
+/// What follows `<aside>` (or `<aside ...>`) in an HTML node that opens a
+/// Notion callout.
+fn aside_open(node: &Value) -> Option<&str> {
+    if ty(node) != "html" {
+        return None;
+    }
+    let rest = s(node, "value")?.trim_start().strip_prefix("<aside")?;
+    if !rest.starts_with(['>', ' ', '\n']) {
+        return None;
+    }
+    Some(&rest[rest.find('>')? + 1..])
+}
+
+/// `` $`x`$ `` (GitLab and GitHub's inline math with backticks) → inline
+/// math. markdown-rs reads it as math holding the code span, or as `$`,
+/// code, `$`, depending on what is around it.
+fn dollar_code_math(nodes: Vec<Value>) -> Vec<Value> {
+    let mut out: Vec<Value> = Vec::with_capacity(nodes.len());
+    let mut iter = nodes.into_iter().peekable();
+    while let Some(mut node) = iter.next() {
+        if ty(&node) == "inlineMath"
+            && let Some(inner) = s(&node, "value").and_then(|v| v.strip_prefix('`')).and_then(|v| v.strip_suffix('`'))
+            && !inner.is_empty()
+        {
+            node["value"] = Value::String(inner.to_owned());
+        }
+        let opens = ty(&node) == "text" && s(&node, "value").is_some_and(|v| v.ends_with('$'));
+        if opens
+            && iter.peek().is_some_and(|n| ty(n) == "inlineCode")
+            && let Some(code) = iter.next()
+        {
+            if iter.peek().is_some_and(|n| ty(n) == "text" && s(n, "value").is_some_and(|v| v.starts_with('$'))) {
+                let before = s(&node, "value").unwrap_or("");
+                out.push(text_node(&before[..before.len() - 1]));
+                out.push(json!({ "type": "inlineMath", "value": s(&code, "value").unwrap_or("") }));
+                let mut after = iter.next().unwrap();
+                let rest = s(&after, "value").unwrap_or("")[1..].to_owned();
+                after["value"] = Value::String(rest);
+                out.push(after);
+            } else {
+                out.push(node);
+                out.push(code);
+            }
+            continue;
+        }
+        out.push(node);
+    }
+    out
 }
 
 /// `<sub>`, `<sup>` and `<u>` around inline content → subscript,
@@ -969,6 +1106,26 @@ mod tests {
         assert_eq!((b[1]["type"].as_str(), b[1]["kind"].as_str()), (Some("proof"), Some("theorem")));
         assert_eq!(b[2]["_block_id"], "code-id");
         assert_eq!(blocks[1]["children"][0], json!({ "type": "mystComment", "value": "a comment" }));
+    }
+
+    #[test]
+    fn notion_callouts_and_math() {
+        let text = "Inline $a^2$, $`b_1`$ and $$c$$.\n\n$$\nE = mc^2\n$$\n\n$$ F = ma $$\n\n<aside>\n💡 A *callout*.\n\nSecond paragraph.\n\n</aside>\n\n<aside>\nOne block.\n</aside>\n\n<aside>\nNever closed.\n\nAfter.";
+        let mut b = body(text, Dialect::Notion);
+        let p = &b[0]["children"];
+        let math: Vec<&str> = p.as_array().unwrap().iter().filter(|n| n["type"] == "inlineMath").map(|n| n["value"].as_str().unwrap()).collect();
+        assert_eq!(math, ["a^2", "b_1", "c"], "{p}");
+        assert_eq!((b[1]["type"].as_str(), b[1]["value"].as_str()), (Some("math"), Some("E = mc^2")));
+        assert_eq!((b[2]["type"].as_str(), b[2]["value"].as_str()), (Some("math"), Some("F = ma")));
+        b.as_array_mut().unwrap().remove(2);
+        assert_eq!((b[2]["type"].as_str(), b[2]["kind"].as_str()), (Some("admonition"), Some("note")));
+        assert_eq!(b[2]["children"][0]["children"][0]["value"], "💡 A ");
+        assert_eq!(b[2]["children"][0]["children"][1]["type"], "emphasis");
+        assert_eq!(b[2]["children"][1]["children"][0]["value"], "Second paragraph.");
+        assert_eq!(b[3]["children"][0]["children"][0]["value"], "One block.");
+        // An aside that never closes stays as written.
+        assert_eq!(b[4]["type"], "html");
+        assert_eq!(b[5]["children"][0]["value"], "After.");
     }
 
     #[test]

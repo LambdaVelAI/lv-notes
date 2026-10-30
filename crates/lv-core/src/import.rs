@@ -1,5 +1,5 @@
-//! Importing a folder of Markdown: a Jupyter Book 2 project or an Obsidian
-//! vault, as one batch of ops that creates a note per file.
+//! Importing a folder of Markdown: a Jupyter Book 2 project, an Obsidian
+//! vault or a Notion export, as one batch of ops that creates a note per file.
 //!
 //! Files are parsed with [`crate::markdown`], then:
 //!
@@ -10,7 +10,12 @@
 //!   already uses is replaced, so importing twice makes two copies;
 //! - links between files become ID links: `[x](other.md#label)` and
 //!   `[[Other#Heading]]`, `[[Other#^block]]` point at `doc_…` or `node_…`.
-//!   A wikilink to a note that isn't in the folder stays text.
+//!   A wikilink to a note that isn't in the folder stays text;
+//! - a Notion export names each page `Title <32 hex id>.md` and starts it
+//!   with `# Title`; the heading becomes the note's title, the id goes, and
+//!   links to a page are found by path, then by its id (Notion's own
+//!   `notion.so/...-<id>` URLs too). A database page's `Key: value`
+//!   property lines become frontmatter.
 //!
 //! Nothing here touches the file system: the caller reads the folder.
 
@@ -33,6 +38,8 @@ pub enum FolderFormat {
     Book,
     /// An Obsidian vault.
     Obsidian,
+    /// A Notion export (Markdown & CSV, unzipped).
+    Notion,
 }
 
 /// A file read from the folder. `path` is relative to the folder, with `/`.
@@ -55,7 +62,8 @@ pub struct FolderImport {
     /// One batch: provisional declarations for unknown kinds, then each note.
     pub ops: Vec<OpBody>,
     pub notes: Vec<ImportedNote>,
-    /// Files that were not imported (notebooks, for now).
+    /// Files that were not imported (notebooks and Notion database tables,
+    /// for now).
     pub skipped: Vec<String>,
     /// Links to notes or blocks that aren't in the folder.
     pub unresolved: usize,
@@ -66,6 +74,7 @@ pub fn import_folder(state: &ProjectState, format: FolderFormat, files: &[Source
     let dialect = match format {
         FolderFormat::Book => Dialect::Myst,
         FolderFormat::Obsidian => Dialect::Obsidian,
+        FolderFormat::Notion => Dialect::Notion,
     };
     let is_markdown = |p: &str| p.ends_with(".md") || p.ends_with(".markdown");
     let config = files.iter().find(|f| f.path == "myst.yml").and_then(|f| yaml_to_json(&f.text));
@@ -106,6 +115,13 @@ pub fn import_folder(state: &ProjectState, format: FolderFormat, files: &[Source
                 }
                 title.unwrap_or(stem)
             }
+            FolderFormat::Notion => {
+                let title = notion_title(&mut tree).unwrap_or_else(|| notion_name(&stem).0.to_owned());
+                if let Some(columns) = database_columns(files, &file.path) {
+                    notion_properties(&mut tree, &columns);
+                }
+                title
+            }
         };
         notes.push(ImportedNote { doc: DocumentId::new(), title, path: file.path.clone() });
         trees.push(tree);
@@ -115,7 +131,11 @@ pub fn import_folder(state: &ProjectState, format: FolderFormat, files: &[Source
     for (note, tree) in notes.iter().zip(trees.iter_mut()) {
         ids.assign(note.doc, tree);
     }
-    let resolver = Resolver { notes: &notes, anchors: &ids.anchors, known: &ids.used };
+    let pages = match format {
+        FolderFormat::Notion => notes.iter().enumerate().filter_map(|(i, n)| Some((notion_name(stem(&n.path)).1?.to_owned(), i))).collect(),
+        _ => HashMap::new(),
+    };
+    let resolver = Resolver { notes: &notes, anchors: &ids.anchors, known: &ids.used, pages };
     let mut unresolved = 0;
     for (i, tree) in trees.iter_mut().enumerate() {
         unresolved += resolver.links(i, tree);
@@ -139,6 +159,101 @@ fn toc_files(toc: &Value, out: &mut Vec<String>) {
         if let Some(children) = entry.get("children") {
             toc_files(children, out);
         }
+    }
+}
+
+/// A Notion file stem → (title, id): `Reading notes 1a2b…` (32 hex digits).
+fn notion_name(stem: &str) -> (&str, Option<&str>) {
+    match stem.rsplit_once(' ') {
+        Some((title, id)) if id.len() == 32 && id.bytes().all(|b| b.is_ascii_hexdigit()) => (title, Some(id)),
+        _ => (stem, None),
+    }
+}
+
+/// The 32-hex id that ends a Notion URL or file path, before any `.md`,
+/// query or fragment: `…/Reading-notes-1a2b…?pvs=4`, `Reading%20notes%201a2b….md`.
+fn notion_id(url: &str) -> Option<String> {
+    let path = url.split(['?', '#']).next().unwrap_or(url);
+    let path = path.strip_suffix(".md").unwrap_or(path);
+    let tail = path.get(path.len().checked_sub(32)?..)?;
+    let before = path[..path.len() - 32].chars().next_back();
+    (tail.bytes().all(|b| b.is_ascii_hexdigit()) && before.is_none_or(|c| matches!(c, '/' | '-' | ' ')))
+        .then(|| tail.to_lowercase())
+}
+
+/// Takes a leading `# Title` out of a Notion page and returns its text.
+fn notion_title(tree: &mut Value) -> Option<String> {
+    let children = tree.get_mut("children").and_then(Value::as_array_mut)?;
+    let first = children.first().filter(|h| ty(h) == "heading" && h.get("depth").and_then(Value::as_u64) == Some(1))?;
+    let title = plain(first).trim().to_owned();
+    children.remove(0);
+    (!title.is_empty()).then_some(title)
+}
+
+/// The columns of the database `path` is a page of: Notion writes a
+/// database as `Name <id>.csv` (and `Name <id>_all.csv`) beside a folder
+/// `Name <id>/` of its pages.
+fn database_columns(files: &[SourceFile], path: &str) -> Option<Vec<String>> {
+    let (folder, _) = path.rsplit_once('/')?;
+    let csv = [format!("{folder}.csv"), format!("{folder}_all.csv")];
+    let file = files.iter().find(|f| csv.contains(&f.path))?;
+    let header = file.text.trim_start_matches('\u{feff}').lines().next()?;
+    Some(csv_row(header))
+}
+
+/// One CSV line's fields (quotes, and `""` inside them).
+fn csv_row(line: &str) -> Vec<String> {
+    let mut fields = vec![String::new()];
+    let mut quoted = false;
+    let mut chars = line.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            '"' if quoted && chars.peek() == Some(&'"') => {
+                chars.next();
+                fields.last_mut().unwrap().push('"');
+            }
+            '"' => quoted = !quoted,
+            ',' if !quoted => fields.push(String::new()),
+            c => fields.last_mut().unwrap().push(c),
+        }
+    }
+    fields.into_iter().map(|f| f.trim().to_owned()).collect()
+}
+
+/// A database page's `Key: value` lines at its top, each naming a column,
+/// become frontmatter. The first line that isn't one, or that holds a link
+/// or formatting (a relation, say), stays in the page with the rest, so
+/// nothing is lost.
+fn notion_properties(tree: &mut Value, columns: &[String]) {
+    let mut properties = serde_json::Map::new();
+    let Some(children) = tree.get_mut("children").and_then(Value::as_array_mut) else { return };
+    while let Some(first) = children.first_mut().filter(|p| ty(p) == "paragraph") {
+        let Some(inline) = first.get_mut("children").and_then(Value::as_array_mut) else { break };
+        let only_text = inline.len() == 1;
+        let Some(value) = inline.first().filter(|t| ty(t) == "text").map(plain) else { break };
+        let mut taken = 0;
+        for line in value.split_inclusive('\n') {
+            let whole = line.ends_with('\n') || only_text;
+            let Some((key, v)) = line.split_once(": ").filter(|(key, _)| whole && columns.iter().any(|c| c == key.trim())) else { break };
+            properties.insert(key.trim().to_owned(), json!(v.trim()));
+            taken += line.len();
+        }
+        if taken == 0 {
+            break;
+        }
+        if taken < value.len() {
+            inline[0]["value"] = json!(value[taken..]);
+            break;
+        }
+        inline.remove(0);
+        if inline.is_empty() {
+            children.remove(0);
+        } else {
+            break;
+        }
+    }
+    if !properties.is_empty() {
+        tree["frontmatter"] = Value::Object(properties);
     }
 }
 
@@ -236,6 +351,8 @@ struct Resolver<'a> {
     anchors: &'a HashMap<(DocumentId, String), NodeId>,
     /// Every node ID this import gives out.
     known: &'a HashSet<NodeId>,
+    /// Notion page id → note, for a Notion export.
+    pages: HashMap<String, usize>,
 }
 
 impl Resolver<'_> {
@@ -307,6 +424,13 @@ impl Resolver<'_> {
         if let Some(label) = url.strip_prefix("#node-") {
             return Some(exported_id(&format!("node-{label}")).filter(|id| self.known.contains(id)).map(|id| id.to_string()));
         }
+        if !self.pages.is_empty()
+            && (url.contains("notion.so/") || url.contains("notion.site/"))
+            && let Some(&page) = notion_id(url).and_then(|id| self.pages.get(&id))
+        {
+            // A Notion URL to a page that is in the export.
+            return Some(Some(self.notes[page].doc.to_string()));
+        }
         if url.is_empty() || url.starts_with('#') || url.starts_with('/') || url.contains("://") || url.starts_with("mailto:") {
             return None;
         }
@@ -318,7 +442,10 @@ impl Resolver<'_> {
         let here = &self.notes[from].path;
         let dir = here.rsplit_once('/').map_or("", |(d, _)| d);
         let joined = join(dir, path);
-        let Some(note) = self.notes.iter().find(|n| path_key(&n.path) == path_key(&joined)) else { return Some(None) };
+        let by_path = self.notes.iter().find(|n| path_key(&n.path) == path_key(&joined));
+        // Notion links name the page's id, which also finds it if the path is off.
+        let by_id = || notion_id(path).and_then(|id| self.pages.get(&id)).map(|&i| &self.notes[i]);
+        let Some(note) = by_path.or_else(by_id) else { return Some(None) };
         let node = fragment.and_then(|f| {
             exported_id(f)
                 .filter(|id| self.known.contains(id))

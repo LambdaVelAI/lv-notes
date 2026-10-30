@@ -93,14 +93,17 @@ export interface RegistryEntry {
 }
 
 /** A folder format for import and export. */
-export type FolderFormat = "book" | "obsidian";
+export type FolderFormat = "book" | "obsidian" | "notion";
+
+/** Folder formats the app can also write. */
+export type ExportFormat = Exclude<FolderFormat, "notion">;
 
 /** What a folder import brought in. */
 export interface ImportedFolder {
   notes: number;
   /** The first note, to open. */
   first: string | null;
-  /** Files left out (notebooks, for now). */
+  /** Files left out (notebooks and Notion database tables, for now). */
   skipped: string[];
   /** Links to notes or blocks that weren't in the folder. */
   unresolved: number;
@@ -137,8 +140,8 @@ export interface Backend {
    * Asks for a folder and writes every note into a new folder there, as a
    * Jupyter Book or an Obsidian vault; null if cancelled.
    */
-  exportProject(format: FolderFormat): Promise<Exported | null>;
-  /** Asks for a Jupyter Book or Obsidian vault folder and imports its notes; null if cancelled. */
+  exportProject(format: ExportFormat): Promise<Exported | null>;
+  /** Asks for a Jupyter Book, Obsidian vault or Notion export folder and imports its notes; null if cancelled. */
   importFolder(format: FolderFormat): Promise<ImportedFolder | null>;
   /** Asks where to save `doc` as Markdown; null if cancelled. */
   exportDocument(doc: string, title: string): Promise<Exported | null>;
@@ -193,7 +196,12 @@ async function tauriBackend(): Promise<Backend> {
       return dir ? call("export_project", { dir, format }) : null;
     },
     async importFolder(format) {
-      const title = format === "book" ? "Import a Jupyter Book folder" : "Import an Obsidian vault";
+      const titles: Record<FolderFormat, string> = {
+        book: "Import a Jupyter Book folder",
+        obsidian: "Import an Obsidian vault",
+        notion: "Import a Notion export (unzipped)",
+      };
+      const title = titles[format];
       const dir = await dialog.open({ title, directory: true, multiple: false });
       return dir ? call("import_folder", { dir, format }) : null;
     },

@@ -204,7 +204,7 @@ fn export_project(state: State<App>, dir: PathBuf, format: FolderFormat) -> Repl
     state.with(|s| s.export_project(&dir, format))
 }
 
-/// Imports a Jupyter Book or Obsidian vault in `dir` as new notes.
+/// Imports a Jupyter Book, Obsidian vault or Notion export in `dir` as new notes.
 #[tauri::command]
 fn import_folder<R: Runtime>(app: AppHandle<R>, state: State<App>, dir: PathBuf, format: FolderFormat) -> Reply<ImportedFolder> {
     state.with(|s| {

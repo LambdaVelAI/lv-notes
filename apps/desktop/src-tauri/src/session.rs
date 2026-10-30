@@ -57,6 +57,9 @@ pub enum Error {
     /// Writing an export failed.
     #[error("{0}: {1}")]
     Io(PathBuf, std::io::Error),
+    /// Something the app can't do (yet), like exporting to Notion.
+    #[error("{0}")]
+    Unsupported(&'static str),
 }
 
 impl Error {
@@ -68,6 +71,7 @@ impl Error {
             Error::Import(_) | Error::Materialize(_) | Error::BadTree(_) => "INVALID_DOCUMENT".into(),
             Error::StaleBase { .. } => "STALE_BASE".into(),
             Error::Io(..) => "IO".into(),
+            Error::Unsupported(_) => "UNSUPPORTED".into(),
         }
     }
 }
@@ -178,6 +182,8 @@ pub enum FolderFormat {
     Book,
     /// An Obsidian vault.
     Obsidian,
+    /// A Notion export (Markdown & CSV, unzipped). Import only.
+    Notion,
 }
 
 /// What a folder import brought in.
@@ -186,13 +192,15 @@ pub struct Imported {
     pub notes: usize,
     /// The first note, to open.
     pub first: Option<DocumentId>,
-    /// Files left out (notebooks, for now), relative to the folder.
+    /// Files left out (notebooks and Notion database tables, for now),
+    /// relative to the folder.
     pub skipped: Vec<String>,
     /// Links to notes or blocks that aren't in the folder.
     pub unresolved: usize,
 }
 
-/// Files an import reads: Markdown, notebooks (to report them) and
+/// Files an import reads: Markdown, notebooks and CSV (to report them;
+/// a Notion database's header also names its pages' properties) and
 /// `myst.yml`. Hidden folders (`.obsidian`, `.git`), build output and
 /// anything over 5 MB are left out.
 fn read_folder(dir: &Path) -> Result<Vec<lv_core::import::SourceFile>> {
@@ -213,7 +221,7 @@ fn read_folder(dir: &Path) -> Result<Vec<lv_core::import::SourceFile>> {
                 stack.push(path);
                 continue;
             }
-            let wanted = name.ends_with(".md") || name.ends_with(".markdown") || name.ends_with(".ipynb") || (name == "myst.yml" && folder == dir);
+            let wanted = name.ends_with(".md") || name.ends_with(".markdown") || name.ends_with(".ipynb") || name.ends_with(".csv") || (name == "myst.yml" && folder == dir);
             if !wanted || meta.len() > MAX_BYTES {
                 continue;
             }
@@ -463,6 +471,7 @@ impl Session {
         let (base, files) = match format {
             FolderFormat::Book => (lv_core::export::slug(&name), lv_core::export::jupyter_book(self.state(), &name)),
             FolderFormat::Obsidian => (lv_core::export::obsidian_name(&name), lv_core::export::obsidian_vault(self.state())),
+            FolderFormat::Notion => return Err(Error::Unsupported("Notion is an import format only")),
         };
         let mut folder = dir.join(&base);
         let mut n = 2;
@@ -479,13 +488,15 @@ impl Session {
         Ok(Exported { path: folder, files: notes })
     }
 
-    /// Imports a Jupyter Book or an Obsidian vault in `dir` as new notes,
+    /// Imports a Jupyter Book, an Obsidian vault or a Notion export in `dir`
+    /// as new notes,
     /// in one batch: all of it or none.
     pub fn import_folder(&mut self, dir: &Path, format: FolderFormat) -> Result<(Imported, Change)> {
         let files = read_folder(dir)?;
         let format = match format {
             FolderFormat::Book => lv_core::import::FolderFormat::Book,
             FolderFormat::Obsidian => lv_core::import::FolderFormat::Obsidian,
+            FolderFormat::Notion => lv_core::import::FolderFormat::Notion,
         };
         let import = lv_core::import::import_folder(self.state(), format, &files)?;
         let first = import.notes.first().map(|n| n.doc);
@@ -856,6 +867,25 @@ mod tests {
             let doc = t.locate(&block.to_string()).unwrap().doc;
             assert_eq!(t.backlinks(doc).unwrap()[0].target, Some(block));
         }
+    }
+
+    #[test]
+    fn imports_a_notion_export() {
+        let (dir, path, me) = project();
+        let export = dir.path().join("Export");
+        let id = "0a1b2c3d4e5f60718293a4b5c6d7e8f9";
+        std::fs::create_dir_all(export.join(format!("Books {id}"))).unwrap();
+        std::fs::write(export.join(format!("Home {id}.md")), format!("# Home\n\nSee [Books](Books%20{id}.csv) and [Euler](Books%20{id}/Euler%20{id}.md).\n")).unwrap();
+        std::fs::write(export.join(format!("Books {id}.csv")), "Name,Year\nEuler,1748\n").unwrap();
+        std::fs::write(export.join(format!("Books {id}/Euler {id}.md")), "# Euler\n\nYear: 1748\n\n$e^{i\\pi} = -1$\n").unwrap();
+
+        let mut s = Session::create(&path, "P", &me).unwrap();
+        let (imported, _) = s.import_folder(&export, FolderFormat::Notion).unwrap();
+        assert_eq!((imported.notes, imported.unresolved), (2, 0));
+        assert_eq!(imported.skipped, [format!("Books {id}.csv")]);
+        let titles: Vec<String> = s.info().unwrap().documents.into_iter().map(|d| d.title).collect();
+        assert!(titles.contains(&"Euler".to_owned()) && titles.contains(&"Home".to_owned()), "{titles:?}");
+        assert_eq!(s.export_project(dir.path(), FolderFormat::Notion).unwrap_err().code(), "UNSUPPORTED");
     }
 
     #[test]

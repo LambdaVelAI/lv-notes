@@ -253,3 +253,81 @@ fn a_handwritten_book() {
     assert!(urls.contains(&(part, intro.to_string())), "{urls:?}");
     assert!(state.nodes().any(|(_, n)| n.content.node_type == "crossReference" && n.content.fields["identifier"] == "sec-a"));
 }
+
+/// Every file under `dir`, as the desktop app reads a folder: paths
+/// relative to it, sorted.
+fn read_tree(dir: &std::path::Path) -> Vec<SourceFile> {
+    let mut files = Vec::new();
+    let mut stack = vec![dir.to_owned()];
+    while let Some(folder) = stack.pop() {
+        for entry in std::fs::read_dir(&folder).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                stack.push(path);
+            } else {
+                let relative = path.strip_prefix(dir).unwrap().to_string_lossy().replace('\\', "/");
+                files.push(SourceFile { path: relative, text: std::fs::read_to_string(&path).unwrap() });
+            }
+        }
+    }
+    files.sort_by(|a, b| a.path.cmp(&b.path));
+    files
+}
+
+#[test]
+fn a_handwritten_notion_export() {
+    let files = read_tree(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/notion"));
+    let mut w = World::new();
+    let imported = import_folder(w.state(), FolderFormat::Notion, &files).unwrap();
+    let titles: Vec<&str> = imported.notes.iter().map(|n| n.title.as_str()).collect();
+    assert_eq!(titles, ["Research", "Fourier series", "Parseval", "Stein and Shakarchi"], "titles from the headings, without ids");
+    let csv = "Research 0a1b2c3d4e5f60718293a4b5c6d7e8f9/Reading list 3c4d5e6f7a8b90a1b2c3d4e5f6a7b8c9";
+    assert_eq!(imported.skipped, [format!("{csv}.csv"), format!("{csv}_all.csv")]);
+    assert_eq!(imported.unresolved, 1, "only the page that isn't in the export");
+    let ids: Vec<DocumentId> = imported.notes.iter().map(|n| n.doc).collect();
+    let [research, fourier, parseval, stein] = ids[..] else { unreachable!() };
+    w.submit(imported.ops);
+
+    let state = w.state();
+    let of = |doc: DocumentId, node_type: &str, field: &str| -> Vec<String> {
+        state
+            .nodes()
+            .filter(|(_, n)| n.document == doc && n.content.node_type == node_type)
+            .map(|(_, n)| n.content.fields[field].as_str().unwrap().to_owned())
+            .collect()
+    };
+    let links = |doc| {
+        let mut urls = of(doc, "link", "url");
+        urls.sort();
+        urls
+    };
+    let sorted = |mut v: Vec<String>| {
+        v.sort();
+        v
+    };
+    // Relative links (into a subfolder, up with `..`) and a notion.so URL
+    // all find their page; the link to a missing page stays as it was.
+    assert!(links(research).contains(&fourier.to_string()), "{:?}", links(research));
+    assert!(links(research).iter().any(|u| u.starts_with("Measure%20theory")));
+    assert_eq!(links(fourier), sorted(vec![research.to_string(), parseval.to_string()]));
+    assert_eq!(links(parseval), [research.to_string()]);
+    assert_eq!(links(stein), [fourier.to_string()]);
+
+    // Math: `$x$` and `` $`x`$ `` inline, `$$` blocks on several lines or one.
+    assert_eq!(sorted(of(fourier, "inlineMath", "value")), sorted(vec!["f".into(), "[0, 2\\pi]".into(), "\\hat f(n)".into(), "L^2".into()]));
+    assert_eq!(of(fourier, "math", "value"), ["\\hat f(n) = \\frac{1}{2\\pi}\\int_0^{2\\pi} f(x)\\, e^{-inx}\\,dx"]);
+    assert_eq!(of(parseval, "math", "value"), ["\\sum_{n} |\\hat f(n)|^2 = \\frac{1}{2\\pi}\\int_0^{2\\pi} |f(x)|^2\\,dx"]);
+    // The callout is a note, with its math.
+    assert_eq!(of(research, "admonition", "kind"), ["note"]);
+    assert_eq!(of(research, "inlineMath", "value"), ["e^{i\\pi} + 1 = 0"]);
+    // The image stays, pointing where it was.
+    assert_eq!(of(fourier, "image", "url"), ["Fourier%20series%201f2e3d4c5b6a79881726354a5b6c7d8e/partial-sums.png"]);
+
+    // Database properties became frontmatter; the relation, a link, stayed.
+    let book = jupyter_book(state, "Research");
+    let page = &book.iter().find(|f| f.doc == Some(stein)).unwrap().markdown;
+    assert!(page.contains("Author: Stein, Shakarchi\n") && page.contains("Status: Reading\n"), "{page}");
+    assert!(page.contains("Related: [Fourier series]("), "{page}");
+    assert!(page.contains("$\\sum_n |a_n|^2 < \\infty$"), "{page}");
+    assert!(!page.contains("# Stein"), "the title heading went: {page}");
+}

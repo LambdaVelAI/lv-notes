@@ -130,7 +130,8 @@ async function importFolder(format: FolderFormat) {
     if (!done) return;
     showProject(done.info);
     const notes = `Imported ${done.notes} ${done.notes === 1 ? "note" : "notes"}`;
-    const skipped = done.skipped.length ? `; skipped ${done.skipped.length} (notebooks aren't imported yet)` : "";
+    const why = format === "notion" ? "database tables aren't imported, only their pages" : "notebooks aren't imported yet";
+    const skipped = done.skipped.length ? `; skipped ${done.skipped.length} (${why})` : "";
     const unresolved = done.unresolved ? `; ${done.unresolved} links point outside the folder` : "";
     if (done.first) await openDocument(done.first);
     setStatus(notes + skipped + unresolved);
@@ -549,6 +550,7 @@ async function start() {
     showMenu(ui.importMenu, [
       ["Jupyter Book folder…", () => void importFolder("book")],
       ["Obsidian vault…", () => void importFolder("obsidian")],
+      ["Notion export folder…", () => void importFolder("notion")],
     ]);
   ui.exportMenu.onclick = () => {
     const o = open;
