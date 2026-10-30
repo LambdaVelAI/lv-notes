@@ -1,0 +1,122 @@
+# Test corpus: real Jupyter Book / MyST projects for exercising the app.
+#
+# Fetch with:  python3 tools/corpus/fetch.py            (all entries)
+#              python3 tools/corpus/fetch.py --tier 1   (smallest, fastest)
+#              python3 tools/corpus/fetch.py mystmd-docs pbdl
+#
+# Fields
+#   repo     GitHub owner/name
+#   ref      branch or tag (default: the repo's default branch)
+#   path     subfolder holding the book (default: repo root); only this is checked out
+#   format   "myst" (Jupyter Book 2 / mystmd, myst.yml) or "jb1" (Sphinx, _config.yml + _toc.yml)
+#   tier     1 = small smoke test, 2 = feature coverage, 3 = scale
+#   tests    what this project is good at exercising (free text, for humans and agents)
+
+[[project]]
+name = "mystmd-quickstart"
+repo = "jupyter-book/mystmd-quickstart"
+format = "myst"
+tier = 1
+tests = "Three files: a paper with math and figures, and a notebook. Fast smoke test."
+
+[[project]]
+name = "quantecon-mini"
+repo = "executablebooks/quantecon-mini-example"
+path = "mini_book"
+format = "jb1"
+tier = 1
+tests = "Citations, numbered equations, numbered figures with captions, cross-references. Small."
+
+[[project]]
+name = "mystmd-docs"
+repo = "jupyter-book/mystmd"
+path = "docs"
+format = "myst"
+tier = 2
+tests = "Documents every MyST feature by using it: subfigures, embeds, tabs, glossaries, proofs, exercises, citations, cross-page refs. The feature-coverage test."
+
+[[project]]
+name = "jupyter-book-docs"
+repo = "jupyter-book/jupyter-book"
+path = "docs"
+format = "myst"
+tier = 2
+tests = "Jupyter Book 2 docs. Admonitions, cards, grids, code blocks, cross-references."
+
+[[project]]
+name = "scipy-proceedings-2026"
+repo = "scipy-conference/scipy_proceedings"
+ref = "2026"
+path = "papers"
+format = "myst"
+tier = 2
+tests = "Many independent MyST articles: author/affiliation frontmatter, bibliographies, figures, math. The single-article and export case."
+
+[[project]]
+name = "sphinx-proof-docs"
+repo = "executablebooks/sphinx-proof"
+path = "docs"
+format = "jb1"
+tier = 2
+tests = "Every prf: directive kind (theorem, lemma, proof, definition, algorithm...) and references to them."
+
+[[project]]
+name = "pbdl"
+repo = "tum-pbs/pbdl-book"
+format = "jb1"
+tier = 2
+tests = "Dense PDE math, many figures, large bibliography, notebooks with outputs."
+
+[[project]]
+name = "climate-laboratory"
+repo = "brian-rose/ClimateLaboratoryBook"
+format = "myst"
+tier = 2
+tests = "Physics derivations mixed with notebook-generated plots."
+
+[[project]]
+name = "teachbooks-manual"
+repo = "TeachBooks/manual"
+ref = "release"
+path = "book"
+format = "jb1"
+tier = 2
+tests = "TU Delft authoring manual: Sphinx extensions in the wild, exercises, interactive content."
+
+[[project]]
+name = "pythia-foundations"
+repo = "ProjectPythia/pythia-foundations"
+format = "myst"
+tier = 2
+tests = "Tutorial book, mostly notebooks: images, code outputs, admonitions."
+
+[[project]]
+name = "quantecon-intro"
+repo = "QuantEcon/lecture-python-intro"
+path = "lectures"
+format = "jb1"
+tier = 3
+tests = "Intro lectures: many pages, math, exercise/solution pairs, generated plots."
+
+[[project]]
+name = "quantecon-python"
+repo = "QuantEcon/lecture-python.myst"
+path = "lectures"
+format = "jb1"
+tier = 3
+tests = "Hundreds of pages, heavy LaTeX, theorems and proofs, cross-page refs. The scale test."
+
+[[project]]
+name = "inferential-thinking"
+repo = "data-8/textbook"
+format = "myst"
+tier = 3
+tests = "Data 8 textbook: many short pages, tables, images, light math."
+
+[[project]]
+name = "turing-way"
+repo = "the-turing-way/the-turing-way"
+path = "book/website"
+format = "jb1"
+tier = 3
+tests = "Very large, many contributors, deep TOC, many images, translations. Navigation and scale, little math."
