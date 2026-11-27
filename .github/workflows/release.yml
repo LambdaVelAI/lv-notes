@@ -55,7 +55,20 @@ jobs:
           API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          UPDATER_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          UPDATER_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: |
+          # The updater bundle (lv-notes.app.tar.gz) must be signed with the
+          # key whose public half is in tauri.conf.json, or installed apps
+          # refuse it. Without the key, build no update at all.
+          updater_config='{}'
+          if [ -n "$UPDATER_KEY" ]; then
+            export TAURI_SIGNING_PRIVATE_KEY="$UPDATER_KEY" TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$UPDATER_KEY_PASSWORD"
+          else
+            echo "::warning::No updater signing key: installed apps won't be offered this release"
+            updater_config='{"bundle":{"createUpdaterArtifacts":false}}'
+          fi
+
           if [ -n "$CERTIFICATE" ]; then
             export APPLE_CERTIFICATE="$CERTIFICATE"
             export APPLE_CERTIFICATE_PASSWORD="$CERTIFICATE_PASSWORD"
@@ -70,7 +83,7 @@ jobs:
           else
             echo "::warning::No signing certificate: building an unsigned app"
           fi
-          npm --prefix apps/desktop run tauri -- build --target universal-apple-darwin --bundles dmg
+          npm --prefix apps/desktop run tauri -- build --target universal-apple-darwin --bundles app,dmg --config "$updater_config"
 
           # Tauri notarizes the app inside; notarize the disk image too, and
           # staple the ticket so it checks out offline.
@@ -81,10 +94,27 @@ jobs:
             xcrun stapler validate "$dmg"
           fi
 
+      # Installed apps poll releases/latest/download/latest.json, which
+      # GitHub serves from the newest published release that is not a
+      # pre-release. So releases are drafts (nothing reaches users until you
+      # publish) but not pre-releases.
       - name: Attach to a draft release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          dmg=$(ls target/universal-apple-darwin/release/bundle/dmg/*.dmg)
-          gh release create "$GITHUB_REF_NAME" "$dmg" \
-            --draft --prerelease --generate-notes --title "lv-notes $VERSION"
+          bundle=target/universal-apple-darwin/release/bundle
+          dmg=$(ls $bundle/dmg/*.dmg)
+          assets=("$dmg")
+          tarball=$bundle/macos/lv-notes.app.tar.gz
+          if [ -f "$tarball.sig" ]; then
+            url="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/lv-notes.app.tar.gz"
+            # One universal build serves both architectures.
+            jq -n --arg version "$VERSION" --arg url "$url" --rawfile sig "$tarball.sig" \
+              --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+              '{version: $version, notes: "lv-notes \($version)", pub_date: $date,
+                platforms: {"darwin-aarch64": {signature: ($sig | rtrimstr("\n")), url: $url},
+                            "darwin-x86_64": {signature: ($sig | rtrimstr("\n")), url: $url}}}' > latest.json
+            assets+=("$tarball" latest.json)
+          fi
+          gh release create "$GITHUB_REF_NAME" "${assets[@]}" \
+            --draft --generate-notes --title "lv-notes $VERSION"

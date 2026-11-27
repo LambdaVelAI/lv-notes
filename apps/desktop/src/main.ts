@@ -573,6 +573,41 @@ async function start() {
   const info = await backend.openLastProject();
   showProject(info);
   if (info?.documents.length) await openDocument(info.documents[0].id);
+
+  // Dev builds would offer the published release over the code being worked on.
+  if (backend.checkForUpdate && !import.meta.env.DEV) {
+    void checkForUpdate();
+    window.setInterval(() => void checkForUpdate(), 6 * 60 * 60 * 1000);
+  }
+}
+
+// ---- Updates ---------------------------------------------------------------------
+
+let installing = false;
+
+/** Offers a newer release in the sidebar; a failed check stays quiet (offline is normal). */
+async function checkForUpdate() {
+  if (installing) return;
+  const update = await backend.checkForUpdate!().catch((e) => (console.warn("update check failed", e), null));
+  const button = $<HTMLButtonElement>("#update");
+  if (!update) return;
+  button.textContent = `Update to ${update.version} and restart`;
+  button.title = update.notes || `lv-notes ${update.version} is available`;
+  button.hidden = false;
+  button.onclick = async () => {
+    installing = true;
+    button.disabled = true;
+    button.textContent = `Downloading ${update.version}…`;
+    try {
+      await flush();
+      await update.install();
+    } catch (e) {
+      installing = false;
+      button.disabled = false;
+      button.textContent = `Update to ${update.version} and restart`;
+      setStatus(`Couldn't update: ${e}`, "error");
+    }
+  };
 }
 
 void start().catch((e) => {

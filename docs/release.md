@@ -2,8 +2,10 @@
 
 Pushing a version tag builds the app on GitHub Actions
 (`.github/workflows/release.yml`) for Apple Silicon and Intel in one
-universal `.dmg`, and attaches it to a **draft** pre-release. Nothing is
-public until you publish the draft.
+universal `.dmg`, and attaches it to a **draft** release, together with
+the signed update bundle and `latest.json` that installed apps check for
+updates. Nothing is public until you publish the draft, and publishing it
+is what offers the update to everyone running an older version.
 
 ## Cutting a release
 
@@ -22,7 +24,39 @@ public until you publish the draft.
    ```
 
 3. When the workflow finishes, open the draft on the repository's Releases
-   page, check the notes and the `.dmg`, and publish it.
+   page, check the notes and the `.dmg`, and publish it. Don't tick
+   "Set as a pre-release": the updater reads
+   `releases/latest/download/latest.json`, and GitHub's "latest" skips
+   pre-releases, so a pre-release reaches nobody's installed app.
+
+## Updates
+
+The app (0.1.2 and later) checks for a newer release at launch and every
+six hours, and shows **Update to x.y.z and restart** in the sidebar. A click
+saves the open note, downloads the update, checks its signature against the
+public key in `tauri.conf.json` (`plugins.updater.pubkey`), replaces the app
+and restarts. A failed check (offline, say) is silent. Dev builds never
+check.
+
+Anyone still on 0.1.1 or earlier has no updater: they download the new
+`.dmg` once and drag it over the old app.
+
+### The updater signing key (one-time setup)
+
+Updates are signed with a minisign key, separate from the Apple
+certificate. The public half is in `tauri.conf.json`; the private half and
+its password are repository secrets:
+
+| Secret | Value |
+| --- | --- |
+| `TAURI_SIGNING_PRIVATE_KEY` | The contents of `~/.tauri/lv-notes-updater.key` |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | The contents of `~/.tauri/lv-notes-updater.password` |
+
+**Back both files up in a password manager.** If the private key is lost,
+installed apps will refuse every future update, and everyone has to
+reinstall by hand once from a build with a new public key. Without the
+secrets the workflow still builds the `.dmg`, with a warning, but no update
+bundle, so installed apps aren't offered that release.
 
 CI (`.github/workflows/ci.yml`) runs the same tests on every push to
 `main`, so a tag on a green commit should build.

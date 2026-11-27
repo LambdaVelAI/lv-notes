@@ -152,6 +152,17 @@ export interface Backend {
   onChange(listener: (change: Change) => void): void;
   /** Runs `task` (e.g. a final save) before the window closes. */
   beforeClose?(task: () => Promise<void>): void;
+  /** A newer published release, or null if this is the latest. Absent where there is no updater. */
+  checkForUpdate?(): Promise<Update | null>;
+}
+
+/** A newer release the app can install. */
+export interface Update {
+  version: string;
+  /** The release notes, as Markdown. */
+  notes: string;
+  /** Downloads and installs it, then restarts the app. */
+  install(): Promise<void>;
 }
 
 const FILTERS = [{ name: "lv-notes project", extensions: ["lv"] }];
@@ -218,6 +229,22 @@ async function tauriBackend(): Promise<Backend> {
     beforeClose(task) {
       // The window closes once the handler's promise settles.
       void getCurrentWindow().onCloseRequested(() => task().catch(console.error));
+    },
+    async checkForUpdate() {
+      // The updater fetches latest.json from GitHub Releases and checks the
+      // download against the public key in tauri.conf.json.
+      const { check } = await import("@tauri-apps/plugin-updater");
+      const update = await check();
+      if (!update) return null;
+      return {
+        version: update.version,
+        notes: update.body ?? "",
+        async install() {
+          await update.downloadAndInstall();
+          const { relaunch } = await import("@tauri-apps/plugin-process");
+          await relaunch();
+        },
+      };
     },
   };
 }

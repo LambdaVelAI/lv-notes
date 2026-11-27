@@ -280,7 +280,10 @@ pub fn app_in<R: Runtime>(builder: tauri::Builder<R>, config_dir: &Path) -> taur
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    app(tauri::Builder::default())
+    // The updater reads `plugins.updater` from the bundled config, so it is
+    // registered here rather than in `commands`, which tests build without it.
+    let builder = tauri::Builder::default().plugin(tauri_plugin_updater::Builder::new().build()).plugin(tauri_plugin_process::init());
+    app(builder)
         .run(tauri::generate_context!())
         .expect("error while running lv-notes");
 }

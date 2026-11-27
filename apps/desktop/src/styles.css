@@ -114,6 +114,9 @@ button.icon { border: none; background: transparent; padding: 0 6px; font-size: 
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.update { margin: 0 10px 8px; padding: 5px 8px; font-size: 12px; color: var(--accent); background: var(--accent-soft); border: 1px solid transparent; border-radius: 6px; text-align: left; }
+.update:hover { border-color: var(--accent); }
+.update:disabled { opacity: 0.7; }
 .sidebar-footer { display: flex; gap: 6px; padding: 8px 10px 12px; border-top: 1px solid var(--line); }
 .sidebar-footer button { flex: 1; font-size: 12px; padding: 3px 6px; background: transparent; }
 .menu {
